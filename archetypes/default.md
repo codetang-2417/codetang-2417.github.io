@@ -4,7 +4,7 @@ date: {{ .Date }}
 lastmod: {{ .Date }}
 author: ["Ling"]
 keywords:
--
+- hugo
 categories: # 没有分类界面可以不填写
 -
 tags: # 标签
@@ -13,7 +13,7 @@ description: ""
 weight:
 slug: ""
 draft: true # 是否为草稿
-comments: true # 本页面是否显示评论
+comments: false # 本页面是否显示评论
 reward: false # 打赏
 mermaid: true #是否开启mermaid
 showToc: true # 显示目录

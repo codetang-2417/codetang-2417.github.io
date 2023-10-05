@@ -71,7 +71,7 @@ outputs:
 
 params:
     env: production # to enable google analytics, opengraph, twitter-cards and schema.
-    # description: "这是一个纯粹的博客......"
+    description: "ling的个人博客，hugo,manjaro,c++,单片机，qemu"
     author: Linglong
     # author: ["Me", "You"] # multiple authors
     defaultTheme: auto  # defaultTheme: light or  dark
