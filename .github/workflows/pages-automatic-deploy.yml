@@ -24,7 +24,7 @@ jobs:
         run: hugo
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-main@v3
         with:
           github_token: ${{ secrets.HUGO_BUILD }}
           publish_dir: ./public
