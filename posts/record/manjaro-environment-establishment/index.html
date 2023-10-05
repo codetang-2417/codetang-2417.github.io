@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Manjaro Environment Establishment | Linglong&#39;s Blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="时间：2023/9/14/10:42 本文档旨在记录安装完成manjaro系统后，对系统开发和使用环境的配置，不介绍安装部分。manjaro的">
+<meta name="author" content="ling">
+<link rel="canonical" href="/posts/record/manjaro-environment-establishment/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.883140677c3d86d46338150cbbd783ea709d45fec4ff4842b0d3c982d274c920.css" integrity="sha256-iDFAZ3w9htRjOBUMu9eD6nCdRf7E/0hCsNPJgtJ0ySA=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="img/Q.gif">
+<link rel="icon" type="image/png" sizes="16x16" href="img/Q.gif">
+<link rel="icon" type="image/png" sizes="32x32" href="img/Q.gif">
+<link rel="apple-touch-icon" href="Q.gif">
+<link rel="mask-icon" href="Q.gif">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="Manjaro Environment Establishment" />
+<meta property="og:description" content="时间：2023/9/14/10:42 本文档旨在记录安装完成manjaro系统后，对系统开发和使用环境的配置，不介绍安装部分。manjaro的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/record/manjaro-environment-establishment/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-10-04T13:29:11+08:00" />
+<meta property="article:modified_time" content="2023-10-04T13:29:11+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Manjaro Environment Establishment"/>
+<meta name="twitter:description" content="时间：2023/9/14/10:42 本文档旨在记录安装完成manjaro系统后，对系统开发和使用环境的配置，不介绍安装部分。manjaro的"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "文章",
+      "item": "/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "🥝踩坑记录",
+      "item": "/posts/record/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "Manjaro Environment Establishment",
+      "item": "/posts/record/manjaro-environment-establishment/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Manjaro Environment Establishment",
+  "name": "Manjaro Environment Establishment",
+  "description": "时间：2023/9/14/10:42 本文档旨在记录安装完成manjaro系统后，对系统开发和使用环境的配置，不介绍安装部分。manjaro的",
+  "keywords": [
+    
+  ],
+  "articleBody": "时间：2023/9/14/10:42\n本文档旨在记录安装完成manjaro系统后，对系统开发和使用环境的配置，不介绍安装部分。manjaro的安装很人性化，不需要对分区作任何特殊操作，只需要按照使用场景选择对应的模式即可。\n系统环境：\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17    ~  screenfetch  ✔  13s  ██████████████████ ████████ ling@ling-s1series ██████████████████ ████████ OS: Manjaro 23.0.1 Uranos ██████████████████ ████████ Kernel: x86_64 Linux 6.5.1-1-MANJARO ██████████████████ ████████ Uptime: 2h 27m ████████ ████████ Packages: 1254 ████████ ████████ ████████ Shell: zsh 5.9 ████████ ████████ ████████ Resolution: 3840x1080 ████████ ████████ ████████ DE: KDE 5.109.0 / Plasma 5.27.7 ████████ ████████ ████████ WM: KWin ████████ ████████ ████████ GTK Theme: Breeze [GTK2/3] ████████ ████████ ████████ Icon Theme: Ant-Dark ████████ ████████ ████████ Disk: 43G / 453G (10%) ████████ ████████ ████████ CPU: Intel Core i5-8250U @ 8x 3.4GHz [75.0°C] ████████ ████████ ████████ GPU: NVIDIA GeForce MX150 RAM: 6545MiB / 7826MiB 另一台机器：\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20    ~  neofetch  ✔ ██████████████████ ████████ ling@ling-20ym ██████████████████ ████████ -------------- ██████████████████ ████████ OS: Manjaro Linux x86_64 ██████████████████ ████████ Host: 20YM Lenovo ThinkBook 16p Gen 2 ████████ ████████ Kernel: 6.5.3-1-MANJARO ████████ ████████ ████████ Uptime: 21 hours, 34 mins ████████ ████████ ████████ Packages: 1366 (pacman) ████████ ████████ ████████ Shell: bash 5.1.16 ████████ ████████ ████████ Resolution: 1920x1080, 2560x1600 ████████ ████████ ████████ DE: Plasma 5.27.8 ████████ ████████ ████████ WM: KWin ████████ ████████ ████████ WM Theme: WhiteSur-Sharp ████████ ████████ ████████ Theme: [Plasma], Breeze [GTK2/3] ████████ ████████ ████████ Icons: [Plasma], WhiteSur [GTK2/3] Terminal: konsole CPU: AMD Ryzen 7 5800H with Radeon Graphics (16) @ 4.463GHz GPU: NVIDIA GeForce RTX 3060 Mobile / Max-Q GPU: AMD ATI Radeon Vega Series / Radeon Vega Mobile Series Memory: 15568MiB / 23392MiB 安装软件screenfetch，neofetch即可命令行展示出上述信息。\n配置镜像源 1 sudo pacman-mirrors -c China -i -m rank 命令执行后会弹出一个 UI 框来让你选择，默认速度最快的排在第一个（这里选择清华大学tsinghua的源）,然后点击“OK”，再次单击“确定”即可选择好最快的源。\n​ ​\n打开终端输入以下命令，查看是否将源更改成功\n1 kate /etc/pacman.d/mirrorlist 这句命令使用KDE自带的文本编辑器kate来编辑/etc/pacman.d/mirrorlist这个文件。这个文件中保存的就是pacman会使用的软件源地址。打开后会看到如下内容：\n​ ​\n然后更新一下软件仓库：\n1 sudo pacman -Syyu 加入archlinuxcn源 在命令行中使用kate打开/etc/pacman.conf。也就是执行命令\n1 kate /etc/pacman.conf 打开文件后拖到最下方，并且加入如下内容：\n1 2 3 4 [archlinuxcn] Server = https://mirrors.bfsu.edu.cn/archlinuxcn/$arch Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch Server = https://mirrors.sjtug.sjtu.edu.cn/manjaro/stable/$repo/$arch 然后更新\n1 sudo pacman -Syy \u0026\u0026 sudo pacman -S archlinuxcn-keyring 安装 yay Manjaro 上默认使用的包管理工具是 pacman，但是这个工具不支持 AUR 软件仓库。AUR 全称是 ArchLinux User Repository，他是由社区驱动的软件仓库， 属于不受支持的软件仓库（unsupported）.但却是 Arch 社区最有活力的仓库，基本上你想要的软件可能官方源里面没有，但是这里面肯定有。yay 是对 pacman 的一个封装，使用上和 pacman 没有什么差别，但是它支持 AUR。注：yaurt已经过时，不建议安装。\n1 sudo pacman -S yay 查看一下软件源:\n1 yay -P -g 这里查询得到的数据应当是aur官方软件源，以前的教程都会让添加一些国内的aur源，但是现在已经不行了。\n国内已经不支持AUR的镜像源了：清华关于移除 AUR 镜像的通知\n因此更换镜像源后，也不能正常工作，会报错，下列方法也会报错，因此建议不更改官方软件源。aur官方源目前可以访问，但速度很慢，yay上的一些软件是通过aur官方源进行安装的，需要访问外网，因此需要先安装V2ray服务。\nManjaro如果yay使用了aur的清华源,出现报错，解决方法\n​ ​\n1 2 3 4 -\u003e Error during AUR search: 1 error occurred: * request failed: Get \"https://aur.tuna.tsinghua.edu.cn/rpc?arg=fcitx-\u0026by=name-desc\u0026type=search\u0026v=5\": dial tcp: lookup aur.tuna.tsinghua.edu.cn: no such host 或者 response decoding failed: invalid character '\u003c' looking for beginning of value; 安装完成后再次更新\n1 yay -Syyu \u0026\u0026 yay -Sys 安装输入法 因为搜狗拼音现在还依赖着Fcitx-qt4，而这个包现在已经被官方源废除。而搜狗很久都没有迁移到qt5，所以现在Fcitx-sogoupinyin这个包也从官方仓库移除了。目前没法通过官方安装搜狗拼音。\n2023.9.16在搜索pinyin安装包时（谷歌搜拼音并不好用），突然发现基于fcitx5​的安装包fcitx5-pinyin-sougou​，但该包不能正确安装。因此，替换原来的谷歌拼音。过程如下\n搜狗拼音 参考链接：Manjaro安装Fcitx5中文输入法\n由于之前已经安装了fcitx4​，而fcitx5​与其冲突，因此需要先卸载：sudo pacman -Rs $(pacman -Qsq fcitx)​\n安装fcitx5 1 sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color kcm-fcitx5 fcitx5-lua 由于这里复制出错，导致没有正确退出pacman程序，其进程锁没有正常释放，因此，需要手动删除锁，参考链接： Manjaro使用pacman提示无法锁定数据库。（注：该链接的environment配置有误）\n其实报错信息也给出提示​ ​\n删掉之前的文件： /var/lib/pacman/db.lck​。sudo rm /var/lib/pacman/db.lck​。就正常了。关于主题部分就不进行配置了，默认的即可。\n还有一点，和谷歌拼音对输入法的配置一样，也需要加入环境变量。\n配置environment 1 kate /etc/environment 将下面的内容添加到其中，原因为environment在所有用户登陆时都有效。\n1 2 3 4 5 GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx XMODIFIERS=@im=fcitx INPUT_METHOD=fcitx SDL_IM_MODULE=fcitx 如果不进行环境的配置，那么重启之后不能正常切换输入法，也就不能输入中文。\n配置输入法 中文输入法插件的名称为Pinyin,这是在开发者的仓库中发现的，否则不清楚名称，无法确定哪一个是我们安装的，就不能添加到配置中使用。原仓库链接\n​ 添加Pinyin\n​ ​\n添加成功后可以看到\n​ ​\n如果正确配置了仍然不能切换出想要的输入法，可以查看Group是否正常切换。默认的应该有两个Group，所有很可能是Group不正确。\n​ ​\n谷歌拼音 所以直接安装谷歌拼音。manjaro Linux，有什么较为简单的方法，可安装中文输入法? - 知乎用户0C8Unl的回答 - 知乎\n1 2 3 sudo pacman -S fcitx-im yay -S fcitx-configtool yay -S fcitx-googlepinyin KDE 或者其他桌面配置:\n输入kate ~/.xprofile或nano ~/.xprofile 并且加入如下内容（也可以按照上一节的environment添加）:\n1 2 3 4 5 export GTK_IM_MODULE=fcitx export QT_IM_MODULE=fcitx export XMODIFIERS=@im=fcitx 配置好了之后要注销或者重启一下才可以生效;\n第一个输入法需设置为键盘格式。\n重启后，在下面的状态栏中找到键盘图标\n​ ​\n然后进入配置（Configure），点击加号，通过搜索，找到谷歌拼音，并添加到输入法中。然后就可以通过ctrl​+shfit​切换输入法了。\n​ 需要注意：在输入密码时，如果仍然处于中文输入法的话，会按照中文字符进行输入。\n安装输入法后，使用shfit无法切换输入法，需要在fcitx中的全局设置中，增加切换激活/非激活输入法快捷键\n​ ​\n参考链接：安装google输入法后，左shift键不能切换中英文\n安装软件 timeshift 强大好用的备份、回滚系统工具。装好Manjaro必须要做timeshift，以防你哪天玩坏只能重装\n1 yay -S timeshift 关于这个软件的使用，详见另一篇：\n建议：不要在不同的电脑上通过timeshift进行备份迁移，我已经尝试过，能够进入系统，但是应该是由于驱动不适配，最后无法进入系统，只能在登陆界面反复登陆。\n思源笔记 本地储存优先的笔记软件，支持markdown,也支持云同步，但主要内容都是先存放在本地，不需要放在任何云端。\n1 yay -S siyuan-note-bin qq 目前qq已经原生支持linux\n1 yay -S linuxqq qq运行一段时间后闪退，甚至刚刚登陆上就闪退。在AUR论坛中找到问题及解决方案：aur.archlinux.org\n​ ​\n在关机时若未主动退出qq，重启后会导致闪退。手动移除 ~/.config/QQ/crash_files​ 文件夹可以解决问题。\n另在v2ex论坛中，也找到了解决方案，并且可以解决重复删除文件夹的问题，在删除crash_files​中的内容后，将该文件夹设置为只读。\n​ ​\n参考：[求助] Linux 下 QQ 闪退问题\nqq音乐 1 yay -S qqmusic-bin Chrome谷歌浏览器 1 yay -S google-chrome Watt Toolkit：Steam++ 不使用代理就可以访问github或者steam。与科学上网不同，仅仅能够访问一些常见的但没有被ban的网站。安装此软件主要是为了在安装科学上网环境之前能够正常访问github，便于我们下载源码进行安装。\nWatt Toolkit是一个本地通过反向代理实现的访问github等常见的网站的工具，其优势就是访问网站的速度和不使用代理一样。而科学上网的网速需要看代理服务器的速度。\n1 yay -S watt-toolkit-bin 安装后启动，勾选github进行加速\n​ ​\n启动时会转到浏览器，要求先做一些操作：\n利用火狐浏览器导入证书\n​ ​\n‍\n证书文件在/home/ling/.local/share/Steam++/Plugins/Accelerator/SteamTools.Certificate.cer​，其中ling为用户根目录。\n然后输入命令sudo trust anchor --store SteamTools.Certificate.cer​，没有尝试过不输入，输入后启动正常工作。\n​ 需要输入命令sudo chmod a+w /etc/hosts​​，避免每次输入密码\n​ ​\n如果只安装火狐浏览器，可能导入了证书也用不了（当前版本），因此需要安装Chrome，参见上一节Chrome浏览器安装。\n如果还不行，则在开始加速以前，点击右边的刷新按钮，显示加速成功即可。\n‍\nvscode 1 yay -S visual-studio-code-bin ‍\nclion 1 yay -S clion 有问题，提示没有java环境\n​ ​\n根据官方论坛的回答，需要安装两个依赖，Can’t open CLion\n1 yay -S java-runtime clion-jre flameshot-截屏软件 ‍\n1 yay -S flameshot 需要在设置中找到快捷键设置，将flameshot添加到快捷键中，然后设置对应的快捷键。\n​ 需要注意点是，linux下的截屏并不能对右键菜单进行截屏，即使通过快捷键。因此需要利用延时截屏的功能。flameshot的延时截屏需要通过Open launcher​然后进行截屏。\n​ ​\n点击后就会出现窗口，选择延时的时间。\n​ 然后就可以实现截屏右键。参考：Ubuntu 中如何对右键菜单进行截图\n​ ​\n‍\ncmake 1 yay -S cmake clash for windows 1 yay -S clash clash-for-windows-bin free节点仓库\n1 https://github.com/xrayfree/free-ssr-ss-v2ray-vpn-clash 参考链接：blog.linioi.com/posts/cl…\nmanjaro下的系统代理和其他发行版不同，设置系统代理后，仍然有部分程序不会通过系统代理上网。比如火狐浏览器，chrome浏览器。\n因此对于在浏览器中的科学上网，需要分别在两个浏览器中设置代理服务器的地址。\nFireFox 在设置中，General -\u003e Network Settings中，进行设置，一般设置为Manual，也就是手动设置代理。\n​ ​\nChrome Chrome没有代理网络设置，需要在启动文件中增加启动参数\n参考链接：在Linux上为Google Chrome配置代理设置\n​ ​\n右键Chrome图标，选择Edit Application...​编辑启动参数，增加--proxy-server=127.0.0.1:7890​，这是clash的代理地址，可以根据自己的代理软件进行设置。\n​ ​\napplication的源文件地址有两个，一个是菜单栏的地址/home/ling/.local/share/applications/google-chrome.desktop​​，一个是程序安装后的地址/usr/share/applications/google-chrome.desktop​​。\n为了使用方便，建立两个Chrome的desktop文件，都放在usr下的文件目录里，在应用程序的启动菜单里就会自动分类。需要使用哪一个就启动哪一个。但需要注意，chrome关闭后是最小化在状态栏，需要手动关闭后再打开新的chrome，否则不会刷新程序。\nmake 1 yay -S make todesk远程软件 1 yay -S todesk-bin 注意，不要安装todesk​，而是安装todesk-bin​，前者不是最新版本。\n安装完成后，会提示开启守护进程，否则将不能正常使用该软件。守护进程类似于windows中的服务。\n​ ​\n1 systemctl start todeskd.service windows字体安装 参考链接：manjaro踩坑记(2022更新版)\nAUR提供了ttf-ms-win10的安装包，不过不提供字体文件，需要自己从已有的win10系统（拷贝所有C:\\Windows\\Fonts下的字体文件）或从win10镜像中抽取字体文件。\n安装字体有缺陷\n​ ​\n​ 图标符号显示为方块，这是由于konsole的默认配置文件中并没有对字体做限制，因此，显示的字体会随着系统全局使用的字体而改变。只要在字体设置中，改变对应位置的字体为支持manjaro的图标的字体即可。\n在Manjaro官方论坛得知，使用的字体为MesloLGS。可以通过命令行安装（一般已经安装了，只是没有启用，如果你在系统的字体管理中没有发现该字体，则需要手动安装）\n1 yay -S ttf-meslo-nerd-font-powerlevel10k 然后在系统设置-\u003e外观-\u003e字体-\u003e固定宽度，将其字体更改为MesloLGS即可。然后重启konsole,就可以看到图标显示正常了。\n​ ​\n直接拷贝 由于本作者使用的是双系统下的manjaro，因此我可以直接从windows的c盘直接拷贝字体文件。\n首先从AUR克隆tff-ms-win10仓库：\n1 2 3 cd ~/Desktop # 进入用户目录下的桌面 mkdir -p build \u0026\u0026 cd build # 在桌面建立build文件夹 git clone https://aur.archlinux.org/ttf-ms-win10.git 修改ttf-ms-win10仓库中的PKGBUILD如下段落，添加的字体文件表示仿宋、黑体和楷体：\n1 2 3 4 5 6 7 _ttf_ms_win10_zh_cn=( simsun.ttc simfang.ttf simhei.ttf simkai.ttf # 增加这行内容 simsunb.ttf msyh.ttc msyhbd.ttc msyhl.ttc 然后将windows的​ C:\\Windows\\Fonts​下面的所有文件拷贝到桌面的build​文件夹中。再拷贝license文件（C:\\Windows\\System32\\Licenses\\neutral\\_Default\\Professional\\license.rtf​）到桌面的build​文件夹中。\n最后在ttf-ms-win10目录下执行安装命令，注意如果报错，大概率是当前抽取的字体文件中没有该字体，可以按照错误提示从网上下载ttf文件加入其中，或者在PKGBUILD里删掉该字体，毕竟只有中文字体比较重要：\n1 makepkg -sic --skipchecksums 从win10镜像中抽取字体文件 注：以下方法作者并没有尝试过\n挂载win10安装镜像，manjaro下只需要右键选择挂载ISO，Dolphin的左边即可出现ISO的访问文件路径，找出source文件夹下的install.esd或install.wim文件，把该文件拷贝到ttf-ms-win10仓库文件夹下，执行如下命令解锁所有字体文件：\n1 wimextract install.esd 1 /Windows/{Fonts/\"*\".{ttf,ttc},System32/Licenses/neutral/\"*\"/\"*\"/license.rtf} --dest-dir . 其余步骤与直接拷贝相同。\n网易云音乐-微信安装总结 在本文中，将提到许多中安装微信的方法，包含windows原生版本的微信、经过deepin打包的wine版本的微信、对spark商店中微信打包版本的微信等。网易云音乐现在只推荐使用基于deepin-wine/wine-for-wechat联合版本的windows直装版。具体的原因在后面两者的详细安装步骤中会解释。如果只希望安装这两个软件，则可以跳过后面的详细安装介绍章节，直接运行下列命令：\n1 2 3 4 5 yay -S dh-autoreconf # manjaro下需要手动安装deepin的依赖 yay -S deepin-wine-wechat # deepin版本的微信 sudo pacman -S wine-for-wechat yay -S com.qq.weixin.spark # 微信 wine NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe # 网易云音乐，NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe是在官网下载的windows安装包 这里安装了两个版本的微信，但其数据互通，微信的数据文件都在～/Documents/WeChat Files​中。为了微信功能的完整性，请先打开deepin微信，然后关闭。再打开spark版本的微信，此时spark版本的微信所有功能都可以使用。注：如果出现中文字体变成方块字等显示问题，建议参考本文中的windows字体安装部分。\ndeepin版本的启动入口在：\n​ ​\n第一次启动需要安装，安装后点立即打开会崩溃，但再次启动微信就正常了。\nspark版本的启动入口在：\n​ ​\n同样第一次启动需要安装\n​ 在deepin版本的微信安装后，再安装spark版本的微信，则订阅号相关的功能就会变正常。如果只安装deepin版本，或者只安装spark版本的微信，打开这些界面会黑屏或者不显示。\n​ ​\n网易云音乐直接打开安装即可，所有功能全部正常。\n微信 deepin版本的微信 直接安装deepin-wine-wechat​失败，提示有三个包不能直接安装，其中一个是deepin-wine6-stable​，错误原因是系统找不到autoreconf​，这个软件直接搜索是没有的，因为是在debian系linux才有，但是仍然通过yay搜索得到dh-autoreconf​，其说明表示这是deb的helper，能帮助添加autoreconf​。因此安装这个包。\n1 yay -S dh-autoreconf 安装后，再安装微信\n1 yay -S deepin-wine-wechat 但这个版本的wechat不能登录，扫码登录后，会要求输入安全码，但是linux上并没有输入窗口，因此废弃这个版本。但这个版本的wine对于后续的网易云安装是必须的！因此一定要先安装deepin版本的微信！但这个版本的wine对于后续的网易云安装是必须的！因此一定要先安装deepin版本的微信！但这个版本的wine对于后续的网易云安装是必须的！因此一定要先安装deepin版本的微信！\nuos版本的微信 uos的桌面版本只有最基本的聊天功能。yay -S wechat-uos​。不推荐安装。\n直接安装微信 需要使用wine模拟windows的应用层，然后就像在windows中安装软件一样。\n1 sudo pacman -S wine-for-wechat wine-wechat-setup # wine-wechat-setup可以不安装 其中wine-for-wechat​​是对微信和网易云专门做了修改的wine版本，wine-wechat-setup​​是对wine-for-wechat​​​​的安装和启动写了一个封装。只要有wine-for-wechat​​就可以安装，wine-wechat-setup​​会让安装过程更方便。\n安装成功后，需要去官网下载最新版本的微信，然后运行下列命令，在安装之前，需要先((20230916200607-hootjp8 “安装字体”))。\n这里需要说明的，wine-wechat-setup​会给微信单独文件夹安装，如果安装了wine-wechat-setup​则使用下面的命令进行安装：\n1 wechat -i WeChatSetup.exe 否则，使用下面的安装：\n1 wine WeChatSetup.exe 其中WeChatSetup.exe为下载下来的安装包。注意（微信版本3.9.7，wechat-setup版本1.4）64位的安装包会有聊天框白框的问题，因此选择安装32位的包（WeChatSetup_x86.exe）。注意：这里仅仅针对的是没有提前安装deepin版本的情况，如果提前安装了deepin版本的微信，则无论哪个包都会有白框！如果需要直装，则不能安装deepin版本，这样的后果是网易云音乐无法正确使用！\n另外还有中文字符显示方框的问题，这个问题比较简单，但解决的方式有很多，大部分不一定有用。目前的解决方式参见本文中的windows字体安装部分。\n在官方仓库的issues中：wechat相关问题。这里提到的大部分解决字体的方法不适用于目前的版本。请不要在这上面浪费时间，直接使用上面的windows字体安装。如果不按照上面的方法，则下面的步骤也可以正常解决问题，但数字、英文部分的排版会很奇怪。\n安装字体 1 2 3 4 5 6 yay -S ttf-ms-fonts sudo pacman -S ttf-roboto noto-fonts ttf-dejavu sudo pacman -S wqy-bitmapfont wqy-microhei wqy-microhei-lite wqy-zenhei sudo pacman -S noto-fonts-cjk adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts yay -S ttf-ms-fonts 安装字体后再安装微信，就没有方框问题了，不需要修改注册表，以及复制字体到wine环境。\n由于其有一些使用上的小问题，最终选择spark版本的微信。\nspark版本的微信 安装spark商店版本的微信：yay -S com.qq.weixin.spark​。spark版本的可用，且功能完善。\n与直装的方式的微信比较以后，发现直装的字体虽然能显示，但是数字以及一些字体很怪。但是直装方式可以安装网易云音乐。spark版本的微信需要用到wine（deepin-wine-wechat​提供了魔改的wine），只要有wine即可。为了后续的网易云音乐安装，需要先安装deepin-wine-wechat​。因为deepin-wine-wechat​包含了网易云音乐所需要的显示库gdiplus.dll​。但只有deepin-wine-wechat​还不够，因为只安装deepin-wine-wechat​不会提供wine命令，就不能够通过wine安装网易云音乐的安装包了。所以还需要安装wine-for-wechat​。网易云音乐的流程见网易云音乐章节。\n1 2 sudo pacman -S wine-for-wechat yay -S com.qq.weixin.spark spark版本的入口为：\n​ ​\n修改缩放的方式如下，参考链接：com.qq.weixin.spark\n​ ​\n由于我目前使用的屏幕为1080p，不需要修改dpi。直接修改文件中的值为1就行。\n总结 最终选择spark版本的微信，功能完善，不需要修复任何问题，开箱即用。但需要注意的是，要先通过直装方式安装，因为网易云音乐需要前面的环境。\n网易云音乐 经过反复的尝试，原生的网易云音乐已经不能够正常登陆了，详情见：发现Ubuntu网易云音乐几乎不能用了。因此，之前通过官方的linux版本已经无法使用。而其他的第三方客户端，都是基于网页版的网易云音乐作适配，而网页版的功能很少，像心动模式就没有。在本文中安装微信的一节中提到，可以通过直装的方式进行安装，并且要先安装deepin-wine-wechat​和wine-for-wechat​。\n先去官网下载安装包到本地。然后通过wine​命令安装网易云，通过wechat​命令安装也可以，但是没有快捷启动。因此直接通过wine​安装。\n1 2 3 yay -S deepin-wine-wechat sudo pacman -S wine-for-wechat wine NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe 原因及解释：deepin的wine有原装的gdiplus库，但安装deepin的wechat并不会给wine的调用接口，因此无法通过wine命令安装网易云音乐。当安装wine-for-wechat后，不会修改原来的wine文件夹，仅仅是提供wine命令。这一步其实没有安装新的wine。然后就可以直接安装网易云音乐的包，就可以正常运行网易云！\nV2ray 也是一种科学上方式，由于clash在manjaro上的体验不好，不能停止代理，以及代理效果不好。故使用v2ray协议进行科学上网。\nv2ray也有GUI配置，只需要安装两个软件即可\n1 yay -S v2ray v2raya 运行v2raya的服务，否则无法使用 1 2 sudo systemctl start v2raya.service #启动 v2rayA sudo systemctl enable v2raya.service 设置开机自动启动 参考链接：V2rayA在linux 下安装使用教程\n开始设置 通过 2017 端口 如 http://localhost:2017访问 UI 界面。\n（如果无法访问，请检查你的服务是否已经启动，相关问题）\n官方教程：官方教程\n创建账号 在第一次进入页面时，你需要创建一个管理员账号，请妥善保管你的用户名密码，如果遗忘，使用sudo v2raya --reset-password​命令重置。\n然后导入节点\nfree节点仓库\n1 https://github.com/xrayfree/free-ssr-ss-v2ray-vpn-clash 按照其中的方式连接，即可正常科学上网。比起clash好用的多。可以自动代理，自己选择代理方式等。不需要对浏览器单独配置。\n对于v2raya的设置，可能需要按照下面进行设置\n​ ​\nwps-office 1 yay -S patch wps-office wps-office-mui-zh-cn ttf-wps-fonts WPS加粗字体显示错误，显示成一团黑 解决方案：Wps很多字体的加粗都显示异常的问题。如图：\n​ ​\n降级 freetype2 (2.13.2-1 → 2.13.0-1) 即可解决问题\n如果是更新包后，出现问题，则系统应该会保留旧包的缓存，可以直接执行\n1 sudo pacman -U /var/cache/pacman/pkg/freetype2-2.13.0-1-x86_64.pkg.tar.zst 如果提示包不存在，则说明缓存被清理，或者以前没有安装过旧版。\n​ ​\n需要去官方备份下载旧版本，手动安装。官方备份网站：归档\n​ ​\nobs-studio 录屏软件 1 sudo pacman -S obs-studio 目前最新版为obs-studio 29.1.3-1​，这个版本改进了 VAAPI H264 支持，并使用Nvidia的驱动程序libva-vdpau-driver​，但这个程序已经很久没有改进了，是这个驱动的问题导致obs启动崩溃。\n解决方案：卸载libva-vdpau-driver​，yay -R libva-vdpau-driver​，如果实在需要硬件加速，则应安装现在官方活跃的驱动版本：sudo pacman -S nvidia-vaapi-driver ​​，这是一个仍在活跃的改进版：nvidia-vaapi-driver。\n参考链接：OBS 29 linux 启动时崩溃分段错误\n开机自启动 参考链接：Manjaro添加软件或者脚本自启动\n将需要启动的软件的desktop​文件或者脚本放在~/.config/autostart 文件夹下，开机会自动加载。\n​ ​\n针对开机自启动，linux有一套自己的方法，而manjaro又有一套不同的流程。\n上述方式是最简单的一种。参考链接：Manjaro开机自启动脚本实现，Linux开机流程整理\n在linux内核加载完成后，会启动初始化程序，也就是第一个程序 /sbin/init​，作用是初始化系统环境，它的进程编号（pid）就是1。其他所有进程都从它衍生，都是它的子进程。\n许多程序需要开机启动。它们在Windows叫做”服务”（service），在 Linux 就叫做”守护进程”（daemon）。init 进程的一大任务，就是去运行这些开机启动的程序。但是，不同的场合需要启动不同的程序，比如用作服务器时，需要启动 Apache，用作桌面就不需要。Linux 允许为不同的场合，分配不同的开机启动程序，这就叫做”运行级别”（run level）。也就是说，启动时根据”运行级别”，确定要运行哪些程序。manjaro的默认的 init​ 程序是systemd​-sysvcompat​提供的/sbin/init​(新安装的系统已经默认使用systemd​) 或 sysvinit。\nLinux预置七种运行级别（0-6）。基本上，依据有无网络与有无 X Window ，Linux 将 run level 划分为7个等级（0-6）。其中0是关机，1是单用户模式，6是重启。而 2-5，一般来说都是多用户模式。\n每个运行级别在/etc目录下面，都有一个对应的子目录，指定要加载的程序。即rc0.d到rc6.d目录,其中存放的是该运行级别中需要执行的服务脚本的 软链接文件（即快捷方式） 。而真正的脚本文件,都存放在etc/init.d 中(结尾为d,即为direction,与init作为区分 )这样做的另一个好处，就是如果你要手动关闭或重启某个进程，直接到目录 /etc/init.d 中寻找启动脚本即可。然而在manjaro中并没有发现以上两个文件，arch系列是有着自己的另一套启动方式。\n网络上的方法大部分是在启动初始化程序时做做手脚，而manjaro发行版早已经弃用了这种模式,转而采用了systemd，以下是用ArchWiki查找init时的原话:\nWarning: Arch Linux only has official support for systemd. When using a different init system, please mention so in support requests.\n所以在manjaro的/etc目录下并没有init文件夹和init.d文件夹。\nsystemd systemd的文件主要存放在/usr/lib/systemd 目录中,有系统（system）和用户（user）之分。关于这部分内容，还有更多的细节，该文件并不是唯一的管理服务的文件。详见：\n/usr/lib/systemd/system/ #开机不登陆就能运行\n/usr/lib/systemd/user/ #登陆后运行\n每一个服务以.service结尾，文件内一般会分为3部分：[Unit]、[Service]、[Install]\n[Unit] 主要是对这个服务的说明，内容包括Description和After，Description用于描述服务，After用于描述服务类别\n[Service] 是服务的关键，是服务的一些具体运行参数的设置\nType=forking是后台运行的形式，\nPIDFile为存放PID的文件路径，\nExecStart为服务的具体运行命令，\nExecReload为重启命令，\nExecStop为停止命令，\nPrivateTmp=True表示给服务分配独立的临时空间\n注意：[Service]部分的启动、重启、停止命令全部要求使用绝对路径，使用相对路径则会报错！\n[Install] 是服务安装的相关设置，可设置为多用户的\n步骤 以远程软件todesk的守护进程为例\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 [Unit] Description=ToDesk Daemon Service After=network-online.target Before=nss-lookup.target Wants=network-online.target nss-lookup.target [Service] Environment=\"LIBVA_DRIVER_NAME=iHD\" Environment=\"LIBVA_DRIVERS_PATH=/opt/todesk/bin\" ExecStart=/opt/todesk/bin/ToDesk_Service ExecStop=/bin/kill -SIGINT $MAINPID Restart=on-failure RestartSec=3s User=root [Install] WantedBy=multi-user.target 将服务自启动\n1 systemctl enable todeskd.service 重启后利用systemctl status查看todeskd.service的运行状态。\n​ ​\n1 2 3 4 5 6    ~  systemctl status | grep todesk  ✔  11s  │ ├─todeskd.service │ │ └─507 /opt/todesk/bin/ToDesk_Service │ │ └─19388 grep todesk │ ├─app-todesk@autostart.service │ │ └─1160 /opt/todesk/bin/ToDesk 每一个 Unit 都有一个配置文件，告诉 Systemd 怎么启动这个 Unit 。Systemd 默认从目录/etc/systemd/system/​读取配置文件。但是，里面存放的大部分文件都是符号链接，指向目录/usr/lib/systemd/system/​，真正的配置文件存放在那个目录。​systemctl enable​命令用于在上面两个目录之间，建立符号链接关系。\n可以将/etc/systemd/system/​看作是自动目录，和~/.config/autostart​目录作用的形式差不多，只要是这个文件夹中的脚本就会自动运行。因此需要将真实的脚本链接到这个文件夹中。\n详细的关于systemd的介绍参考：Systemd 入门教程：命令篇\n参考链接：Manjaro开机自启动脚本实现\n修改KDE的Applications Menu 我使用的是KDE桌面系统的Manjaro，在安装软件时，会创建desktop文件，用于快速启动应用。这个文件会放在/home/ling/.local/share/applications​下，更多的是放在/home/ling/.local/share/applications​中，wine的程序比较特殊，被放在了文件夹wine中。但我们不需要掌握这一套规则，可以直接使用GUI程序对菜单进行修改。\n右键菜单图标，选择编辑应用（Edit Applications…）\n​ 进入到编辑菜单栏后，就可以按照需求，拖动应用程序，或者新增对应的destop文件即可。\n​ ​\n‍\n更换主题 在主题商店中安装全局主题 kde桌面有很强的定制性，可以在主题商店中安装各种各样的主题。但目前这个版本的kde（KDE 5.109.0 / Plasma 5.27.7），在安装全局主题时，会有如下报错：\n​ ​\n上述问题提示是由于依赖问题导致的安装失败，而网络上的大部分帖子都提到这这是kde的官方仓库问题。还有推荐ocs-url​进行安装主题的，但是这种方式要求在网页下载，并且会等待10秒才能进行下载安装。而ocs-url​已经过时，使用该方式安装得到的主题大多不包含主题布局，仅仅只有一些开机界面，图标之类的残缺品。下图就展示有主题布局的和通过ocs-url​安装的没有桌面布局的主题。\n​ ​\n由于是依赖问题报错，怀疑是仓库被ban导致连接不上仓库，无法下载文件。因此使用科学上网，然后再安装，但仍然有相同问题。在写这篇记录的时候，想对该问题截图，但意外的安装成功了。因此怀疑是代理不稳定。而在Fedora论坛中，发现有如下回答，可以通过命令行方式安装主题压缩包，由于命令行可以直观的观察进度，以及出现问题的原因，因此进行尝试。\n参考链接：Fedora Kinoite Global Theme Installation Problem\n​ ​\n结果，通过多次安装，竟然安装成功。因此，可以肯定该问题是由于网络问题导致的，而通过gui形式安装需要的时间较长，也不能直观的看出问题，因此少次尝试将不会成功。\n​ ​\n可以从上图，看出，前几次安装都会失败，但每一次安装，都会有更多的安装包被安装，仅剩下少量的包依赖没有被下载。直到所有的安装包都被成功安装。\n安装命令行如下：kpackagetool5 -i /path/to/theme/file​\n示例：kpackagetool5 -i com.github.vinceliuice.WhiteSur-dark.tar.xz​\n保证成功的安装某一主题的流程 先在主题商店中查找自己喜欢的主题 ​ ​\n点击主题进入详情界面\n​ ​\n点击2中的红框部分的链接，通过网页打开该主题的下载界面，然后下载\n​ ​\n注意：不要点到​install​，​install​是通过ocs-url下载安装的。\n下载到本地后，在下载文件夹中打开终端，运行安装命令\n​ ​\n这个主题本身没有桌面布局，所以一次就安装成功了。像其他有桌面布局的主题，安装包大概都在1M多，没有布局的通常只有几百k。有布局的安装一次通常不会成功，需要在科学上网的情况下，多安装几次，如下：\n​ ​\n可以看到，在多安装几次以后，已经成功下载了一些之前没有下载成功的包，并进行了安装。如果多次不成功，则检查科学上网是否有问题。一般的情况需要尝试10次以内，依赖多的主题就需要尝试很多次了，例如下面图片中的主题安装\n​ ​\n最终尝试了大概20多次，安装成功\n​ ​\n最终美化效果 ​ ​\n独立显卡笔记本切换GPU，以支持外接显示器 参考链接：Manjaro(kde) 安装nvidia显卡驱动（optimus-manager管理）\n安装nivida驱动 首先进入设置界面，选中硬件设定，默认安装的很可能是第一个，这里先右键卸载当前驱动，然后安装有版本号的最新驱动。安装成功需要重启生效。\n​ ​\n在安装Manjaro时，会自动安装驱动，但经过实践，自动安装的驱动不能正常使用（表现为：外界显示屏仅显示manjaro的开机界面，而不显示桌面内容）。\n因此需要在设置中安装新的驱动。 此问题被修正，见2023.9.19日修正\n开机扩展屏不进入桌面问题 2023.9.26日修正：\n在后续的使用过程中，电脑启动时总是会出现Failed to start Virtual Console Setup.​问题，这个问题会导致tty1启动失败，外接电脑会一直显示启动界面，而不进入桌面应该是这个问题导致的。这个问题是由于/etc/vconsole.conf ​​配置文件中对键盘的KEYMAP​设置错误导致的，默认的KEYMAP​为us​，但现在变成了cn​。在之前配置输入法的时候，修改键盘布局为汉语，由于是在设置的GUI界面更改的，不清楚修改了哪些地方，现在看来也对/etc/vconsole.conf​进行了修改。\n通过下列命令打开配置文件\n1 sudo nano /etc/vconsole.conf 修改其KEYMAP​，原来为cn,修改为us。可能会有FONT​等字段，直接删除就可（注意在文件的最后留一个空行），因为有默认值，直接删除不会影响配置。修改完成后如下：\n​ ​\n2023.9.19日修正：该问题的原因（原因之一）是由于在Optimus中的PCI功耗控制没有正确设置导致的。经过反复的尝试，当开启PCI功耗控制时，开机启动可以正常扩展第二屏幕（我的独显是直连到输出接口）。否则第二屏幕将会一直显示启动界面tty1，并且该桌面是一个虚拟桌面，快捷键ctrl+alt+F1​可以切换当前桌面到tty1（默认桌面为tty2，可以通过快捷键ctrl+alt+F2​切换到tty2）。而且，由于Optimus Qt的设置逻辑有一定问题，如果PCI控制选中，即使按钮变灰，PCI功耗控制仍然有效，如下图：\n​ ​ ​​\n其他的switch选项有一些是可以改变PCI功耗控制的，因此，如果你的PCI功耗控制没有选中，并出现了上述问题，则可以先切换到其他选项，勾选PCI power contol​​，然后再切换到相应的模式。我的电脑在任何模式下都工作，但官方文档中提到，有一些显卡并不能都正常工作，需要自己进行尝试。\n注意：不要勾选​ PCI reset ​**，会导致机器经常卡死屏幕键盘大小写等完全没反应，或者重启！**\n修改文件sddm.conf 1 kate /etc/sddm.conf 找到x11,把这两项注释掉\n1 2 3 [X11] #DisplayCommand=/usr/share/sddm/scripts/Xsetup #DisplayStopCommand=/usr/share/sddm/scripts/Xstop ​ ​\n安装optimus-manager管理软件 1 yay -S optimus-manager optimus-manager-qt 安装完成后，开启对应的服务，并设置为开机自启\n1 2 systemctl start optimus-manager.service systemctl enable optimus-manager.service 重启后，进行显卡模式切换，一般切换为Hybird，意为混合模式，在连接显示屏时启动独显（图中没有开启PCI power control，这导致了我在上面提到的开机扩展屏不进入桌面的问题）\n2023.9.29更正：使用ACPI call会导致概率性卡死，可能是底层不支持某一些指令，因为厂商不会实现所有的API。改为开源驱动Nouveau，测试下来，使用Nouveau比较稳定，没有出现突然卡死的情况。\n‍\n​​ ​​\n​​\n其中swiching mode不用更改。若需更改，请参考官方文档：optimus-manager 中的电源管理选项指南\n双屏分辨率缩放问题 对与该问题，目前在kde中没有完美的解决方案，唯一的一种方式是通过将要缩小的显示器虚拟一个较高的分辨率，并渲染较高分辨率的画面，然后根据比例缩小到物理分辨率。\n参考链接：KDE 双高分辨率显示器不同 DPI 缩放比例。\n这种方式我只对其在X11下的工具进行了使用，并没有完全按照其计算方式进行设置，但很遗憾，在我的电脑并不能正常工作。无论是修改~/.config/kdeglobals文件还是通过xrandr​​进行配置，都无法正常工作。\n一行安装 1 yay -S qqmusic-bin visual-studio-code-bin clion java-runtime clion-jre flameshot cmake make linuxqq siyuan-note-bin google-chrome watt-toolkit-bin clash clash-for-windows-bin todesk-bin 最后附上一位博主2022的安装笔记 链接：manjaro踩坑记(2022更新版)\n只使用了其中的windows字体安装，这部分，如果早点看到，那么微信字体的bug就不会费那么大劲了。另，其中提到到的SSD优化，目前的版本已经默认开启。\n下面是该网页的保存文件，只在Chrome上测试过，可以打开。manjaro踩坑记2022更新版_swolf的博客.mhtml。mhtml格式是单个文件。\n网易云音乐卡bug安装 1 2 3 4 5 yay -S dh-autoreconf # manjaro下需要手动安装deepin的依赖 yay -S deepin-wine-wechat # deepin版本的微信 sudo pacman -S wine-for-wechat yay -S com.qq.weixin.spark # 微信 wine NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe # 网易云音乐，NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe是在官网下载的windows安装包 deepin的wine有原装的gdiplus库，但只安装deepin的wechat，没有给wine程序，因此无法通过命令行安装网易云音乐。因此需要安装wine-for-wechat，提供wine命令。这一步其实没有安装新的wine。然后就可以直接安装网易云的包，就可以正常运行网易云！甚至能使用桌面歌词！\n​ ​\n​​\n",
+  "wordCount" : "15603",
+  "inLanguage": "zh",
+  "datePublished": "2023-10-04T13:29:11+08:00",
+  "dateModified": "2023-10-04T13:29:11+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "ling"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/posts/record/manjaro-environment-establishment/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Linglong's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img/Q.gif"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="" accesskey="h" title="Linglong&#39;s Blog (Alt + H)">
+                <img src="https://www.sulvblog.cn/Q.gif" alt="" aria-label="logo"
+                    height="35">Linglong&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="search" title="🔍搜索 (Alt &#43; /)" accesskey=/>
+                    <span>🔍搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="/" title="🏠主页">
+                    <span>🏠主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="posts" title="📚文章">
+                    <span>📚文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="archives" title="⏱时间轴">
+                    <span>⏱时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="tags" title="🔖标签">
+                    <span>🔖标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="about" title="🙋🏻‍♂️关于">
+                    <span>🙋🏻‍♂️关于</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="">主页</a>&nbsp;»&nbsp;<a href="/posts/">文章</a>&nbsp;»&nbsp;<a href="/posts/record/">🥝踩坑记录</a></div>
+    <h1 class="post-title">
+      Manjaro Environment Establishment
+    </h1>
+    <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+
+    .year {
+        font-size: 14px;  
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>
+            
+十月
+四日
+
+            &nbsp;
+            <span class="year"> 2023</span>
+            
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>15603字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>32分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>ling
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+    <span style="opacity: 0.8;">
+          <span id="post_meta_style_7">
+              &nbsp;&nbsp;
+              <span class="fa fa-eye" ></span>
+              <span>
+                  <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                  &nbsp;&nbsp;
+              </span>
+          </span>
+      </span>
+</span>
+
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#%e9%85%8d%e7%bd%ae%e9%95%9c%e5%83%8f%e6%ba%90" aria-label="配置镜像源">配置镜像源</a></li>
+                    <li>
+                        <a href="#%e5%8a%a0%e5%85%a5archlinuxcn%e6%ba%90" aria-label="加入archlinuxcn源"><strong>加入archlinuxcn源</strong></a></li>
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85-yay" aria-label="安装 yay">安装 yay</a></li>
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85%e8%be%93%e5%85%a5%e6%b3%95" aria-label="安装输入法">安装输入法</a><ul>
+                            
+                    <li>
+                        <a href="#%e6%90%9c%e7%8b%97%e6%8b%bc%e9%9f%b3" aria-label="搜狗拼音">搜狗拼音</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85fcitx5" aria-label="安装fcitx5">安装fcitx5</a></li>
+                    <li>
+                        <a href="#%e9%85%8d%e7%bd%aeenvironment" aria-label="配置environment">配置environment</a></li>
+                    <li>
+                        <a href="#%e9%85%8d%e7%bd%ae%e8%be%93%e5%85%a5%e6%b3%95" aria-label="配置输入法">配置输入法</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e8%b0%b7%e6%ad%8c%e6%8b%bc%e9%9f%b3" aria-label="谷歌拼音">谷歌拼音</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85%e8%bd%af%e4%bb%b6" aria-label="安装软件">安装软件</a><ul>
+                            
+                    <li>
+                        <a href="#timeshift" aria-label="timeshift"><strong>timeshift</strong></a></li>
+                    <li>
+                        <a href="#%e6%80%9d%e6%ba%90%e7%ac%94%e8%ae%b0" aria-label="思源笔记">思源笔记</a></li>
+                    <li>
+                        <a href="#qq" aria-label="qq">qq</a></li>
+                    <li>
+                        <a href="#qq%e9%9f%b3%e4%b9%90" aria-label="qq音乐">qq音乐</a></li>
+                    <li>
+                        <a href="#chrome%e8%b0%b7%e6%ad%8c%e6%b5%8f%e8%a7%88%e5%99%a8" aria-label="Chrome谷歌浏览器">Chrome谷歌浏览器</a></li>
+                    <li>
+                        <a href="#watt-toolkitsteam" aria-label="Watt Toolkit：Steam&#43;&#43;">Watt Toolkit：Steam++</a></li>
+                    <li>
+                        <a href="#vscode" aria-label="vscode">vscode</a></li>
+                    <li>
+                        <a href="#clion" aria-label="clion">clion</a></li>
+                    <li>
+                        <a href="#flameshot-%e6%88%aa%e5%b1%8f%e8%bd%af%e4%bb%b6" aria-label="flameshot-截屏软件">flameshot-截屏软件</a></li>
+                    <li>
+                        <a href="#cmake" aria-label="cmake">cmake</a></li>
+                    <li>
+                        <a href="#clash-for-windows" aria-label="clash for windows">clash for windows</a><ul>
+                            
+                    <li>
+                        <a href="#firefox" aria-label="FireFox">FireFox</a></li>
+                    <li>
+                        <a href="#chrome" aria-label="Chrome">Chrome</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#make" aria-label="make">make</a></li>
+                    <li>
+                        <a href="#todesk%e8%bf%9c%e7%a8%8b%e8%bd%af%e4%bb%b6" aria-label="todesk远程软件">todesk远程软件</a></li>
+                    <li>
+                        <a href="#windows%e5%ad%97%e4%bd%93%e5%ae%89%e8%a3%85" aria-label="windows字体安装">windows字体安装</a><ul>
+                            
+                    <li>
+                        <a href="#%e7%9b%b4%e6%8e%a5%e6%8b%b7%e8%b4%9d" aria-label="直接拷贝">直接拷贝</a></li>
+                    <li>
+                        <a href="#%e4%bb%8ewin10%e9%95%9c%e5%83%8f%e4%b8%ad%e6%8a%bd%e5%8f%96%e5%ad%97%e4%bd%93%e6%96%87%e4%bb%b6" aria-label="从win10镜像中抽取字体文件">从win10镜像中抽取字体文件</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%bd%91%e6%98%93%e4%ba%91%e9%9f%b3%e4%b9%90-%e5%be%ae%e4%bf%a1%e5%ae%89%e8%a3%85%e6%80%bb%e7%bb%93" aria-label="网易云音乐-微信安装总结">网易云音乐-微信安装总结</a></li>
+                    <li>
+                        <a href="#%e5%be%ae%e4%bf%a1" aria-label="微信">微信</a><ul>
+                            
+                    <li>
+                        <a href="#deepin%e7%89%88%e6%9c%ac%e7%9a%84%e5%be%ae%e4%bf%a1" aria-label="deepin版本的微信">deepin版本的微信</a></li>
+                    <li>
+                        <a href="#uos%e7%89%88%e6%9c%ac%e7%9a%84%e5%be%ae%e4%bf%a1" aria-label="uos版本的微信">uos版本的微信</a></li>
+                    <li>
+                        <a href="#%e7%9b%b4%e6%8e%a5%e5%ae%89%e8%a3%85%e5%be%ae%e4%bf%a1" aria-label="直接安装微信">直接安装微信</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85%e5%ad%97%e4%bd%93" aria-label="安装字体">安装字体</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#spark%e7%89%88%e6%9c%ac%e7%9a%84%e5%be%ae%e4%bf%a1" aria-label="spark版本的微信">spark版本的微信</a></li>
+                    <li>
+                        <a href="#%e6%80%bb%e7%bb%93" aria-label="总结">总结</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%bd%91%e6%98%93%e4%ba%91%e9%9f%b3%e4%b9%90" aria-label="网易云音乐">网易云音乐</a></li>
+                    <li>
+                        <a href="#v2ray" aria-label="V2ray">V2ray</a><ul>
+                            
+                    <li>
+                        <a href="#%e8%bf%90%e8%a1%8cv2raya%e7%9a%84%e6%9c%8d%e5%8a%a1%e5%90%a6%e5%88%99%e6%97%a0%e6%b3%95%e4%bd%bf%e7%94%a8" aria-label="运行v2raya的服务，否则无法使用">运行v2raya的服务，否则无法使用</a></li>
+                    <li>
+                        <a href="#%e5%bc%80%e5%a7%8b%e8%ae%be%e7%bd%ae" aria-label="开始设置">开始设置</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%88%9b%e5%bb%ba%e8%b4%a6%e5%8f%b7" aria-label="创建账号">创建账号</a></li></ul>
+                    </li></ul>
+                    </li>
+                    <li>
+                        <a href="#wps-office" aria-label="wps-office">wps-office</a><ul>
+                            
+                    <li>
+                        <a href="#wps%e5%8a%a0%e7%b2%97%e5%ad%97%e4%bd%93%e6%98%be%e7%a4%ba%e9%94%99%e8%af%af%e6%98%be%e7%a4%ba%e6%88%90%e4%b8%80%e5%9b%a2%e9%bb%91" aria-label="WPS加粗字体显示错误，显示成一团黑">WPS加粗字体显示错误，显示成一团黑</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#obs-studio-%e5%bd%95%e5%b1%8f%e8%bd%af%e4%bb%b6" aria-label="obs-studio 录屏软件">obs-studio 录屏软件</a></li>
+                    <li>
+                        <a href="#%e5%bc%80%e6%9c%ba%e8%87%aa%e5%90%af%e5%8a%a8" aria-label="开机自启动">开机自启动</a><ul>
+                            
+                    <li>
+                        <a href="#systemd" aria-label="systemd">systemd</a></li>
+                    <li>
+                        <a href="#%e6%ad%a5%e9%aa%a4" aria-label="步骤">步骤</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e4%bf%ae%e6%94%b9kde%e7%9a%84applications-menu" aria-label="修改KDE的Applications Menu">修改KDE的Applications Menu</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e6%9b%b4%e6%8d%a2%e4%b8%bb%e9%a2%98" aria-label="更换主题">更换主题</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%9c%a8%e4%b8%bb%e9%a2%98%e5%95%86%e5%ba%97%e4%b8%ad%e5%ae%89%e8%a3%85%e5%85%a8%e5%b1%80%e4%b8%bb%e9%a2%98" aria-label="在主题商店中安装全局主题">在主题商店中安装全局主题</a></li>
+                    <li>
+                        <a href="#%e4%bf%9d%e8%af%81%e6%88%90%e5%8a%9f%e7%9a%84%e5%ae%89%e8%a3%85%e6%9f%90%e4%b8%80%e4%b8%bb%e9%a2%98%e7%9a%84%e6%b5%81%e7%a8%8b" aria-label="保证成功的安装某一主题的流程">保证成功的安装某一主题的流程</a></li>
+                    <li>
+                        <a href="#%e6%9c%80%e7%bb%88%e7%be%8e%e5%8c%96%e6%95%88%e6%9e%9c" aria-label="最终美化效果">最终美化效果</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e7%8b%ac%e7%ab%8b%e6%98%be%e5%8d%a1%e7%ac%94%e8%ae%b0%e6%9c%ac%e5%88%87%e6%8d%a2gpu%e4%bb%a5%e6%94%af%e6%8c%81%e5%a4%96%e6%8e%a5%e6%98%be%e7%a4%ba%e5%99%a8" aria-label="独立显卡笔记本切换GPU，以支持外接显示器">独立显卡笔记本切换GPU，以支持外接显示器</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85nivida%e9%a9%b1%e5%8a%a8" aria-label="安装nivida驱动">安装nivida驱动</a></li>
+                    <li>
+                        <a href="#%e5%bc%80%e6%9c%ba%e6%89%a9%e5%b1%95%e5%b1%8f%e4%b8%8d%e8%bf%9b%e5%85%a5%e6%a1%8c%e9%9d%a2%e9%97%ae%e9%a2%98" aria-label="开机扩展屏不进入桌面问题">开机扩展屏不进入桌面问题</a></li>
+                    <li>
+                        <a href="#%e4%bf%ae%e6%94%b9%e6%96%87%e4%bb%b6sddmconf" aria-label="修改文件sddm.conf">修改文件sddm.conf</a></li>
+                    <li>
+                        <a href="#%e5%ae%89%e8%a3%85optimus-manager%e7%ae%a1%e7%90%86%e8%bd%af%e4%bb%b6" aria-label="安装optimus-manager管理软件">安装optimus-manager管理软件</a></li>
+                    <li>
+                        <a href="#%e5%8f%8c%e5%b1%8f%e5%88%86%e8%be%a8%e7%8e%87%e7%bc%a9%e6%94%be%e9%97%ae%e9%a2%98" aria-label="双屏分辨率缩放问题">双屏分辨率缩放问题</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e4%b8%80%e8%a1%8c%e5%ae%89%e8%a3%85" aria-label="一行安装">一行安装</a></li>
+                    <li>
+                        <a href="#%e6%9c%80%e5%90%8e%e9%99%84%e4%b8%8a%e4%b8%80%e4%bd%8d%e5%8d%9a%e4%b8%bb2022%e7%9a%84%e5%ae%89%e8%a3%85%e7%ac%94%e8%ae%b0" aria-label="最后附上一位博主2022的安装笔记">最后附上一位博主2022的安装笔记</a></li>
+                    <li>
+                        <a href="#%e7%bd%91%e6%98%93%e4%ba%91%e9%9f%b3%e4%b9%90%e5%8d%a1bug%e5%ae%89%e8%a3%85" aria-label="网易云音乐卡bug安装">网易云音乐卡bug安装</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+
+  <div class="post-content"><p>时间：2023/9/14/10:42</p>
+<p>本文档旨在记录安装完成manjaro系统后，对系统开发和使用环境的配置，不介绍安装部分。manjaro的安装很人性化，不需要对分区作任何特殊操作，只需要按照使用场景选择对应的模式即可。</p>
+<p>系统环境：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>    ~  screenfetch                                                                                          ✔  13s 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> ██████████████████  ████████     ling@ling-s1series
+</span></span><span style="display:flex;"><span> ██████████████████  ████████     OS: Manjaro 23.0.1 Uranos
+</span></span><span style="display:flex;"><span> ██████████████████  ████████     Kernel: x86_64 Linux 6.5.1-1-MANJARO
+</span></span><span style="display:flex;"><span> ██████████████████  ████████     Uptime: 2h 27m
+</span></span><span style="display:flex;"><span> ████████            ████████     Packages: <span style="color:#ff0;font-weight:bold">1254</span>
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     Shell: zsh 5.9
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     Resolution: 3840x1080
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     DE: KDE 5.109.0 / Plasma 5.27.7
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     WM: KWin
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     GTK Theme: Breeze [GTK2/3]
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     Icon Theme: Ant-Dark
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     Disk: 43G / 453G (10%)
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     CPU: Intel Core i5-8250U @ 8x 3.4GHz [75.0°C]
+</span></span><span style="display:flex;"><span> ████████  ████████  ████████     GPU: NVIDIA GeForce MX150
+</span></span><span style="display:flex;"><span>                                  RAM: 6545MiB / 7826MiB
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>另一台机器：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>    ~  neofetch                                                                                                                                                                                          ✔
+</span></span><span style="display:flex;"><span>██████████████████  ████████   ling@ling-20ym
+</span></span><span style="display:flex;"><span>██████████████████  ████████   --------------
+</span></span><span style="display:flex;"><span>██████████████████  ████████   OS: Manjaro Linux x86_64
+</span></span><span style="display:flex;"><span>██████████████████  ████████   Host: 20YM Lenovo ThinkBook 16p Gen <span style="color:#ff0;font-weight:bold">2</span>
+</span></span><span style="display:flex;"><span>████████            ████████   Kernel: 6.5.3-1-MANJARO
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   Uptime: <span style="color:#ff0;font-weight:bold">21</span> hours, <span style="color:#ff0;font-weight:bold">34</span> mins
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   Packages: <span style="color:#ff0;font-weight:bold">1366</span> (pacman)
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   Shell: bash 5.1.16
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   Resolution: 1920x1080, 2560x1600
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   DE: Plasma 5.27.8
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   WM: KWin
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   WM Theme: WhiteSur-Sharp
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   Theme: [Plasma], Breeze [GTK2/3]
+</span></span><span style="display:flex;"><span>████████  ████████  ████████   Icons: [Plasma], WhiteSur [GTK2/3]
+</span></span><span style="display:flex;"><span>                               Terminal: konsole
+</span></span><span style="display:flex;"><span>                               CPU: AMD Ryzen <span style="color:#ff0;font-weight:bold">7</span> 5800H with Radeon Graphics (16) @ 4.463GHz
+</span></span><span style="display:flex;"><span>                               GPU: NVIDIA GeForce RTX <span style="color:#ff0;font-weight:bold">3060</span> Mobile / Max-Q
+</span></span><span style="display:flex;"><span>                               GPU: AMD ATI Radeon Vega Series / Radeon Vega Mobile Series
+</span></span><span style="display:flex;"><span>                               Memory: 15568MiB / 23392MiB
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装软件screenfetch，neofetch即可命令行展示出上述信息。</p>
+<h1 id="配置镜像源">配置镜像源<a hidden class="anchor" aria-hidden="true" href="#配置镜像源">#</a></h1>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>sudo pacman-mirrors -c China -i -m rank 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>命令执行后会弹出一个 UI 框来让你选择，默认速度最快的排在第一个（这里选择清华大学tsinghua的源）,然后点击“OK”，再次单击“确定”即可选择好最快的源。</p>
+<p>​<img loading="lazy" src="assets/image-20230914214553-xly3bf8.png" alt="image"  />
+​</p>
+<p>打开终端输入以下命令，查看是否将源更改成功</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>kate /etc/pacman.d/mirrorlist 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这句命令使用KDE自带的文本编辑器kate来编辑/etc/pacman.d/mirrorlist这个文件。这个文件中保存的就是pacman会使用的软件源地址。打开后会看到如下内容：</p>
+<p>​<img loading="lazy" src="assets/image-20230914215120-g7jz1fa.png" alt="image"  />
+​</p>
+<p>然后更新一下软件仓库：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>sudo pacman -Syyu 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="加入archlinuxcn源"><strong>加入archlinuxcn源</strong><a hidden class="anchor" aria-hidden="true" href="#加入archlinuxcn源">#</a></h1>
+<p>在命令行中使用kate打开/etc/pacman.conf。也就是执行命令</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>kate /etc/pacman.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>打开文件后拖到最下方，并且加入如下内容：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>[archlinuxcn]
+</span></span><span style="display:flex;"><span>Server = https://mirrors.bfsu.edu.cn/archlinuxcn/$arch
+</span></span><span style="display:flex;"><span>Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+</span></span><span style="display:flex;"><span>Server = https://mirrors.sjtug.sjtu.edu.cn/manjaro/stable/$repo/$arch
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后更新</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo pacman -Syy &amp;&amp; sudo pacman -S archlinuxcn-keyring
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="安装-yay">安装 yay<a hidden class="anchor" aria-hidden="true" href="#安装-yay">#</a></h1>
+<p>Manjaro 上默认使用的包管理工具是 pacman，但是这个工具不支持 AUR  软件仓库。AUR 全称是 ArchLinux User Repository，他是由社区驱动的软件仓库，  属于不受支持的软件仓库（unsupported）.但却是 Arch  社区最有活力的仓库，基本上你想要的软件可能官方源里面没有，但是这里面肯定有。yay 是对 pacman 的一个封装，使用上和 pacman  没有什么差别，但是它支持 AUR。注：yaurt已经过时，不建议安装。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>sudo pacman -S yay 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看一下软件源:</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>yay -P -g 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里查询得到的数据应当是aur官方软件源，以前的教程都会让添加一些国内的aur源，但是现在已经不行了。</p>
+<p>国内已经不支持AUR的镜像源了：<a href="https://mirrors.tuna.tsinghua.edu.cn/news/remove-aur/">清华关于移除 AUR 镜像的通知</a></p>
+<p>因此更换镜像源后，也不能正常工作，会报错，<strong>下列方法也会报错</strong>，因此建议不更改官方软件源。aur官方源目前可以访问，但速度很慢，yay上的一些软件是通过aur官方源进行安装的，需要访问外网，因此需要先安装V2ray服务。</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/weixin_49927493/article/details/125615396">Manjaro如果yay使用了aur的清华源,出现报错，解决方法</a></p>
+<p>​<img loading="lazy" src="assets/image-20230914221733-rlnm79f.png" alt="image"  />
+​</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span> -&gt; Error during AUR search: <span style="color:#ff0;font-weight:bold">1</span> error occurred:
+</span></span><span style="display:flex;"><span>        * request failed: Get <span style="color:#0ff;font-weight:bold">&#34;https://aur.tuna.tsinghua.edu.cn/rpc?arg=fcitx-&amp;by=name-desc&amp;type=search&amp;v=5&#34;</span>: dial tcp: lookup aur.tuna.tsinghua.edu.cn: no such host
+</span></span><span style="display:flex;"><span>或者
+</span></span><span style="display:flex;"><span>response decoding failed: invalid character <span style="color:#0ff;font-weight:bold">&#39;&lt;&#39;</span> looking <span style="color:#fff;font-weight:bold">for</span> beginning of value;
+</span></span></code></pre></td></tr></table>
+</div>
+</div></blockquote>
+<p>安装完成后再次更新</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -Syyu &amp;&amp; yay -Sys
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="安装输入法">安装输入法<a hidden class="anchor" aria-hidden="true" href="#安装输入法">#</a></h1>
+<p><del>因为搜狗拼音现在还依赖着Fcitx-qt4，而这个包现在已经被官方源废除。而搜狗很久都没有迁移到qt5，所以现在Fcitx-sogoupinyin这个包也从官方仓库移除了。目前没法通过官方安装搜狗拼音。</del></p>
+<p>2023.9.16在搜索pinyin安装包时（谷歌搜拼音并不好用），突然发现基于<code>fcitx5</code>​的安装包<code>fcitx5-pinyin-sougou</code>​，但该包不能正确安装。因此，替换原来的谷歌拼音。过程如下</p>
+<h2 id="搜狗拼音">搜狗拼音<a hidden class="anchor" aria-hidden="true" href="#搜狗拼音">#</a></h2>
+<p>参考链接：<a href="https://zhuanlan.zhihu.com/p/468426138">Manjaro安装Fcitx5中文输入法</a></p>
+<p>由于之前已经安装了<code>fcitx4</code>​，而<code>fcitx5</code>​与其冲突，因此需要先卸载：<code>sudo pacman -Rs $(pacman -Qsq fcitx)</code>​</p>
+<h3 id="安装fcitx5">安装fcitx5<a hidden class="anchor" aria-hidden="true" href="#安装fcitx5">#</a></h3>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>sudo pacman -S fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons fcitx5-material-color kcm-fcitx5 fcitx5-lua
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于这里复制出错，导致没有正确退出pacman程序，其进程锁没有正常释放，因此，需要手动删除锁，参考链接： <a href="https://blog.csdn.net/weixin_34190136/article/details/92464438">Manjaro使用pacman提示无法锁定数据库</a>。（注：该链接的environment配置有误）</p>
+<p>其实报错信息也给出提示​<img loading="lazy" src="assets/image-20230916212520-5mwkjj9.png" alt="image"  />
+​</p>
+<p>删掉之前的文件： <code>/var/lib/pacman/db.lck</code>​。<code>sudo rm /var/lib/pacman/db.lck</code>​。就正常了。关于主题部分就不进行配置了，默认的即可。</p>
+<p>还有一点，和谷歌拼音对输入法的配置一样，也需要加入环境变量。</p>
+<h3 id="配置environment">配置environment<a hidden class="anchor" aria-hidden="true" href="#配置environment">#</a></h3>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kate /etc/environment
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将下面的内容添加到其中，原因为environment在所有用户登陆时都有效。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>GTK_IM_MODULE=fcitx
+</span></span><span style="display:flex;"><span>QT_IM_MODULE=fcitx
+</span></span><span style="display:flex;"><span>XMODIFIERS=@im=fcitx
+</span></span><span style="display:flex;"><span>INPUT_METHOD=fcitx
+</span></span><span style="display:flex;"><span>SDL_IM_MODULE=fcitx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果不进行环境的配置，那么重启之后不能正常切换输入法，也就不能输入中文。</p>
+<h3 id="配置输入法">配置输入法<a hidden class="anchor" aria-hidden="true" href="#配置输入法">#</a></h3>
+<p>中文输入法插件的名称为Pinyin,这是在开发者的仓库中发现的，否则不清楚名称，无法确定哪一个是我们安装的，就不能添加到配置中使用。<a href="https://github.com/fcitx/fcitx5-chinese-addons">原仓库链接</a></p>
+<p>​<img loading="lazy" src="assets/image-20230916223305-f0j85gh.png" alt="image"  title="云输入法的名称"  />
+</p>
+<p>添加Pinyin</p>
+<p>​<img loading="lazy" src="assets/image-20230916223604-w6xy8hj.png" alt="image"  />
+​</p>
+<p>添加成功后可以看到</p>
+<p>​<img loading="lazy" src="assets/image-20230916223533-686qpdz.png" alt="image"  title="添加成功"  />
+​</p>
+<p>如果正确配置了仍然不能切换出想要的输入法，可以查看Group是否正常切换。默认的应该有两个Group，所有很可能是Group不正确。</p>
+<p>​<img loading="lazy" src="assets/image-20230916222529-a5cuez8.png" alt="image"  />
+​</p>
+<h2 id="谷歌拼音">谷歌拼音<a hidden class="anchor" aria-hidden="true" href="#谷歌拼音">#</a></h2>
+<p>所以直接安装谷歌拼音。<a href="https://www.zhihu.com/question/330715155/answer/1051545736">manjaro Linux，有什么较为简单的方法，可安装中文输入法? - 知乎用户0C8Unl的回答 - 知乎</a></p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo pacman -S fcitx-im
+</span></span><span style="display:flex;"><span>yay -S fcitx-configtool
+</span></span><span style="display:flex;"><span>yay -S fcitx-googlepinyin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>KDE 或者其他桌面配置:</p>
+<p>输入kate ~/.xprofile或nano ~/.xprofile 并且加入如下内容（也可以按照上一节的environment添加）:</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>export GTK_IM_MODULE=fcitx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>export QT_IM_MODULE=fcitx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>export XMODIFIERS=@im=fcitx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>配置好了之后要注销或者重启一下才可以生效;<br>
+第一个输入法需设置为键盘格式。</p>
+</blockquote>
+<p>重启后，在下面的状态栏中找到键盘图标</p>
+<p>​<img loading="lazy" src="assets/image-20230914224441-axndd3q.png" alt="image"  />
+​</p>
+<p>然后进入配置（Configure），点击加号，通过搜索，找到谷歌拼音，并添加到输入法中。然后就可以通过<code>ctrl</code>​+<code>shfit</code>​切换输入法了。</p>
+<p>​<img loading="lazy" src="assets/image-20230914223834-yjar97l.png" alt="image"  />
+</p>
+<p>需要注意：在输入密码时，如果仍然处于中文输入法的话，会按照中文字符进行输入。</p>
+<p>安装输入法后，使用shfit无法切换输入法，需要在fcitx中的全局设置中，增加切换激活/非激活输入法快捷键</p>
+<p>​<img loading="lazy" src="assets/image-20230916095211-op95cd2.png" alt="image"  />
+​</p>
+<p>参考链接：<a href="https://blog.csdn.net/qq_43409608/article/details/121751301">安装google输入法后，左shift键不能切换中英文</a></p>
+<h1 id="安装软件">安装软件<a hidden class="anchor" aria-hidden="true" href="#安装软件">#</a></h1>
+<h2 id="timeshift"><strong>timeshift</strong><a hidden class="anchor" aria-hidden="true" href="#timeshift">#</a></h2>
+<p><strong>强大好用的备份、回滚系统工具。装好Manjaro必须要做timeshift，以防你哪天玩坏只能重装</strong></p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S timeshift
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>关于这个软件的使用，详见另一篇：</p>
+<p>建议：不要在不同的电脑上通过timeshift进行备份迁移，我已经尝试过，能够进入系统，但是应该是由于驱动不适配，最后无法进入系统，只能在登陆界面反复登陆。</p>
+<h2 id="思源笔记">思源笔记<a hidden class="anchor" aria-hidden="true" href="#思源笔记">#</a></h2>
+<p>本地储存优先的笔记软件，支持markdown,也支持云同步，但主要内容都是先存放在本地，不需要放在任何云端。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S siyuan-note-bin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="qq">qq<a hidden class="anchor" aria-hidden="true" href="#qq">#</a></h2>
+<p>目前qq已经原生支持linux</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S linuxqq
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>qq运行一段时间后闪退，甚至刚刚登陆上就闪退。在AUR论坛中找到问题及解决方案：<a href="https://aur.archlinux.org/packages/linuxqq">aur.archlinux.org</a></p>
+<p>​<img loading="lazy" src="assets/image-20230917103116-9z55cib.png" alt="image"  />
+​</p>
+<blockquote>
+<p>在关机时若未主动退出qq，重启后会导致闪退。手动移除 <code>~/.config/QQ/crash_files</code>​ 文件夹可以解决问题。</p>
+</blockquote>
+<p>另在v2ex论坛中，也找到了解决方案，并且可以解决重复删除文件夹的问题，在删除<code>crash_files</code>​中的内容后，将该文件夹设置为只读。</p>
+<p>​<img loading="lazy" src="assets/image-20230917111943-oel5ohg.png" alt="image"  />
+​</p>
+<p>参考：<a href="https://www.v2ex.com/t/959776">[求助] Linux 下 QQ 闪退问题</a></p>
+<h2 id="qq音乐">qq音乐<a hidden class="anchor" aria-hidden="true" href="#qq音乐">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S qqmusic-bin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="chrome谷歌浏览器">Chrome谷歌浏览器<a hidden class="anchor" aria-hidden="true" href="#chrome谷歌浏览器">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S google-chrome
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="watt-toolkitsteam">Watt Toolkit：Steam++<a hidden class="anchor" aria-hidden="true" href="#watt-toolkitsteam">#</a></h2>
+<p>不使用代理就可以访问github或者steam。与科学上网不同，仅仅能够访问一些常见的但没有被ban的网站。安装此软件主要是为了在安装科学上网环境之前能够正常访问github，便于我们下载源码进行安装。</p>
+<p>Watt Toolkit是一个本地通过反向代理实现的访问github等常见的网站的工具，其优势就是访问网站的速度和不使用代理一样。而科学上网的网速需要看代理服务器的速度。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S watt-toolkit-bin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装后启动，勾选github进行加速</p>
+<p>​<img loading="lazy" src="assets/image-20230914235818-yqnluuj.png" alt="image"  />
+​</p>
+<p>启动时会转到浏览器，要求先做一些操作：</p>
+<ul>
+<li>
+<p>利用火狐浏览器导入证书</p>
+<p>​<img loading="lazy" src="assets/image-20230914235954-dkn0xsw.png" alt="image"  />
+​</p>
+<p>‍</p>
+<p>证书文件在<code>/home/ling/.local/share/Steam++/Plugins/Accelerator/SteamTools.Certificate.cer</code>​，其中ling为用户根目录。</p>
+<p>然后输入命令<code>sudo trust anchor --store SteamTools.Certificate.cer</code>​，没有尝试过不输入，输入后启动正常工作。</p>
+<p>​<img loading="lazy" src="assets/image-20230915000114-4mu23oy.png" alt="image"  />
+</p>
+</li>
+<li>
+<p>需要输入命令<code>sudo chmod a+w /etc/hosts</code>​​，避免每次输入密码</p>
+<p>​<img loading="lazy" src="assets/image-20230915000257-fodr1h2.png" alt="image"  />
+​</p>
+</li>
+<li>
+<p>如果只安装火狐浏览器，可能导入了证书也用不了（当前版本），因此需要安装Chrome，参见上一节Chrome浏览器安装。</p>
+</li>
+<li>
+<p>如果还不行，则在开始加速以前，点击右边的刷新按钮，显示加速成功即可。</p>
+</li>
+</ul>
+<p>‍</p>
+<h2 id="vscode">vscode<a hidden class="anchor" aria-hidden="true" href="#vscode">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S visual-studio-code-bin 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>‍</p>
+<h2 id="clion">clion<a hidden class="anchor" aria-hidden="true" href="#clion">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S clion
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>有问题，提示没有java环境</p>
+<p>​<img loading="lazy" src="assets/image-20230915221911-prna1wr.png" alt="image"  />
+​</p>
+<p>根据官方论坛的回答，需要安装两个依赖，<a href="https://forum.manjaro.org/t/cant-open-clion/120136">Can’t open CLion</a></p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S java-runtime clion-jre
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="flameshot-截屏软件">flameshot-截屏软件<a hidden class="anchor" aria-hidden="true" href="#flameshot-截屏软件">#</a></h2>
+<p>‍</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S flameshot
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要在设置中找到快捷键设置，将flameshot添加到快捷键中，然后设置对应的快捷键。</p>
+<p>​<img loading="lazy" src="assets/image-20230915221505-evi7jg8.png" alt="image"  />
+</p>
+<p>需要注意点是，linux下的截屏并不能对右键菜单进行截屏，即使通过快捷键。因此需要利用延时截屏的功能。flameshot的延时截屏需要通过<code>Open launcher</code>​然后进行截屏。</p>
+<p>​<img loading="lazy" src="assets/image-20230916222600-u6rmjoc.png" alt="image"  />
+​</p>
+<p>点击后就会出现窗口，选择延时的时间。</p>
+<p>​<img loading="lazy" src="assets/image-20230916222635-qxs4rml.png" alt="image"  />
+</p>
+<p>然后就可以实现截屏右键。参考：<a href="https://blog.csdn.net/amnesiagreen/article/details/108623868">Ubuntu 中如何对右键菜单进行截图</a></p>
+<p>​<img loading="lazy" src="assets/image-20230916222529-a5cuez8.png" alt="image"  />
+​</p>
+<p>‍</p>
+<h2 id="cmake">cmake<a hidden class="anchor" aria-hidden="true" href="#cmake">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S cmake
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="clash-for-windows">clash for windows<a hidden class="anchor" aria-hidden="true" href="#clash-for-windows">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S clash clash-for-windows-bin 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>free节点仓库</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>https://github.com/xrayfree/free-ssr-ss-v2ray-vpn-clash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>参考链接：<a href="https://blog.linioi.com/posts/clash-on-arch/">blog.linioi.com/posts/cl&hellip;</a></p>
+<p>manjaro下的系统代理和其他发行版不同，设置系统代理后，仍然有部分程序不会通过系统代理上网。比如火狐浏览器，chrome浏览器。</p>
+<p>因此对于在浏览器中的科学上网，需要分别在两个浏览器中设置代理服务器的地址。</p>
+<h3 id="firefox">FireFox<a hidden class="anchor" aria-hidden="true" href="#firefox">#</a></h3>
+<p>在设置中，General -&gt; Network Settings中，进行设置，一般设置为Manual，也就是手动设置代理。</p>
+<p>​<img loading="lazy" src="assets/image-20230916094334-yutfgrw.png" alt="image"  />
+​</p>
+<h3 id="chrome">Chrome<a hidden class="anchor" aria-hidden="true" href="#chrome">#</a></h3>
+<p>Chrome没有代理网络设置，需要在启动文件中增加启动参数</p>
+<p>参考链接：<a href="https://qastack.cn/superuser/83007/configuring-proxy-settings-for-google-chrome-on-linux#:~:text=%E4%BB%A5root%E8%BA%AB%E4%BB%BD%E8%BF%90%E8%A1%8C%EF%BC%8C%20gedit%20%2Fusr%2Fshare%2Fapplications%2Fgoogle-chrome.desktop,%E7%84%B6%E5%90%8E%E6%A0%B9%E6%8D%AE%E9%9C%80%E8%A6%81%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%90%86%E8%AE%BE%E7%BD%AE%EF%BC%8C%E5%8D%B3%20--proxy-server%3D%22http%3A%2F%2F127.0.0.1%3A8080%22%20%E4%BF%9D%E5%AD%98%E5%B9%B6%E8%BF%90%E8%A1%8Cchrome%E3%80%82">在Linux上为Google Chrome配置代理设置</a></p>
+<p>​<img loading="lazy" src="assets/image-20230916095640-swtwyca.png" alt="image"  />
+​</p>
+<p>右键Chrome图标，选择<code>Edit Application...</code>​编辑启动参数，增加<code>--proxy-server=127.0.0.1:7890</code>​，这是clash的代理地址，可以根据自己的代理软件进行设置。</p>
+<p>​<img loading="lazy" src="assets/image-20230916095811-uy7k0hv.png" alt="image"  />
+​</p>
+<p>application的源文件地址有两个，一个是菜单栏的地址<code>/home/ling/.local/share/applications/google-chrome.desktop</code>​​，一个是程序安装后的地址<code>/usr/share/applications/google-chrome.desktop</code>​​。</p>
+<p>为了使用方便，建立两个Chrome的desktop文件，都放在usr下的文件目录里，在应用程序的启动菜单里就会自动分类。需要使用哪一个就启动哪一个。但需要注意，chrome关闭后是最小化在状态栏，需要手动关闭后再打开新的chrome，否则不会刷新程序。</p>
+<h2 id="make">make<a hidden class="anchor" aria-hidden="true" href="#make">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S make
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="todesk远程软件">todesk远程软件<a hidden class="anchor" aria-hidden="true" href="#todesk远程软件">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>yay -S todesk-bin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意，不要安装<code>todesk</code>​，而是安装<code>todesk-bin</code>​，前者不是最新版本。</p>
+<p>安装完成后，会提示开启守护进程，否则将不能正常使用该软件。守护进程类似于windows中的服务。</p>
+<p>​<img loading="lazy" src="assets/image-20230916111916-336cw2u.png" alt="image"  />
+​</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>systemctl start todeskd.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="windows字体安装">windows字体安装<a hidden class="anchor" aria-hidden="true" href="#windows字体安装">#</a></h2>
+<p>参考链接：<a href="https://mrswolf.github.io/my-manjaro-log/">manjaro踩坑记(2022更新版)</a></p>
+<p>AUR提供了ttf-ms-win10的安装包，不过不提供字体文件，需要自己从已有的win10系统（拷贝所有C:\Windows\Fonts下的字体文件）或从win10镜像中抽取字体文件。</p>
+<p>安装字体有缺陷</p>
+<p>​<img loading="lazy" src="assets/image-20230920112712-kr8p3g7.png" alt="image"  />
+​</p>
+<p>​<img loading="lazy" src="assets/image-20230920112754-2sutfpm.png" alt="image"  />
+</p>
+<p>图标符号显示为方块，这是由于konsole的默认配置文件中并没有对字体做限制，因此，显示的字体会随着系统全局使用的字体而改变。只要在字体设置中，改变对应位置的字体为支持manjaro的图标的字体即可。</p>
+<p>在Manjaro官方论坛得知，使用的字体为MesloLGS。可以通过命令行安装（一般已经安装了，只是没有启用，如果你在系统的字体管理中没有发现该字体，则需要手动安装）</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>yay -S ttf-meslo-nerd-font-powerlevel10k
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后在系统设置-&gt;外观-&gt;字体-&gt;固定宽度，将其字体更改为MesloLGS即可。然后重启konsole,就可以看到图标显示正常了。</p>
+<p>​<img loading="lazy" src="assets/image-20230921091557-tx33occ.png" alt="image"  />
+​</p>
+<h3 id="直接拷贝">直接拷贝<a hidden class="anchor" aria-hidden="true" href="#直接拷贝">#</a></h3>
+<p>由于本作者使用的是双系统下的manjaro，因此我可以直接从windows的c盘直接拷贝字体文件。</p>
+<p>首先从AUR克隆tff-ms-win10仓库：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#fff;font-weight:bold">cd</span> ~/Desktop <span style="color:#007f7f"># 进入用户目录下的桌面</span>
+</span></span><span style="display:flex;"><span>mkdir -p build &amp;&amp; <span style="color:#fff;font-weight:bold">cd</span> build <span style="color:#007f7f"># 在桌面建立build文件夹</span>
+</span></span><span style="display:flex;"><span>git clone https://aur.archlinux.org/ttf-ms-win10.git
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改ttf-ms-win10仓库中的PKGBUILD如下段落，添加的字体文件表示仿宋、黑体和楷体：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>_ttf_ms_win10_zh_cn=(
+</span></span><span style="display:flex;"><span>simsun.ttc                                             
+</span></span><span style="display:flex;"><span>simfang.ttf simhei.ttf simkai.ttf <span style="color:#007f7f"># 增加这行内容</span>
+</span></span><span style="display:flex;"><span>simsunb.ttf                                             
+</span></span><span style="display:flex;"><span>msyh.ttc   
+</span></span><span style="display:flex;"><span>msyhbd.ttc                               
+</span></span><span style="display:flex;"><span>msyhl.ttc
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后将windows的<code>​ C:\Windows\Fonts</code>​下面的所有文件拷贝到桌面的<code>build</code>​文件夹中。再拷贝license文件（<code>C:\Windows\System32\Licenses\neutral\_Default\Professional\license.rtf</code>​）到桌面的<code>build</code>​文件夹中。</p>
+<p>最后在ttf-ms-win10目录下执行安装命令，注意如果报错，大概率是当前抽取的字体文件中没有该字体，可以按照错误提示从网上下载ttf文件加入其中，或者在PKGBUILD里删掉该字体，毕竟只有中文字体比较重要：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>makepkg -sic --skipchecksums
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="从win10镜像中抽取字体文件">从win10镜像中抽取字体文件<a hidden class="anchor" aria-hidden="true" href="#从win10镜像中抽取字体文件">#</a></h3>
+<p>注：以下方法作者并没有尝试过</p>
+<p>挂载win10安装镜像，manjaro下只需要右键选择挂载ISO，Dolphin的左边即可出现ISO的访问文件路径，找出source文件夹下的install.esd或install.wim文件，把该文件拷贝到ttf-ms-win10仓库文件夹下，执行如下命令解锁所有字体文件：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>wimextract install.esd 1 /Windows/{Fonts/&#34;*&#34;.{ttf,ttc},System32/Licenses/neutral/&#34;*&#34;/&#34;*&#34;/license.rtf} --dest-dir .
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其余步骤与直接拷贝相同。</p>
+<h2 id="网易云音乐-微信安装总结">网易云音乐-微信安装总结<a hidden class="anchor" aria-hidden="true" href="#网易云音乐-微信安装总结">#</a></h2>
+<p>在本文中，将提到许多中安装微信的方法，包含windows原生版本的微信、经过deepin打包的wine版本的微信、对spark商店中微信打包版本的微信等。网易云音乐现在只推荐使用基于deepin-wine/wine-for-wechat联合版本的windows直装版。具体的原因在后面两者的详细安装步骤中会解释。如果只希望安装这两个软件，则可以跳过后面的详细安装介绍章节，直接运行下列命令：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S dh-autoreconf <span style="color:#007f7f"># manjaro下需要手动安装deepin的依赖</span>
+</span></span><span style="display:flex;"><span>yay -S deepin-wine-wechat <span style="color:#007f7f"># deepin版本的微信</span>
+</span></span><span style="display:flex;"><span>sudo pacman -S wine-for-wechat
+</span></span><span style="display:flex;"><span>yay -S com.qq.weixin.spark <span style="color:#007f7f"># 微信</span>
+</span></span><span style="display:flex;"><span>wine NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe <span style="color:#007f7f"># 网易云音乐，NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe是在官网下载的windows安装包</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里安装了两个版本的微信，但其数据互通，微信的数据文件都在<code>～/Documents/WeChat Files</code>​中。为了微信功能的完整性，请先打开deepin微信，然后关闭。再打开spark版本的微信，此时spark版本的微信所有功能都可以使用。<strong>注：如果出现中文字体变成方块字等显示问题，建议参考本文中的</strong>windows字体安装<strong>部分。</strong></p>
+<p>deepin版本的启动入口在：</p>
+<p>​<img loading="lazy" src="assets/image-20230920091702-l1ne6dk.png" alt="image"  />
+​</p>
+<p>第一次启动需要安装，安装后点立即打开会崩溃，但再次启动微信就正常了。</p>
+<p>spark版本的启动入口在：</p>
+<p>​<img loading="lazy" src="assets/image-20230920091918-gk3cuoi.png" alt="image"  />
+​</p>
+<p>同样第一次启动需要安装</p>
+<p>​<img loading="lazy" src="assets/image-20230920091949-pmwb32i.png" alt="image"  />
+</p>
+<p>在deepin版本的微信安装后，再安装spark版本的微信，则订阅号相关的功能就会变正常。如果只安装deepin版本，或者只安装spark版本的微信，打开这些界面会黑屏或者不显示。</p>
+<p>​<img loading="lazy" src="assets/image-20230920092129-eifgkbx.png" alt="image"  />
+​</p>
+<p>网易云音乐直接打开安装即可，所有功能全部正常。</p>
+<h2 id="微信">微信<a hidden class="anchor" aria-hidden="true" href="#微信">#</a></h2>
+<h3 id="deepin版本的微信">deepin版本的微信<a hidden class="anchor" aria-hidden="true" href="#deepin版本的微信">#</a></h3>
+<p>直接安装<code>deepin-wine-wechat</code>​失败，提示有三个包不能直接安装，其中一个是<code>deepin-wine6-stable</code>​，错误原因是系统找不到<code>autoreconf</code>​，这个软件直接搜索是没有的，因为是在debian系linux才有，但是仍然通过yay搜索得到<code>dh-autoreconf</code>​，其说明表示这是deb的helper，能帮助添加<code>autoreconf</code>​。因此安装这个包。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S dh-autoreconf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装后，再安装微信</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S deepin-wine-wechat
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但这个版本的wechat不能登录，扫码登录后，会要求输入安全码，但是linux上并没有输入窗口，因此废弃这个版本。<strong>但这个版本的wine对于后续的网易云安装是必须的！因此一定要先安装deepin版本的微信！但这个版本的wine对于后续的网易云安装是必须的！因此一定要先安装deepin版本的微信！但这个版本的wine对于后续的网易云安装是必须的！因此一定要先安装deepin版本的微信！</strong></p>
+<h3 id="uos版本的微信">uos版本的微信<a hidden class="anchor" aria-hidden="true" href="#uos版本的微信">#</a></h3>
+<p>uos的桌面版本只有最基本的聊天功能。<code>yay -S wechat-uos</code>​。不推荐安装。</p>
+<h3 id="直接安装微信">直接安装微信<a hidden class="anchor" aria-hidden="true" href="#直接安装微信">#</a></h3>
+<p>需要使用wine模拟windows的应用层，然后就像在windows中安装软件一样。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo pacman -S wine-for-wechat wine-wechat-setup  <span style="color:#007f7f"># wine-wechat-setup可以不安装</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中wine-for-wechat​​是对微信和网易云专门做了修改的wine版本，wine-wechat-setup​​是对wine-for-wechat​​​​的安装和启动写了一个封装。只要有wine-for-wechat​​就可以安装，wine-wechat-setup​​会让安装过程更方便。</p>
+<p>安装成功后，需要去官网下载最新版本的微信，然后运行下列命令，在安装之前，需要先((20230916200607-hootjp8 &ldquo;安装字体&rdquo;))。</p>
+<p>这里需要说明的，<code>wine-wechat-setup</code>​会给微信单独文件夹安装，如果安装了<code>wine-wechat-setup</code>​则使用下面的命令进行安装：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>wechat -i WeChatSetup.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>否则，使用下面的安装：</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>wine WeChatSetup.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中WeChatSetup.exe为下载下来的安装包。注意（微信版本3.9.7，wechat-setup版本1.4）64位的安装包会有聊天框白框的问题，因此选择安装32位的包（WeChatSetup_x86.exe）。<strong>注意：这里仅仅针对的是没有提前安装deepin版本的情况，如果提前安装了deepin版本的微信，则无论哪个包都会有白框！如果需要直装，则不能安装deepin版本，这样的后果是网易云音乐无法正确使用！</strong></p>
+<p>另外还有中文字符显示方框的问题，这个问题比较简单，但解决的方式有很多，大部分不一定有用。目前的解决方式参见本文中的windows字体安装部分。</p>
+<p>在官方仓库的issues中：<a href="https://github.com/archlinuxcn/repo/issues?q=is%3Aissue+is%3Aclosed+wechat">wechat相关问题</a>。这里提到的大部分解决字体的方法不适用于目前的版本。请不要在这上面浪费时间，直接使用上面的windows字体安装。如果不按照上面的方法，则下面的步骤也可以正常解决问题，但数字、英文部分的排版会很奇怪。</p>
+<h4 id="安装字体">安装字体<a hidden class="anchor" aria-hidden="true" href="#安装字体">#</a></h4>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S ttf-ms-fonts
+</span></span><span style="display:flex;"><span>sudo pacman -S ttf-roboto noto-fonts ttf-dejavu
+</span></span><span style="display:flex;"><span>sudo pacman -S wqy-bitmapfont wqy-microhei wqy-microhei-lite wqy-zenhei
+</span></span><span style="display:flex;"><span>sudo pacman -S noto-fonts-cjk adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>yay -S ttf-ms-fonts
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装字体后再安装微信，就没有方框问题了，不需要修改注册表，以及复制字体到wine环境。</p>
+<p>由于其有一些使用上的小问题，最终选择spark版本的微信。</p>
+<h3 id="spark版本的微信">spark版本的微信<a hidden class="anchor" aria-hidden="true" href="#spark版本的微信">#</a></h3>
+<p>安装spark商店版本的微信：<code>yay -S com.qq.weixin.spark</code>​。spark版本的可用，且功能完善。</p>
+<p>与直装的方式的微信比较以后，发现直装的字体虽然能显示，但是数字以及一些字体很怪。但是直装方式可以安装网易云音乐。spark版本的微信需要用到wine（<code>deepin-wine-wechat</code>​提供了魔改的wine），只要有wine即可。<strong>为了后续的网易云音乐安装</strong>，需要先安装<code>deepin-wine-wechat</code>​。因为<code>deepin-wine-wechat</code>​包含了网易云音乐所需要的显示库<code>gdiplus.dll</code>​。但只有<code>deepin-wine-wechat</code>​还不够，因为只安装<code>deepin-wine-wechat</code>​不会提供wine命令，就不能够通过wine安装网易云音乐的安装包了。所以还需要安装<code>wine-for-wechat</code>​。网易云音乐的流程见网易云音乐章节。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo pacman -S wine-for-wechat
+</span></span><span style="display:flex;"><span>yay -S com.qq.weixin.spark 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>spark版本的入口为：</p>
+<p>​<img loading="lazy" src="assets/image-20230918170549-fzngul1.png" alt="image"  />
+​</p>
+<p>修改缩放的方式如下，参考链接：<a href="https://aur.archlinux.org/packages/com.qq.weixin.spark">com.qq.weixin.spark</a></p>
+<p>​<img loading="lazy" src="assets/image-20230916205336-2j1chp3.png" alt="image"  />
+​</p>
+<p>由于我目前使用的屏幕为1080p，不需要修改dpi。直接修改文件中的值为1就行。</p>
+<h3 id="总结">总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a></h3>
+<p>最终选择spark版本的微信，功能完善，不需要修复任何问题，开箱即用。但需要注意的是，要先通过直装方式安装，因为网易云音乐需要前面的环境。</p>
+<h2 id="网易云音乐">网易云音乐<a hidden class="anchor" aria-hidden="true" href="#网易云音乐">#</a></h2>
+<p>经过反复的尝试，原生的网易云音乐已经不能够正常登陆了，详情见：<a href="https://www.cnblogs.com/SendBoringBackToNoWhere/p/17633696.html">发现Ubuntu网易云音乐几乎不能用了</a>。因此，之前通过官方的linux版本已经无法使用。而其他的第三方客户端，都是基于网页版的网易云音乐作适配，而网页版的功能很少，像心动模式就没有。在本文中安装微信的一节中提到，可以通过直装的方式进行安装，并且要先安装<code>deepin-wine-wechat</code>​和<code>wine-for-wechat</code>​。</p>
+<p>先去官网下载安装包到本地。然后通过<code>wine</code>​命令安装网易云，通过<code>wechat</code>​命令安装也可以，但是没有快捷启动。因此直接通过<code>wine</code>​安装。</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S deepin-wine-wechat 
+</span></span><span style="display:flex;"><span>sudo pacman -S wine-for-wechat
+</span></span><span style="display:flex;"><span>wine NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>原因及解释：deepin的wine有原装的gdiplus库，但安装deepin的wechat并不会给wine的调用接口，因此无法通过wine命令安装网易云音乐。当安装wine-for-wechat后，不会修改原来的wine文件夹，仅仅是提供wine命令。这一步其实没有安装新的wine。然后就可以直接安装网易云音乐的包，就可以正常运行网易云！</p>
+<h2 id="v2ray">V2ray<a hidden class="anchor" aria-hidden="true" href="#v2ray">#</a></h2>
+<p>也是一种科学上方式，由于clash在manjaro上的体验不好，不能停止代理，以及代理效果不好。故使用v2ray协议进行科学上网。</p>
+<p>v2ray也有GUI配置，只需要安装两个软件即可</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S v2ray v2raya
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="运行v2raya的服务否则无法使用">运行v2raya的服务，否则无法使用<a hidden class="anchor" aria-hidden="true" href="#运行v2raya的服务否则无法使用">#</a></h3>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo systemctl start v2raya.service <span style="color:#007f7f">#启动 v2rayA</span>
+</span></span><span style="display:flex;"><span>sudo systemctl <span style="color:#fff;font-weight:bold">enable</span> v2raya.service 设置开机自动启动
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>参考链接：<a href="https://zhuanlan.zhihu.com/p/414998586">V2rayA在linux 下安装使用教程</a></p>
+<h3 id="开始设置">开始设置<a hidden class="anchor" aria-hidden="true" href="#开始设置">#</a></h3>
+<p>通过 2017 端口 如 <a href="https://link.zhihu.com/?target=http%3A//localhost%3A2017/">http://localhost:2017</a>访问 UI 界面。</p>
+<p>（如果无法访问，请检查你的服务是否已经启动，<a href="https://link.zhihu.com/?target=https%3A//github.com/v2rayA/v2rayA/issues/237">相关问题</a>）</p>
+<p>官方教程：<a href="https://v2raya.org/docs/prologue/quick-start/">官方教程</a></p>
+<h4 id="创建账号">创建账号<a hidden class="anchor" aria-hidden="true" href="#创建账号">#</a></h4>
+<p>在第一次进入页面时，你需要创建一个管理员账号，请妥善保管你的用户名密码，如果遗忘，使用<code>sudo v2raya --reset-password</code>​命令重置。</p>
+<p>然后导入节点</p>
+<p>free节点仓库</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>https://github.com/xrayfree/free-ssr-ss-v2ray-vpn-clash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>按照其中的方式连接，即可正常科学上网。比起clash好用的多。可以自动代理，自己选择代理方式等。不需要对浏览器单独配置。</p>
+<p>对于v2raya的设置，可能需要按照下面进行设置</p>
+<p>​<img loading="lazy" src="assets/image-20230916170226-kktcy8e.png" alt="image"  />
+​</p>
+<h2 id="wps-office">wps-office<a hidden class="anchor" aria-hidden="true" href="#wps-office">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S patch wps-office wps-office-mui-zh-cn ttf-wps-fonts
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="wps加粗字体显示错误显示成一团黑">WPS加粗字体显示错误，显示成一团黑<a hidden class="anchor" aria-hidden="true" href="#wps加粗字体显示错误显示成一团黑">#</a></h3>
+<p>解决方案：<a href="https://forum.manjaro.org/t/wps/144447">Wps很多字体的加粗都显示异常的问题</a>。如图：</p>
+<p>​<img loading="lazy" src="assets/image-20230921101755-dc4puvl.png" alt="image"  />
+​</p>
+<p>降级 freetype2 (2.13.2-1 → 2.13.0-1) 即可解决问题</p>
+<p>如果是更新包后，出现问题，则系统应该会保留旧包的缓存，可以直接执行</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo pacman -U /var/cache/pacman/pkg/freetype2-2.13.0-1-x86_64.pkg.tar.zst
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果提示包不存在，则说明缓存被清理，或者以前没有安装过旧版。</p>
+<p>​<img loading="lazy" src="assets/image-20230921101903-zcmzndi.png" alt="image"  />
+​</p>
+<p>需要去官方备份下载旧版本，手动安装。官方备份网站：<a href="https://archive.archlinux.org/">归档</a></p>
+<p>​<img loading="lazy" src="assets/image-20230921101945-3yva1uo.png" alt="image"  title="降级后正常"  />
+​</p>
+<h2 id="obs-studio-录屏软件">obs-studio 录屏软件<a hidden class="anchor" aria-hidden="true" href="#obs-studio-录屏软件">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>sudo pacman -S obs-studio 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>目前最新版为<code>obs-studio 29.1.3-1</code>​，这个版本改进了 VAAPI H264 支持，并使用Nvidia的驱动程序<code>libva-vdpau-driver</code>​，但这个程序已经很久没有改进了，是这个驱动的问题导致obs启动崩溃。</p>
+<p>解决方案：卸载<code>libva-vdpau-driver</code>​，<code>yay -R libva-vdpau-driver</code>​，如果实在需要硬件加速，则应安装现在官方活跃的驱动版本：<code>sudo pacman -S nvidia-vaapi-driver ​</code>​，这是一个仍在活跃的改进版：<a href="https://github.com/elFarto/nvidia-vaapi-driver/">nvidia-vaapi-driver</a>。</p>
+<p>参考链接：<a href="https://github.com/obsproject/obs-studio/issues/8056">OBS 29 linux 启动时崩溃分段错误</a></p>
+<h2 id="开机自启动">开机自启动<a hidden class="anchor" aria-hidden="true" href="#开机自启动">#</a></h2>
+<p>参考链接：<a href="https://blog.csdn.net/leigelaile1/article/details/105475105">Manjaro添加软件或者脚本自启动</a></p>
+<p>将需要启动的软件的<code>desktop</code>​文件或者脚本放在~/.config/autostart 文件夹下，开机会自动加载。</p>
+<p>​<img loading="lazy" src="assets/image-20230916100817-5agw1wu.png" alt="image"  />
+​</p>
+<p>针对开机自启动，linux有一套自己的方法，而manjaro又有一套不同的流程。</p>
+<p>上述方式是最简单的一种。参考链接：<a href="https://github.com/MregXN/blogs/issues/2">Manjaro开机自启动脚本实现</a>，<a href="https://github.com/MregXN/blogs/issues/1">Linux开机流程整理</a></p>
+<p>在linux内核加载完成后，会启动初始化程序，也就是第一个程序 <code>/sbin/init</code>​，作用是初始化系统环境，它的进程编号（pid）就是1。其他所有进程都从它衍生，都是它的子进程。</p>
+<p>许多程序需要开机启动。它们在Windows叫做”服务”（service），在 Linux 就叫做”守护进程”（daemon）。init  进程的一大任务，就是去运行这些开机启动的程序。但是，不同的场合需要启动不同的程序，比如用作服务器时，需要启动  Apache，用作桌面就不需要。Linux 允许为不同的场合，分配不同的开机启动程序，这就叫做”运行级别”（run  level）。也就是说，启动时根据”运行级别”，确定要运行哪些程序。manjaro的默认的 <code>init</code>​ 程序是<code>systemd</code>​-<code>sysvcompat</code>​提供的<code>/sbin/init</code>​(新安装的系统已经默认使用<code>systemd</code>​) 或 sysvinit。</p>
+<p>Linux预置七种运行级别（0-6）。基本上，依据有无网络与有无 X Window ，Linux 将 run level 划分为7个等级（0-6）。其中0是关机，1是单用户模式，6是重启。而 2-5，一般来说都是多用户模式。</p>
+<p>每个运行级别在/etc目录下面，都有一个对应的子目录，指定要加载的程序。即rc0.d到rc6.d目录,其中存放的是该运行级别中需要执行的服务脚本的 <strong>软链接文件（即快捷方式）</strong> 。而真正的脚本文件,都存放在etc/init.d 中(结尾为d,即为direction,与init作为区分  )这样做的另一个好处，就是如果你要手动关闭或重启某个进程，直接到目录 /etc/init.d 中寻找启动脚本即可。然而在manjaro中并没有发现以上两个文件，arch系列是有着自己的另一套启动方式。</p>
+<p>网络上的方法大部分是在启动初始化程序时做做手脚，而manjaro发行版早已经弃用了这种模式,转而采用了systemd，以下是用ArchWiki查找init时的原话:</p>
+<blockquote>
+<p>Warning: Arch Linux only has official support for systemd.  When using a different init system, please mention so in support  requests.</p>
+</blockquote>
+<p>所以在manjaro的/etc目录下并没有init文件夹和init.d文件夹。</p>
+<h3 id="systemd">systemd<a hidden class="anchor" aria-hidden="true" href="#systemd">#</a></h3>
+<p>systemd的文件主要存放在/usr/lib/systemd 目录中,有系统（system）和用户（user）之分。关于这部分内容，还有更多的细节，该文件并不是唯一的管理服务的文件。详见：</p>
+<blockquote>
+<p>/usr/lib/systemd/system/  #开机不登陆就能运行<br>
+/usr/lib/systemd/user/  #登陆后运行</p>
+</blockquote>
+<p>每一个服务以.service结尾，文件内一般会分为3部分：[Unit]、[Service]、[Install]</p>
+<p>[Unit] 主要是对这个服务的说明，内容包括Description和After，Description用于描述服务，After用于描述服务类别</p>
+<p>[Service] 是服务的关键，是服务的一些具体运行参数的设置</p>
+<blockquote>
+<p>Type=forking是后台运行的形式，</p>
+<p>PIDFile为存放PID的文件路径，</p>
+<p>ExecStart为服务的具体运行命令，</p>
+<p>ExecReload为重启命令，</p>
+<p>ExecStop为停止命令，</p>
+<p>PrivateTmp=True表示给服务分配独立的临时空间</p>
+<p>注意：[Service]部分的启动、重启、停止命令全部要求使用绝对路径，使用相对路径则会报错！</p>
+</blockquote>
+<p>[Install] 是服务安装的相关设置，可设置为多用户的</p>
+<h3 id="步骤">步骤<a hidden class="anchor" aria-hidden="true" href="#步骤">#</a></h3>
+<p>以远程软件todesk的守护进程为例</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>[Unit]
+</span></span><span style="display:flex;"><span>Description=ToDesk Daemon Service
+</span></span><span style="display:flex;"><span>After=network-online.target
+</span></span><span style="display:flex;"><span>Before=nss-lookup.target
+</span></span><span style="display:flex;"><span>Wants=network-online.target nss-lookup.target
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[Service]
+</span></span><span style="display:flex;"><span>Environment=<span style="color:#0ff;font-weight:bold">&#34;LIBVA_DRIVER_NAME=iHD&#34;</span>
+</span></span><span style="display:flex;"><span>Environment=<span style="color:#0ff;font-weight:bold">&#34;LIBVA_DRIVERS_PATH=/opt/todesk/bin&#34;</span>
+</span></span><span style="display:flex;"><span>ExecStart=/opt/todesk/bin/ToDesk_Service
+</span></span><span style="display:flex;"><span>ExecStop=/bin/kill -SIGINT $MAINPID
+</span></span><span style="display:flex;"><span>Restart=on-failure
+</span></span><span style="display:flex;"><span>RestartSec=3s
+</span></span><span style="display:flex;"><span>User=root
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[Install]
+</span></span><span style="display:flex;"><span>WantedBy=multi-user.target
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将服务自启动</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>systemctl enable todeskd.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>重启后利用systemctl status查看todeskd.service的运行状态。</p>
+<p>​<img loading="lazy" src="assets/image-20230916225844-4cd394h.png" alt="image"  />
+​</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>    ~  systemctl status | grep todesk                                                                                                      ✔  11s  
+</span></span><span style="display:flex;"><span>           │ ├─todeskd.service
+</span></span><span style="display:flex;"><span>           │ │ └─507 /opt/todesk/bin/ToDesk_Service
+</span></span><span style="display:flex;"><span>                 │ │ └─19388 grep todesk
+</span></span><span style="display:flex;"><span>                 │ ├─app-todesk@autostart.service
+</span></span><span style="display:flex;"><span>                 │ │ └─1160 /opt/todesk/bin/ToDesk
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>每一个 Unit 都有一个配置文件，告诉 Systemd 怎么启动这个 Unit 。Systemd 默认从目录<code>/etc/systemd/system/</code>​读取配置文件。但是，里面存放的大部分文件都是符号链接，指向目录<code>/usr/lib/systemd/system/</code>​，真正的配置文件存放在那个目录。​<code>systemctl enable</code>​命令用于在上面两个目录之间，建立符号链接关系。</p>
+<p>可以将<code>/etc/systemd/system/</code>​看作是自动目录，和<code>~/.config/autostart</code>​目录作用的形式差不多，只要是这个文件夹中的脚本就会自动运行。因此需要将真实的脚本链接到这个文件夹中。</p>
+<p>详细的关于systemd的介绍参考：<a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html">Systemd 入门教程：命令篇</a></p>
+<p>参考链接：<a href="https://github.com/MregXN/blogs/issues/2">Manjaro开机自启动脚本实现</a></p>
+<h2 id="修改kde的applications-menu">修改KDE的Applications Menu<a hidden class="anchor" aria-hidden="true" href="#修改kde的applications-menu">#</a></h2>
+<p>我使用的是KDE桌面系统的Manjaro，在安装软件时，会创建desktop文件，用于快速启动应用。这个文件会放在<code>/home/ling/.local/share/applications</code>​下，更多的是放在<code>/home/ling/.local/share/applications</code>​中，wine的程序比较特殊，被放在了文件夹wine中。但我们不需要掌握这一套规则，可以直接使用GUI程序对菜单进行修改。</p>
+<p>右键菜单图标，选择编辑应用（Edit Applications&hellip;）</p>
+<p>​<img loading="lazy" src="assets/image-20230917100317-zev0q9d.png" alt="image"  title="编辑入口"  />
+</p>
+<p>进入到编辑菜单栏后，就可以按照需求，拖动应用程序，或者新增对应的destop文件即可。</p>
+<p>​<img loading="lazy" src="assets/image-20230917100446-u1ui6j6.png" alt="image"  />
+​</p>
+<p>‍</p>
+<h1 id="更换主题">更换主题<a hidden class="anchor" aria-hidden="true" href="#更换主题">#</a></h1>
+<h2 id="在主题商店中安装全局主题">在主题商店中安装全局主题<a hidden class="anchor" aria-hidden="true" href="#在主题商店中安装全局主题">#</a></h2>
+<p>kde桌面有很强的定制性，可以在主题商店中安装各种各样的主题。但目前这个版本的kde（KDE 5.109.0 / Plasma 5.27.7），在安装全局主题时，会有如下报错：</p>
+<p>​<img loading="lazy" src="assets/image-20230917153905-lkkbyqy.png" alt="image"  title="直接安装主题报错"  />
+​</p>
+<p>上述问题提示是由于依赖问题导致的安装失败，而网络上的大部分帖子都提到这这是kde的官方仓库问题。还有推荐<code>ocs-url</code>​进行安装主题的，但是这种方式要求在网页下载，并且会等待10秒才能进行下载安装。而<code>ocs-url</code>​已经过时，使用该方式安装得到的主题大多不包含主题布局，仅仅只有一些开机界面，图标之类的残缺品。下图就展示有主题布局的和通过<code>ocs-url</code>​安装的没有桌面布局的主题。</p>
+<p>​<img loading="lazy" src="assets/image-20230917154123-ixr7fd4.png" alt="image"  title="1没有主题布局"  />
+​</p>
+<p>由于是依赖问题报错，怀疑是仓库被ban导致连接不上仓库，无法下载文件。因此使用科学上网，然后再安装，但仍然有相同问题。在写这篇记录的时候，想对该问题截图，但意外的安装成功了。因此怀疑是代理不稳定。而在Fedora论坛中，发现有如下回答，可以通过命令行方式安装主题压缩包，由于命令行可以直观的观察进度，以及出现问题的原因，因此进行尝试。</p>
+<p>参考链接：<a href="https://discussion.fedoraproject.org/t/fedora-kinoite-global-theme-installation-problem/73736">Fedora Kinoite Global Theme Installation Problem</a></p>
+<p>​<img loading="lazy" src="assets/image-20230917155050-manuq8w.png" alt="image"  />
+​</p>
+<p>结果，通过多次安装，竟然安装成功。因此，可以肯定该问题是由于网络问题导致的，而通过gui形式安装需要的时间较长，也不能直观的看出问题，因此少次尝试将不会成功。</p>
+<p>​<img loading="lazy" src="assets/image-20230917154748-kiesgr1.png" alt="image"  title="多次安装成功"  />
+​</p>
+<p>可以从上图，看出，前几次安装都会失败，但每一次安装，都会有更多的安装包被安装，仅剩下少量的包依赖没有被下载。直到所有的安装包都被成功安装。</p>
+<p>安装命令行如下：<code>kpackagetool5 -i /path/to/theme/file</code>​</p>
+<p>示例：<code>kpackagetool5 -i com.github.vinceliuice.WhiteSur-dark.tar.xz</code>​</p>
+<h2 id="保证成功的安装某一主题的流程">保证成功的安装某一主题的流程<a hidden class="anchor" aria-hidden="true" href="#保证成功的安装某一主题的流程">#</a></h2>
+<ol>
+<li>先在主题商店中查找自己喜欢的主题</li>
+</ol>
+<p>​<img loading="lazy" src="assets/image-20230917155442-slkcq5q.png" alt="image"  title="红框中的为例"  />
+​</p>
+<ol start="2">
+<li>
+<p>点击主题进入详情界面</p>
+<p>​<img loading="lazy" src="assets/image-20230917155544-6omrcno.png" alt="image"  />
+​</p>
+</li>
+<li>
+<p>点击2中的红框部分的链接，通过网页打开该主题的下载界面，然后下载</p>
+<p>​<img loading="lazy" src="assets/image-20230917155711-pbung4s.png" alt="image"  />
+​</p>
+<p><strong>注意：不要点到​<code>install</code>​</strong>，<strong>​<code>install</code>​是通过ocs-url下载安装的。</strong></p>
+</li>
+<li>
+<p>下载到本地后，在下载文件夹中打开终端，运行安装命令</p>
+<p>​<img loading="lazy" src="assets/image-20230917160050-wc6sg3g.png" alt="image"  />
+​</p>
+<p>这个主题本身没有桌面布局，所以一次就安装成功了。像其他有桌面布局的主题，安装包大概都在1M多，没有布局的通常只有几百k。有布局的安装一次通常不会成功，需要在科学上网的情况下，多安装几次，如下：</p>
+<p>​<img loading="lazy" src="assets/image-20230917161322-lsf313u.png" alt="image"  />
+​</p>
+<p>可以看到，在多安装几次以后，已经成功下载了一些之前没有下载成功的包，并进行了安装。如果多次不成功，则检查科学上网是否有问题。一般的情况需要尝试10次以内，依赖多的主题就需要尝试很多次了，例如下面图片中的主题安装</p>
+<p>​<img loading="lazy" src="assets/image-20230917162950-rob9sfx.png" alt="image"  />
+​</p>
+<p>最终尝试了大概20多次，安装成功</p>
+<p>​<img loading="lazy" src="assets/image-20230917163020-xzihix1.png" alt="image"  />
+​</p>
+</li>
+</ol>
+<h2 id="最终美化效果">最终美化效果<a hidden class="anchor" aria-hidden="true" href="#最终美化效果">#</a></h2>
+<p>​<img loading="lazy" src="assets/image-20230917180959-hvxtl28.png" alt="image"  />
+​</p>
+<h1 id="独立显卡笔记本切换gpu以支持外接显示器">独立显卡笔记本切换GPU，以支持外接显示器<a hidden class="anchor" aria-hidden="true" href="#独立显卡笔记本切换gpu以支持外接显示器">#</a></h1>
+<p>参考链接：<a href="https://blog.csdn.net/viilike/article/details/128569907">Manjaro(kde) 安装nvidia显卡驱动（optimus-manager管理）</a></p>
+<h2 id="安装nivida驱动">安装nivida驱动<a hidden class="anchor" aria-hidden="true" href="#安装nivida驱动">#</a></h2>
+<p>首先进入设置界面，选中<strong>硬件设定</strong>，默认安装的很可能是第一个，这里先右键卸载当前驱动，然后安装有版本号的最新驱动。安装成功需要重启生效。</p>
+<p>​<img loading="lazy" src="assets/image-20230918135327-ayorpu5.png" alt="image"  />
+​</p>
+<p>在安装Manjaro时，会自动安装驱动，<del>但经过实践，自动安装的驱动不能正常使用（表现为：外界显示屏仅显示manjaro的开机界面，而不显示桌面内容）</del>。</p>
+<p><del>因此需要在设置中安装新的驱动。</del> 此问题被修正，见2023.9.19日修正</p>
+<h2 id="开机扩展屏不进入桌面问题">开机扩展屏不进入桌面问题<a hidden class="anchor" aria-hidden="true" href="#开机扩展屏不进入桌面问题">#</a></h2>
+<p>2023.9.26日修正：</p>
+<p>在后续的使用过程中，电脑启动时总是会出现<code>Failed to start Virtual Console Setup.</code>​问题，这个问题会导致tty1启动失败，外接电脑会一直显示启动界面，而不进入桌面应该是这个问题导致的。这个问题是由于<code>/etc/vconsole.conf ​</code>​配置文件中对键盘的<code>KEYMAP</code>​设置错误导致的，默认的<code>KEYMAP</code>​为<code>us</code>​，但现在变成了<code>cn</code>​。在之前配置输入法的时候，修改键盘布局为汉语，由于是在设置的GUI界面更改的，不清楚修改了哪些地方，现在看来也对<code>/etc/vconsole.conf</code>​进行了修改。</p>
+<p>通过下列命令打开配置文件</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo nano /etc/vconsole.conf 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改其<code>KEYMAP</code>​，原来为cn,修改为us。可能会有<code>FONT</code>​等字段，直接删除就可（注意在文件的最后留一个空行），因为有默认值，直接删除不会影响配置。修改完成后如下：</p>
+<p>​<img loading="lazy" src="assets/image-20230926114032-0ptawvw.png" alt="image"  />
+​</p>
+<p>2023.9.19日修正：该问题的原因（原因之一）是由于在Optimus中的PCI功耗控制没有<strong>正确设置导致的</strong>。经过反复的尝试，当开启PCI功耗控制时，开机启动可以正常扩展第二屏幕（我的独显是直连到输出接口）。否则第二屏幕将会一直显示启动界面tty1，并且该桌面是一个虚拟桌面，快捷键<code>ctrl+alt+F1</code>​可以切换当前桌面到tty1（默认桌面为tty2，可以通过快捷键<code>ctrl+alt+F2</code>​切换到tty2）。而且，由于Optimus Qt的设置逻辑有一定问题，如果PCI控制选中，即使按钮变灰，PCI功耗控制仍然有效，如下图：</p>
+<p>​<img loading="lazy" src="assets/image-20230919090944-d1fvkgo.png" alt="image"  />
+</p>
+<p>​<img loading="lazy" src="assets/image-20230919091130-tv8wchm.png" alt="image"  />
+​​</p>
+<p>其他的switch选项有一些是可以改变PCI功耗控制的，因此，如果你的PCI功耗控制没有选中，并出现了上述问题，则可以先切换到其他选项，勾选<code>PCI power contol</code>​​，然后再切换到相应的模式。我的电脑在任何模式下都工作，但官方文档中提到，有一些显卡并不能都正常工作，需要自己进行尝试。</p>
+<p><strong>注意：不要勾选</strong>​ <code>PCI reset</code> ​**，会导致机器经常卡死屏幕键盘大小写等完全没反应，或者重启！**</p>
+<h2 id="修改文件sddmconf">修改文件sddm.conf<a hidden class="anchor" aria-hidden="true" href="#修改文件sddmconf">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>kate /etc/sddm.conf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>找到x11,把这两项注释掉</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>[X11]
+</span></span><span style="display:flex;"><span><span style="color:#007f7f">#DisplayCommand=/usr/share/sddm/scripts/Xsetup</span>
+</span></span><span style="display:flex;"><span><span style="color:#007f7f">#DisplayStopCommand=/usr/share/sddm/scripts/Xstop</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>​<img loading="lazy" src="assets/image-20230918134321-0rvcljw.png" alt="image"  />
+​</p>
+<h2 id="安装optimus-manager管理软件">安装optimus-manager管理软件<a hidden class="anchor" aria-hidden="true" href="#安装optimus-manager管理软件">#</a></h2>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S optimus-manager optimus-manager-qt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>安装完成后，开启对应的服务，并设置为开机自启</p>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>systemctl start optimus-manager.service
+</span></span><span style="display:flex;"><span>systemctl <span style="color:#fff;font-weight:bold">enable</span> optimus-manager.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>重启后，进行显卡模式切换，一般切换为Hybird，意为混合模式，在连接显示屏时启动独显（图中没有开启PCI power control，这导致了我在上面提到的开机扩展屏不进入桌面的问题）</p>
+<p>2023.9.29更正：使用ACPI call会导致概率性卡死，可能是底层不支持某一些指令，因为厂商不会实现所有的API。改为开源驱动Nouveau，测试下来，使用Nouveau比较稳定，没有出现突然卡死的情况。</p>
+<p>‍</p>
+<p>​​<img loading="lazy" src="assets/image-20230929092044-c9tfqb8.png" alt="image"  />
+​​</p>
+<p>​​</p>
+<p>其中swiching mode不用更改。若需更改，请参考官方文档：<a href="https://github.com/Askannz/optimus-manager/wiki/A-guide--to-power-management-options">optimus-manager 中的电源管理选项指南</a></p>
+<h2 id="双屏分辨率缩放问题">双屏分辨率缩放问题<a hidden class="anchor" aria-hidden="true" href="#双屏分辨率缩放问题">#</a></h2>
+<p>对与该问题，目前在kde中没有完美的解决方案，唯一的一种方式是通过将要缩小的显示器虚拟一个较高的分辨率，并渲染较高分辨率的画面，然后根据比例缩小到物理分辨率。</p>
+<p>参考链接：<a href="https://zhuanlan.zhihu.com/p/636626088">KDE 双高分辨率显示器不同 DPI 缩放比例</a>。</p>
+<p>这种方式我只对其在X11下的工具进行了使用，并没有完全按照其计算方式进行设置，但很遗憾，在我的电脑并不能正常工作。无论是修改~/.config/kdeglobals文件还是通过<code>xrandr</code>​​进行配置，都无法正常工作。</p>
+<h1 id="一行安装">一行安装<a hidden class="anchor" aria-hidden="true" href="#一行安装">#</a></h1>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S qqmusic-bin visual-studio-code-bin clion java-runtime clion-jre flameshot cmake make linuxqq siyuan-note-bin google-chrome watt-toolkit-bin clash clash-for-windows-bin todesk-bin
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="最后附上一位博主2022的安装笔记">最后附上一位博主2022的安装笔记<a hidden class="anchor" aria-hidden="true" href="#最后附上一位博主2022的安装笔记">#</a></h1>
+<p>链接：<a href="https://mrswolf.github.io/my-manjaro-log/">manjaro踩坑记(2022更新版)</a></p>
+<p>只使用了其中的windows字体安装，这部分，如果早点看到，那么微信字体的bug就不会费那么大劲了。另，其中提到到的SSD优化，目前的版本已经默认开启。</p>
+<p>下面是该网页的保存文件，只在Chrome上测试过，可以打开。<a href="assets/manjaro%E8%B8%A9%E5%9D%91%E8%AE%B02022%E6%9B%B4%E6%96%B0%E7%89%88_swolf%E7%9A%84%E5%8D%9A%E5%AE%A2-20230919165124-ar99mvr.mhtml">manjaro踩坑记2022更新版_swolf的博客.mhtml</a>。mhtml格式是单个文件。</p>
+<h1 id="网易云音乐卡bug安装">网易云音乐卡bug安装<a hidden class="anchor" aria-hidden="true" href="#网易云音乐卡bug安装">#</a></h1>
+<div class="highlight"><div style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#727272">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#e5e5e5;background-color:#000;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S dh-autoreconf <span style="color:#007f7f"># manjaro下需要手动安装deepin的依赖</span>
+</span></span><span style="display:flex;"><span>yay -S deepin-wine-wechat <span style="color:#007f7f"># deepin版本的微信</span>
+</span></span><span style="display:flex;"><span>sudo pacman -S wine-for-wechat
+</span></span><span style="display:flex;"><span>yay -S com.qq.weixin.spark <span style="color:#007f7f"># 微信</span>
+</span></span><span style="display:flex;"><span>wine NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe <span style="color:#007f7f"># 网易云音乐，NeteaseCloudMusic_Music_official_2.10.12.201849_32.exe是在官网下载的windows安装包</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>deepin的wine有原装的gdiplus库，但只安装deepin的wechat，没有给wine程序，因此无法通过命令行安装网易云音乐。因此需要安装wine-for-wechat，提供wine命令。这一步其实没有安装新的wine。然后就可以直接安装网易云的包，就可以正常运行网易云！甚至能使用桌面歌词！</p>
+<p>​<img loading="lazy" src="assets/image-20230920001021-5n92b9r.png" alt="image"  />
+​</p>
+<p>​​</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="">Linglong&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
