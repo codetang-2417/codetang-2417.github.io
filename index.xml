@@ -6,14 +6,14 @@
     <description>Recent content on Linglong&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Wed, 04 Oct 2023 13:29:11 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 05 Oct 2023 23:13:01 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Manjaro Environment Establishment</title>
-      <link>https://codetang-2417.github.io/posts/record/manjaro-environment-establishment/</link>
-      <pubDate>Wed, 04 Oct 2023 13:29:11 +0800</pubDate>
+      <title>基于Hugo PaperMod搭建一个博客网站</title>
+      <link>https://codetang-2417.github.io/posts/record/%E5%9F%BA%E4%BA%8Ehugo%E5%BB%BA%E7%AB%8B%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Thu, 05 Oct 2023 23:13:01 +0800</pubDate>
       
-      <guid>https://codetang-2417.github.io/posts/record/manjaro-environment-establishment/</guid>
-      <description>时间：2023/9/14/10:42 本文档旨在记录安装完成manjaro系统后，对系统开发和使用环境的配置，不介绍安装部分。manjaro的</description>
+      <guid>https://codetang-2417.github.io/posts/record/%E5%9F%BA%E4%BA%8Ehugo%E5%BB%BA%E7%AB%8B%E5%8D%9A%E5%AE%A2/</guid>
+      <description>Hugo PaperMod 是基于 hugo-paper 的一个主题。基于其可以快速搭建一个博客网站。这是利用框架搭建的一个example，介绍其安装和搭建过程：hugo-PaperMo</description>
     </item>
     
     <item>
@@ -23,6 +23,15 @@
       
       <guid>https://codetang-2417.github.io/about/</guid>
       <description>关于我 在读研究生 一个普通人</description>
+    </item>
+    
+    <item>
+      <title>Manjaro Environment Establishment</title>
+      <link>https://codetang-2417.github.io/posts/record/manjaro-environment-establishment/</link>
+      <pubDate>Wed, 04 Oct 2023 13:29:11 +0800</pubDate>
+      
+      <guid>https://codetang-2417.github.io/posts/record/manjaro-environment-establishment/</guid>
+      <description>Manjaro Environment 自用环境配置</description>
     </item>
     
     
