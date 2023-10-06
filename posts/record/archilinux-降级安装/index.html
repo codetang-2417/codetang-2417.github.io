@@ -10,9 +10,7 @@
 <meta name="description" content="参考链接：降级软件包 使用pacman的临时文件 如果一个新包刚刚被安装并且没有删除pacman cache,你可以在/var/cache/pac">
 <meta name="author" content="Ling">
 <link rel="canonical" href="https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.e17922e3a67c643a741238ddb4b0d55cd3f1c7f02dec55aa8ecc24f5d90aaeaa.css" integrity="sha256-4Xki46Z8ZDp0EjjdtLDVXNPxx/At7FWqjswk9dkKrqo=" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
-    onload="hljs.initHighlightingOnLoad();"></script>
+<link crossorigin="anonymous" href="/assets/css/stylesheet.17c5abc5d55618d9034f239ddb99eba84bad8b4b8dc02b52b3efa5fb0184fb2a.css" integrity="sha256-F8WrxdVWGNkDTyOd25nrqEuti0uNwCtSs&#43;&#43;l&#43;wGE&#43;yo=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://codetang-2417.github.io/img/L.png">
@@ -396,7 +394,7 @@ var _hmt = _hmt || [];
   <div class="post-content"><p>参考链接：<a href="https://wiki.archlinuxcn.org/wiki/%E9%99%8D%E7%BA%A7%E8%BD%AF%E4%BB%B6%E5%8C%85">降级软件包</a></p>
 <h1 id="使用pacman的临时文件">使用pacman的临时文件<a hidden class="anchor" aria-hidden="true" href="#使用pacman的临时文件">#</a></h1>
 <p>如果一个新包刚刚被安装并且没有删除<a href="https://wiki.archlinuxcn.org/wiki/Pacman#Cleaning_the_package_cache" title="Pacman">pacman cache</a>,你可以在<code>/var/cache/pacman/pkg/</code>​中找到较早版本. 安装替换现有的版本.<a href="https://wiki.archlinuxcn.org/wiki/Pacman" title="Pacman">pacman</a>会处理依赖包但不会处理依赖库的版本冲突。如果一个其依赖库因该包降级需要降级，你需要手动降级这些包。</p>
-<div class="highlight"><pre tabindex="0" style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> # pacman -U /var/cache/pacman/pkg/package-old_version.pkg.tar.type
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> # pacman -U /var/cache/pacman/pkg/package-old_version.pkg.tar.type
 </span></span></code></pre></div><p>对老的软件包，<code>type</code>​ 应该是 <code>xz</code>​，遵循 <a href="https://archlinux.org/news/now-using-zstandard-instead-of-xz-for-package-compression/">2020 变更</a>的新软件包，<code>type</code>​ 应该是 <code>zst</code>​。</p>
 <p>当成功降级该包以后，请<strong>暂时将其加入</strong>​<code>**pacman.conf**</code>​​​的<a href="https://wiki.archlinuxcn.org/wiki/Pacman#Skip_package_from_being_upgraded" title="Pacman">IgnorePkg section</a>，直到您的问题被解决。</p>
 <p>使用nano编辑文件/etc/pacman.conf，找到其中的IgnorePKG字段，按照下图将降级包加入到配置中。</p>

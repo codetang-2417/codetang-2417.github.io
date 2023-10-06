@@ -10,9 +10,7 @@
 <meta name="description" content="WPS加粗字体显示错误">
 <meta name="author" content="Ling">
 <link rel="canonical" href="https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.e17922e3a67c643a741238ddb4b0d55cd3f1c7f02dec55aa8ecc24f5d90aaeaa.css" integrity="sha256-4Xki46Z8ZDp0EjjdtLDVXNPxx/At7FWqjswk9dkKrqo=" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
-    onload="hljs.initHighlightingOnLoad();"></script>
+<link crossorigin="anonymous" href="/assets/css/stylesheet.17c5abc5d55618d9034f239ddb99eba84bad8b4b8dc02b52b3efa5fb0184fb2a.css" integrity="sha256-F8WrxdVWGNkDTyOd25nrqEuti0uNwCtSs&#43;&#43;l&#43;wGE&#43;yo=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://codetang-2417.github.io/img/L.png">
@@ -323,7 +321,7 @@ var _hmt = _hmt || [];
 ​</p>
 <p>降级 freetype2 (2.13.2-1 → 2.13.0-1) 即可解决问题</p>
 <p>如果是更新包后，出现问题，则系统应该会保留旧包的缓存，可以直接执行</p>
-<div class="highlight"><pre tabindex="0" style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo pacman -U /var/cache/pacman/pkg/freetype2-2.13.0-1-x86_64.pkg.tar.zst
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo pacman -U /var/cache/pacman/pkg/freetype2-2.13.0-1-x86_64.pkg.tar.zst
 </span></span></code></pre></div><p>如果提示包不存在，则说明缓存被清理，或者以前没有安装过旧版。</p>
 <p>​<img loading="lazy" src="assets/image-20230921101903-zcmzndi.png" alt="image"  />
 ​</p>
