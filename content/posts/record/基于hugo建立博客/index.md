@@ -1,7 +1,7 @@
 ---
 title: "基于Hugo PaperMod搭建一个博客网站"
 date: 2023-10-05T23:13:01+08:00
-lastmod: 2023-10-05T23:13:01+08:00
+lastmod: 2023-10-06T12:44:01+08:00
 author: ["Ling"]
 keywords:
 - hugo
@@ -31,6 +31,7 @@ cover:
     alt: ""
     relative: false
 ---
+
 [Hugo PaperMod](https://github.com/adityatelange/hugo-PaperMod/) 是基于 [hugo-paper](https://github.com/nanxiaobei/hugo-paper) 的一个主题。基于其可以快速搭建一个博客网站。这是利用框架搭建的一个example，介绍其安装和搭建过程：[hugo-PaperMod - Installation](https://adityatelange.github.io/hugo-PaperMod/posts/papermod/papermod-installation/)。
 
 在普通搭建以及在GITHUB上搭建参考：[hugo博客搭建 | PaperMod主题](https://www.sulvblog.cn/posts/blog/build_hugo/)；[利用 Hugo 和 Github Pages 创建静态博客并实现自动部署](https://www.yuweihung.com/posts/2021/hugo-github-pages-blog/)
@@ -1093,16 +1094,78 @@ params:
 
 ## Google搜索优化
 
-第一步，进入Google Search Console点击添加资源，输入自己的网站。比如我的是https://www.sulvblog.cn，选择第二种验证方式，然后下载一个html文件放到hugo站点的static文件夹下，然后重新部署站点，回到Google Search Console页面点击验证，如果能访问到表示验证成功。
+第一步，进入[Google Search Console](https://search.google.com/search-console)点击添加资源，输入自己的网站。比如我的是https://codetang-2417.github.io，选择第二种验证方式，然后下载一个html文件放到hugo站点的static文件夹下，然后重新部署站点，回到Google Search Console页面点击验证，如果能访问到表示验证成功。
 
-第二步，在Google Search Console页面点击站点地图，输入当前站点的sitemap.xml，也有可能是其他后缀，hugo部署后一般会自动生成sitemap，在根目录下，如：https://www.sulvblog.cn/sitemap.xml
+​![image](assets/image-20231005232045-hh5js26.png)​
 
-​![image](assets/image-20231005225831-fricika.png)​
+第二步，在Google Search Console页面点击站点地图，输入当前站点的sitemap.xml，也有可能是其他后缀，hugo部署后一般会自动生成sitemap，在根目录下，如：https://codetang-2417.github.io/sitemap.xml
+
+​​![image](assets/image-20231005232543-h4bnoxd.png)​​
 
 ## 百度搜索优化
 
-进入百度搜索资源平台，选择 用户中心->站点管理->添加网站，添加上你自己的网站，这里的验证方式也可以选择下载html的方式，步骤和google的一样，验证成功后选择 搜索服务->普通收录->sitemap，输入sitemap的网址，和google的站点地图一样，如我的是： https://www.sulvblog.cn/sitemap.xml。注意百度不容许以子目录的方式提交子站点，和google不一样，只能在提交sitemap文件时，提交多个sitemap文件。
+进入[百度搜索资源平台](https://ziyuan.baidu.com/)，选择 用户中心->站点管理->添加网站，添加上你自己的网站，这里的验证方式也可以选择下载html的方式，步骤和google的一样，验证成功后选择 搜索服务->普通收录->sitemap，输入sitemap的网址，和google的站点地图一样，如我的是： https://codetang-2417.github.io/sitemap.xml。注意百度不容许以子目录的方式提交子站点，和google不一样，只能在提交sitemap文件时，提交多个sitemap文件。
 
 ## 必应搜索优化
 
 进入[Bing Webmaster Tools](https://www.bing.com/webmasters)，登录后直接导入google的数据就可以，很方便。
+
+‍
+
+# 评论系统
+
+参考：[Hugo使用指北](https://hj24.life/posts/hugo%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8C%97/)
+
+### 添加 gittalk
+
+用 gittalk 做评论系统
+
+评论模块在主题里的路径是：`/path/to/site/themes/{theme}/layouts/partials/comments.html`​，只需要再站点目录的`/path/to/site/layouts/partials/comments.html`​写对应的内容就能覆盖这一部分了。
+
+下面就给个例子，不同模板得看着自己的css样式啥的改成对应的，不过gittalk接入的代码都是一样的：
+
+```html
+<!-- gitalk -->
+<div class="doc_comments">
+	<div id="gitalk-container"></div>
+</div>
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script type="text/javascript">
+let gitalk = new Gitalk({
+  clientID: '换成你自己的',
+  clientSecret: '换成你自己的',
+  repo: 'xxx.github.io',
+  owner: 'xxx',
+  admin: ['xxx'],
+  id: '{{ .Params.Date }}',      // Ensure uniqueness and length less than 50
+  distractionFreeMode: false,  // Facebook-like distraction free mode
+  title : '{{ .Params.Title }}',
+  labels : []
+});
+gitalk.render('gitalk-container')
+</script>
+```
+
+接入 gittalk 之前要去申请 Github OAuth App，可以点[这里](https://github.com/settings/applications/new)申请，几个需要填写的内容：
+
+|字段|内容|备注|
+| ----------------------------| ----------------------| --------------|
+|Application name|取一个名字|填写应用名称|
+|Homepage URL|https://你的域名|主页地址|
+|Application description|描述，自己写就可以了|备注|
+|Authorization callback URL|和上面的域名一样|回调地址|
+
+注册完之后拿着你的 clientID 和 clientSecret 填到上面，在配置里把原主题自带的评论选项打开，就可以完成覆盖了:
+
+```toml
+[params.valine]
+  enable = true
+  appId = ""
+  appKey = ""
+  placeholder = " "
+  visitor = true
+```
+
+‍
