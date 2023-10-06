@@ -5,12 +5,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>PaperMod | Linglong&#39;s Blog</title>
-<meta name="keywords" content="">
-<meta name="description" content="ling的个人博客，hugo,manjaro,c&#43;&#43;,单片机，qemu">
-<meta name="author" content="Linglong">
-<link rel="canonical" href="https://codetang-2417.github.io/tags/papermod/">
+<title>WPS加粗字体显示错误，显示成一团黑 | Linglong&#39;s Blog</title>
+<meta name="keywords" content="linux, archlinux, wps">
+<meta name="description" content="WPS加粗字体显示错误">
+<meta name="author" content="Ling">
+<link rel="canonical" href="https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.e17922e3a67c643a741238ddb4b0d55cd3f1c7f02dec55aa8ecc24f5d90aaeaa.css" integrity="sha256-4Xki46Z8ZDp0EjjdtLDVXNPxx/At7FWqjswk9dkKrqo=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+    onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://codetang-2417.github.io/img/L.png">
@@ -18,7 +20,6 @@
 <link rel="mask-icon" href="https://codetang-2417.github.io/L.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" type="application/rss+xml" href="https://codetang-2417.github.io/tags/papermod/index.xml">
 <noscript>
     <style>
         #theme-toggle,
@@ -56,6 +57,8 @@
 
     </style>
 </noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
 <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
@@ -71,18 +74,80 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 })();
 </script>
-<meta property="og:title" content="PaperMod" />
-<meta property="og:description" content="ling的个人博客，hugo,manjaro,c&#43;&#43;,单片机，qemu" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://codetang-2417.github.io/tags/papermod/" />
+<meta property="og:title" content="WPS加粗字体显示错误，显示成一团黑" />
+<meta property="og:description" content="WPS加粗字体显示错误" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-10-06T12:58:01+08:00" />
+<meta property="article:modified_time" content="2023-10-06T12:58:01+08:00" />
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="PaperMod"/>
-<meta name="twitter:description" content="ling的个人博客，hugo,manjaro,c&#43;&#43;,单片机，qemu"/>
+<meta name="twitter:title" content="WPS加粗字体显示错误，显示成一团黑"/>
+<meta name="twitter:description" content="WPS加粗字体显示错误"/>
 
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "文章",
+      "item": "https://codetang-2417.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "🥝踩坑记录",
+      "item": "https://codetang-2417.github.io/posts/record/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "WPS加粗字体显示错误，显示成一团黑",
+      "item": "https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "WPS加粗字体显示错误，显示成一团黑",
+  "name": "WPS加粗字体显示错误，显示成一团黑",
+  "description": "WPS加粗字体显示错误",
+  "keywords": [
+    "linux", "archlinux", "wps"
+  ],
+  "articleBody": "解决方案：Wps很多字体的加粗都显示异常的问题。如图：\n​ ​\n降级 freetype2 (2.13.2-1 → 2.13.0-1) 即可解决问题\n如果是更新包后，出现问题，则系统应该会保留旧包的缓存，可以直接执行\nsudo pacman -U /var/cache/pacman/pkg/freetype2-2.13.0-1-x86_64.pkg.tar.zst 如果提示包不存在，则说明缓存被清理，或者以前没有安装过旧版。\n​ ​\n需要去官方备份下载旧版本，再使用上述命令行手动安装。官方备份网站：归档\n​ ​\n‍\n",
+  "wordCount" : "148",
+  "inLanguage": "zh",
+  "datePublished": "2023-10-06T12:58:01+08:00",
+  "dateModified": "2023-10-06T12:58:01+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "Ling"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Linglong's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://codetang-2417.github.io/img/L.png"
+    }
+  }
+}
+</script>
 </head>
 
-<body class="list" id="top">
+<body class="" id="top">
 <script>
     if (localStorage.getItem("pref-theme") === "dark") {
         document.body.classList.add('dark');
@@ -157,22 +222,18 @@ var _hmt = _hmt || [];
         </ul>
     </nav>
 </header>
-<main class="main"> 
-<header class="page-header"><div class="breadcrumbs"><a href="https://codetang-2417.github.io">主页</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/tags/">Tags</a></div>
-  <h1>
-    PaperMod
-  </h1>
-</header>
+<main class="main">
 
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
-    <h2>基于Hugo PaperMod搭建一个博客网站
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Hugo PaperMod 是基于 hugo-paper 的一个主题。基于其可以快速搭建一个博客网站。这是利用框架搭建的一个example，介绍其安装和搭建过程：hugo-PaperMo...</p>
-  </div>
-  <footer class="entry-footer">
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://codetang-2417.github.io">主页</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/">文章</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/record/">🥝踩坑记录</a></div>
+    <h1 class="post-title">
+      WPS加粗字体显示错误，显示成一团黑
+    </h1>
+    <div class="post-description">
+      WPS加粗字体显示错误
+    </div>
+    <div class="post-meta">
 
 <style>
     i[id*="post_meta_style"] {
@@ -198,7 +259,7 @@ var _hmt = _hmt || [];
         <span>
             
 十月
-五日
+六日
 
             &nbsp;
             <span class="year"> 2023</span>
@@ -215,13 +276,13 @@ var _hmt = _hmt || [];
     
     <span id="post_meta_style_3">
         <span class="fa fa-file-word-o"></span>
-        <span>11363字
+        <span>148字
             &nbsp;&nbsp;
         </span>
     </span>
     <span id="post_meta_style_4">
         <span class="fa fa-clock-o"></span>
-        <span>23分钟
+        <span>1分钟
             &nbsp;&nbsp;
         </span>
     </span>
@@ -235,8 +296,9 @@ var _hmt = _hmt || [];
         <span class="fa fa-tags" style="opacity: 0.8"></span>
         <span>
             <span class="post-tags-meta">
-                <a href="https://codetang-2417.github.io/tags/hugo/" style="color: var(--secondary)!important;">hugo</a>
-                &nbsp;<a href="https://codetang-2417.github.io/tags/papermod/" style="color: var(--secondary)!important;">PaperMod</a>
+                <a href="https://codetang-2417.github.io/tags/archlinux/" style="color: var(--secondary)!important;">archlinux</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/wps/" style="color: var(--secondary)!important;">wps</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/linux/" style="color: var(--secondary)!important;">linux</a>
             </span>
         </span>
     </span>
@@ -251,8 +313,48 @@ var _hmt = _hmt || [];
           </span>
       </span>
 </span>
-</footer>
-  <a class="entry-link" aria-label="post link to 基于Hugo PaperMod搭建一个博客网站" href="https://codetang-2417.github.io/posts/record/%E5%9F%BA%E4%BA%8Ehugo%E5%BB%BA%E7%AB%8B%E5%8D%9A%E5%AE%A2/"></a>
+
+
+</div>
+  </header> 
+
+  <div class="post-content"><p>解决方案：<a href="https://forum.manjaro.org/t/wps/144447">Wps很多字体的加粗都显示异常的问题</a>。如图：</p>
+<p>​<img loading="lazy" src="assets/image-20230921101755-dc4puvl.png" alt="image"  />
+​</p>
+<p>降级 freetype2 (2.13.2-1 → 2.13.0-1) 即可解决问题</p>
+<p>如果是更新包后，出现问题，则系统应该会保留旧包的缓存，可以直接执行</p>
+<div class="highlight"><pre tabindex="0" style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>sudo pacman -U /var/cache/pacman/pkg/freetype2-2.13.0-1-x86_64.pkg.tar.zst
+</span></span></code></pre></div><p>如果提示包不存在，则说明缓存被清理，或者以前没有安装过旧版。</p>
+<p>​<img loading="lazy" src="assets/image-20230921101903-zcmzndi.png" alt="image"  />
+​</p>
+<p>需要去官方备份下载旧版本，再使用上述命令行手动安装。官方备份网站：<a href="https://archive.archlinux.org/">归档</a></p>
+<p>​<img loading="lazy" src="assets/image-20230921101945-3yva1uo.png" alt="image"  title="降级后正常"  />
+​</p>
+<p>‍</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://codetang-2417.github.io/tags/archlinux/">archlinux</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/wps/">wps</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/linux/">linux</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>Archlinux  降级安装</span>
+  </a>
+  <a class="next" href="https://codetang-2417.github.io/posts/record/%E5%9F%BA%E4%BA%8Ehugo%E5%BB%BA%E7%AB%8B%E5%8D%9A%E5%AE%A2/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>基于Hugo PaperMod搭建一个博客网站</span>
+  </a>
+</nav>
+
+  </footer>
 </article>
     </main>
     
@@ -323,6 +425,53 @@ var _hmt = _hmt || [];
         }
     })
 
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
 </script>
 </body>
 

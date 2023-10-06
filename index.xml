@@ -6,7 +6,25 @@
     <description>Recent content on Linglong&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Thu, 05 Oct 2023 23:13:01 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 06 Oct 2023 19:10:01 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Archlinux  降级安装</title>
+      <link>https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/</link>
+      <pubDate>Fri, 06 Oct 2023 19:10:01 +0800</pubDate>
+      
+      <guid>https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/</guid>
+      <description>参考链接：降级软件包 使用pacman的临时文件 如果一个新包刚刚被安装并且没有删除pacman cache,你可以在/var/cache/pac</description>
+    </item>
+    
+    <item>
+      <title>WPS加粗字体显示错误，显示成一团黑</title>
+      <link>https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/</link>
+      <pubDate>Fri, 06 Oct 2023 12:58:01 +0800</pubDate>
+      
+      <guid>https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/</guid>
+      <description>WPS加粗字体显示错误</description>
+    </item>
+    
     <item>
       <title>基于Hugo PaperMod搭建一个博客网站</title>
       <link>https://codetang-2417.github.io/posts/record/%E5%9F%BA%E4%BA%8Ehugo%E5%BB%BA%E7%AB%8B%E5%8D%9A%E5%AE%A2/</link>
