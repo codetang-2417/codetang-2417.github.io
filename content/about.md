@@ -1,5 +1,5 @@
 ---
-title: "About"
+title: "关于"
 date: 2023-10-04T16:33:56+08:00
 lastmod: 2023-10-05T22:33:56+08:00
 author: ["Ling"]
@@ -13,7 +13,7 @@ showToc: false # 显示目录
 TocOpen: false # 自动展开目录
 hidemeta: true # 是否隐藏文章的元信息，如发布日期、作者等
 disableShare: true # 底部不显示分享栏
-showbreadcrumbs: flase #顶部显示路径
+showbreadcrumbs: false #顶部显示路径
 cover:
     image: "" #图片路径例如：posts/tech/123/123.png
     zoom: # 图片大小，例如填写 50% 表示原图像的一半大小
@@ -21,6 +21,4 @@ cover:
     alt: ""
     relative: false
 ---
-# 关于我
-在读研究生
-一个普通人
+😃欢迎到此一游
