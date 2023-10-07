@@ -10,7 +10,7 @@
 <meta name="description" content="Hugo PaperMod 是基于 hugo-paper 的一个主题。基于其可以快速搭建一个博客网站。这是利用框架搭建的一个example，介绍其安装和搭建过程：hugo-PaperMo">
 <meta name="author" content="Ling">
 <link rel="canonical" href="https://codetang-2417.github.io/posts/record/%E5%9F%BA%E4%BA%8Ehugo%E5%BB%BA%E7%AB%8B%E5%8D%9A%E5%AE%A2/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.17c5abc5d55618d9034f239ddb99eba84bad8b4b8dc02b52b3efa5fb0184fb2a.css" integrity="sha256-F8WrxdVWGNkDTyOd25nrqEuti0uNwCtSs&#43;&#43;l&#43;wGE&#43;yo=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.7d6c890d7dd19cf7a2c61815803e78fb9bb1b7e592021bd7ccd51754bdbfde13.css" integrity="sha256-fWyJDX3RnPeixhgVgD54&#43;5uxt&#43;WSAhvXzNUXVL2/3hM=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://codetang-2417.github.io/img/L.png">
@@ -121,7 +121,7 @@ var _hmt = _hmt || [];
     "hugo", "PaperMod", "github"
   ],
   "articleBody": "Hugo PaperMod 是基于 hugo-paper 的一个主题。基于其可以快速搭建一个博客网站。这是利用框架搭建的一个example，介绍其安装和搭建过程：hugo-PaperMod - Installation。\n在普通搭建以及在GITHUB上搭建参考：hugo博客搭建 | PaperMod主题；利用 Hugo 和 Github Pages 创建静态博客并实现自动部署\nhugo官方文档中文版：Hugo静态网站建站手册\n网络上关于搭建博客的文章很多，但是很多都只是简单的搭建，没有说清楚搭建以后，应该怎么用，建立新文章怎么管理内容，怎么将图片放在文章之中。如果要对文章进行分类，应该如何做。\nHugo 快速上手 创建网站 本文档在Manjaro系统下操作。\n首先需要安装一些依赖软件：go​​ hugo​​ ​dart-sass​​\n参考链接：manjaro go环境搭建、PaperMod Installation\nsudo pacman -S go sudo pacman -S hugo sudo pacman -S dart-sass 首先使用hugo建立一个新网站：quick-start。需要注意的是，Hugo PaperMod推荐使用的配置文件格式是yml，因此需要使用 -f 指定为yml。\nhugo new site -f yml 但是指定以后在目录下自动创建的配置文件的格式仍然是toml，需要手动更改为yml。并且其默认名称也从config.toml变成了现在的hogo.toml。\n下载主题 这一步需要下载主题到本地。然后按照配置文件，修改其中的配置，以符合自己的想法，然后在配置中选中主题。\nhugo主题官网中有很多主题，我选择PaperMod。点击下载，进入主题github界面，然后通过submodule的方式将主题添加到blog网站站点的文件夹的themes目录。\nsubmodule的好处是便于更新。当下载完主题后，将主题的assets、i18n、layouts目录复制到网站目录下。后续修改直接在网站目录下修改即可。参考 PaperMod Installation 中的方法2.\n​ ​\n完成的目录\n​ ​\n​ ​\n当新电脑需要clone时，加入下列参数，可以直接连submdules一起下载。\ngit clone username.github.io --recurse-submodules 站点目录介绍 quickstart/\n├── archetypes/\n│ └── default.md # 指明新生成的页面默认的头部注释\n├── assets/ # 存储所有需要由 Hugo Pipes 处理的文件。只有使用了 .Permalink 或 .RelPermalink 的文件才会发布到public 目录\n├── config/ # 默认情况下不会创建。存储 yaml、toml、json 文件，几乎不用配置，但是 Hugo 提供了配置指令\n├── content/ # 网站的所有内容都将位于此目录中。content 下的顶级文件夹表示分类\n├── data/ # 存储Hugo在生成网站时可以使用的配置文件。也可以创建从动态内容中提取的数据模板\n├── layouts/ # 以 .html 文件的形式存储模板，指定如何将内容视图呈现到静态网站中\n├── public/ # hugo 命令生成的静态页面存储位置，用于正式发布\n├── static/ # 存储所有静态内容：图像、CSS、JavaScript等\n├── themes/ # 主题目录\n└── hogo.toml # 生成页面配置文件\n配置主题 在配置文件hugo.yml中，将theme配置成主题文件夹的名称PaperMod。hugo有一套自己的配置参数，可以配置网站的显示效果，每个主题又有自己单独的一些配置参数，可以参考主题的介绍进行配置。这是hugo的配置介绍：Configure Hugo，这是PaperMod的配置介绍：Features。\n建议按照PaperMod的sample-configyml进行配置，配置大概后，再根据需求进行更改。\n​ ​\n在PaperMod主题的官方wiki中的Features部分，详细介绍了支持的几种模式（Regular Mode ，Home-Info Mode，Profile Mode）以及给了默认的一些界面（search（搜索界面），archives（记录时间线），tags（标签））。并给出了使用对应的特性的方法。\n例如使用Archives Layout，展示时间线 在 content​中建立新文件archive.md​\n. ├── config.yml ├── content/ │ ├── archives.md \u003c--- Create archive.md here │ └── posts/ ├── static/ └── themes/ └── PaperMod/ 然后将下列内容放在文件中\n--- title: \"Archive\" layout: \"archives\" url: \"/archives/\" summary: archives --- layout字段表示使用主题自带的layout布局。\n如果在hogo.yml的配置文件中，正确配置了菜单，并将archives的路径加入到菜单（如下），则可以在主页顶部看到导航栏中有时间轴，点击就可以看到建立文件的时间线。\nmenu: main: - identifier: search name: 🔍搜索 url: search weight: 1 - identifier: home name: 🏠主页 url: / weight: 2 - identifier: posts name: 📚文章 url: posts weight: 3 - identifier: archives name: ⏱时间轴 url: archives weight: 4 - identifier: tags name: 🔖标签 url: tags weight: 5 - identifier: about name: 🙋🏻♂️关于 url: about weight: 6 启动博客 配置完成后，在终端直接输入hugo server -D​，启动 Hogo server，然后在浏览器中打开http://localhost:1313​就可以在本地预览效果。\nhugo server的用法简介 根据官方网站的描述：hugo server\n​hugo​提供高性能的网络服务器功能，渲染的内容以及网站的内容被放在内存中而不是放在硬盘。hugo会监视硬盘中的文件，如果有任何改动，hugo会自动重新构建整个网站，并且重新加载。然后就能在浏览器中看到最新的更改。\n​hugo server​的命令格式为\nUsage: hugo server [command] [flags] hugo server [command] Command仅有trust，用于安装证书，一般都不需要。只在后面跟各种flags，例如\nhugo server -D -D用于将标记为Drafts的content也进行build，然后放在website中进行显示。\n添加文章到网站 hugo有一套管理内容的方式，称之为page bundles​。要了解如何将文章添加到网站，并对其进行有效的管理，才能有条理的添加文章到网站。\npage bundles 又被称作页面解析。page bundles​分为两种：\nLeaf Bundle (leaf means it has no children) 叶子目录 Branch Bundle (home page, section, taxonomy terms, taxonomy list)集合目录 叶子目录 集合目录 用法 单个页面的内容和附件集合 章节页面的附件集合（主页、章节、分类术语、分类列表） 索引文件名 ​index.md​ ​_index.md​ 允许的资源 页面（page）和非页面（如图像、PDF 等） 仅限非页面（如图像、PDF 等） 资源位置 叶子界面下包含的所有目录 仅_index.md​ 所在目录，不包含下级目录 布局类型 ​single​ ​list​ 嵌套 不允许嵌套其他页面 允许在其下嵌套集合和页面 例 ​content/posts/test/index.md​ ​content/posts/_index.md​ 非索引页面文件 仅作为页面资源访问 仅作为常规页面访问 Leaf Bundle Leaf Bundle 是 content/ 目录中任何层次结构中的包含一个 index.md 文件的目录。叶子目录中不能再包含叶子目录，但不限制其本身的目录深度。\nExamples of leaf bundle organization content/ ├── about # leaf bundle │ ├── index.md ├── posts # leaf bundle │ ├── my-post # leaf bundle │ │ ├── content1.md │ │ ├── content2.md │ │ ├── image1.jpg │ │ ├── image2.png │ │ └── index.md │ └── my-other-post # leaf bundle │ └── index.md │ └── another-section ├── .. └── not-a-leaf-bundle ├── .. └── another-leaf-bundle # leaf bundle └── index.md branch Bundle branch Bundle 是 content/ 目录中任何层次结构中的包含一个 _index.md 文件的目录。\nExamples of branch bundle organization content/ ├── branch-bundle-1 │ ├── branch-content1.md │ ├── branch-content2.md │ ├── image1.jpg │ ├── image2.png │ └── _index.md └── branch-bundle-2 ├── _index.md └── a-leaf-bundle └── index.md 添加文章 根据上面的描述，Leaf Bundle适合单独的page，这个page中用到的图片，文档，音乐等资源可以整合到一起。Branch Bundle适合组合多个page的资源，可以理解为对Leaf Bundle的分类。英文名取的很形象，树枝上可以长出其他树枝，也可以长出叶子，但是叶子上不能有其他叶子，一片叶子就是一个page，一个树枝上能存在有很多叶子。\n因此，使用Branch Bundle建立一个大类，比如：技术类，生活类。在其下，我们可以建立很多文章。浏览博客的人可以点击不同的类别，进入到该类中，然后才能浏览具体的文章。这样就实现了分类的功能。\n建立一个类别 实际上，content文件夹本身就是一个Branch Bundle，是唯一一个不需要_index.md文件的Branch Bundle。为了便于管理文章，我们在content下建立一个posts文件夹，专门用于存放文章。那么posts也是一个Branch Bundle，需要建立_index.md表明这是一个Branch Bundle。否则就不会显示其中的下一级文件夹中的内容。在posts下，再建立新文件夹，表示一个单独的分类，在该文件夹中再建立_index.md文件，建立一个新Branch Bundl。如下图所示\nposts/ ├── _index.md ├── learning │ ├── _index.md │ └── my-first-post.md ├── projects │ └── _index.md └── record └── _index.md 上面的示例代码有三个分类：learning，projects，record。my-first-post.md就是learning分类下的文章。\n而_index.md中的内容，其实就是hugo中的front matter。用于控制md文件的显示格式的。一般_index.md文件的内容如下：\n--- title: \"🧀我的项目\" description: \"记录做过的项目\" weight: 3 author: [\"ling\"] hidemeta: true # 是否隐藏文章的元信息，如发布日期、作者等 --- 其中分割线---​使用表示内容的格式是yaml，hugo还支持tmol（+++​）和json（{}​）。weight定义了不同md的显示顺序。\n新文章 由于hugo中的front matter可以控制文章的一些显示特性，每一次手动添加这些内容太麻烦了，因此hugo有一个default模板，当通过hugo的命令行添加新文档时就可以自动添加这部分内容。模板位置位于：./archetypes/default.md。\nhugo的官方文档中给出了所有的front-matter支持的变量。每一个主题可能有一些扩展的变量，例如：PaperMod page-variables。\n可以手动对其进行修改，下面是default.md的内容\n--- title: \"{{ replace .Name \"-\" \" \" | title }}\" date: {{ .Date }} lastmod: {{ .Date }} author: [\"Ling\"] keywords: - categories: # 没有分类界面可以不填写 - tags: # 标签 - description: \"\" weight: slug: \"\" draft: true # 是否为草稿 comments: true # 本页面是否显示评论 reward: true # 打赏 mermaid: true #是否开启mermaid showToc: true # 显示目录 TocOpen: true # 自动展开目录 hidemeta: false # 是否隐藏文章的元信息，如发布日期、作者等 disableShare: true # 底部不显示分享栏 showbreadcrumbs: true #顶部显示路径 cover: image: \"\" #图片路径例如：posts/tech/123/123.png zoom: # 图片大小，例如填写 50% 表示原图像的一半大小 caption: \"\" #图片底部描述 alt: \"\" relative: false --- 使用下列命令新建文章\nhugo new content /path/to/file 其中文件的路径默认为content文件夹下的相对路径。\n通过思源笔记编写的内容，可以直接导出md格式，其中的图片，文件等内容会同时导出到文件夹assets内。但hugo默认的资源文件夹在static文件夹内。根据 Hugo 博客插入图片的方法 中介绍的方法，创建一个子文件夹，存放资源文件和index.md，并将写好的笔记放在index.md中，这样在hugo渲染界面的时候，就可以直接通过相对路径获取到资源文件。index.md中可以加入 front-matter，也可以不加。\n​ 但思源的markdown语法有一些和标准的语法不同，例如标准语法中不允许文件名中存在空格，在行内代码中没有加粗字体等。需要在平时编写时注意。\n因此，我使用思源笔记编写完文章后，如果需要推送到博客，则通过下列步骤实现\n在思源中导出md格式的压缩包，包含资源文件夹、md源文件 hugo博客文件夹content下对应的分类中，新建笔记文件夹 复制资源文件夹、md源文件到笔记文件夹 修改md文件，添加front头部 编译hugo 侧边目录 参考：Hugo博客目录放在侧边 | PaperMod主题\n首先找到目录 layouts/partials/toc.html，替换其中的代码为下列代码：\n{{- $headers := findRE \"(.|\\n])+?\" .Content -}} {{- $has_headers := ge (len $headers) 1 -}} {{- if $has_headers -}} ",
-  "wordCount" : "11363",
+  "wordCount" : "11514",
   "inLanguage": "zh",
   "datePublished": "2023-10-05T23:13:01+08:00",
   "dateModified": "2023-10-06T12:44:01+08:00",
@@ -271,7 +271,7 @@ var _hmt = _hmt || [];
     
     <span id="post_meta_style_3">
         <span class="fa fa-file-word-o"></span>
-        <span>11363字
+        <span>11514字
             &nbsp;&nbsp;
         </span>
     </span>
@@ -296,7 +296,8 @@ var _hmt = _hmt || [];
             </span>
         </span>
     </span>
-    <span style="opacity: 0.8;">
+</span>
+<span style="opacity: 0.8;">
           <span id="post_meta_style_7">
               &nbsp;&nbsp;
               <span class="fa fa-eye" ></span>
@@ -306,8 +307,6 @@ var _hmt = _hmt || [];
               </span>
           </span>
       </span>
-</span>
-
 
 </div>
   </header> <aside id="toc-container" class="toc-container wide">
@@ -371,6 +370,8 @@ var _hmt = _hmt || [];
                     </li>
                     <li>
                         <a href="#%e4%be%a7%e8%be%b9%e7%9b%ae%e5%bd%95" aria-label="侧边目录">侧边目录</a></li>
+                    <li>
+                        <a href="#md%e7%9a%84%e8%a1%a8%e6%a0%bc%e6%a0%b7%e5%bc%8f" aria-label="md的表格样式">md的表格样式</a></li>
                     <li>
                         <a href="#hugo%e5%8d%9a%e5%ae%a2%e4%bf%ae%e6%94%b9post_meta%e5%a4%b4%e9%83%a8%e4%bf%a1%e6%81%af" aria-label="Hugo博客修改post_meta头部信息">Hugo博客修改post_meta头部信息</a></li>
                     <li>
@@ -1011,6 +1012,23 @@ var _hmt = _hmt || [];
 </span></span><span style="display:flex;"><span>.toc li a:hover <span style="color:#04a5e5;font-weight:bold">{</span>
 </span></span><span style="display:flex;"><span>    color: var<span style="color:#04a5e5;font-weight:bold">(</span>--secondary<span style="color:#04a5e5;font-weight:bold">)</span>;
 </span></span><span style="display:flex;"><span><span style="color:#04a5e5;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="md的表格样式">md的表格样式<a hidden class="anchor" aria-hidden="true" href="#md的表格样式">#</a></h2>
+<p>加入到<code>blank.css</code>中即可。</p>
+<p>参考：<a href="https://dvel.me/posts/hugo-papermod-config/#markdown-%e6%b8%b2%e6%9f%93%e9%a3%8e%e6%a0%bc">Markdown 渲染风格</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>/* GitHub 样式的表格 */
+</span></span><span style="display:flex;"><span>.post-content table tr <span style="color:#04a5e5;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    border: 1px solid <span style="color:#9ca0b0;font-style:italic">#979da3 !important;</span>
+</span></span><span style="display:flex;"><span><span style="color:#04a5e5;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>.post-content table tr:nth-child<span style="color:#04a5e5;font-weight:bold">(</span>2n<span style="color:#04a5e5;font-weight:bold">)</span>,
+</span></span><span style="display:flex;"><span>.post-content thead <span style="color:#04a5e5;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    background-color: var<span style="color:#04a5e5;font-weight:bold">(</span>--code-bg<span style="color:#04a5e5;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span><span style="color:#04a5e5;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>.post-content table th <span style="color:#04a5e5;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    border: 1px solid <span style="color:#9ca0b0;font-style:italic">#979da3 !important;</span>
+</span></span><span style="display:flex;"><span><span style="color:#04a5e5;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>.post-content table td <span style="color:#04a5e5;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    border: 1px solid <span style="color:#9ca0b0;font-style:italic">#979da3 !important;</span>
+</span></span><span style="display:flex;"><span><span style="color:#04a5e5;font-weight:bold">}</span>
 </span></span></code></pre></div><h2 id="hugo博客修改post_meta头部信息">Hugo博客修改post_meta头部信息<a hidden class="anchor" aria-hidden="true" href="#hugo博客修改post_meta头部信息">#</a></h2>
 <p>参考：<a href="https://www.sulvblog.cn/posts/blog/hugo_postmeta/">Hugo博客修改post_meta头部信息</a></p>
 <p>post_meta是指文章的标题下面显示的一些基本信息，如下图：</p>
@@ -1114,16 +1132,6 @@ var _hmt = _hmt || [];
 </span></span><span style="display:flex;"><span>            <span style="color:#04a5e5;font-weight:bold">{{</span>- end <span style="color:#04a5e5;font-weight:bold">}}</span>
 </span></span><span style="display:flex;"><span>        &lt;/span&gt;
 </span></span><span style="display:flex;"><span>    &lt;/span&gt;
-</span></span><span style="display:flex;"><span>    &lt;span <span style="color:#dc8a78">style</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;opacity: 0.8;&#34;</span>&gt;
-</span></span><span style="display:flex;"><span>          &lt;span <span style="color:#dc8a78">id</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;post_meta_style_7&#34;</span>&gt;
-</span></span><span style="display:flex;"><span>              &amp;nbsp;&amp;nbsp;
-</span></span><span style="display:flex;"><span>              &lt;span <span style="color:#dc8a78">class</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;fa fa-eye&#34;</span> &gt;&lt;/span&gt;
-</span></span><span style="display:flex;"><span>              &lt;span&gt;
-</span></span><span style="display:flex;"><span>                  &lt;span <span style="color:#dc8a78">id</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;busuanzi_container_page_pv&#34;</span>&gt;&lt;span <span style="color:#dc8a78">id</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;busuanzi_value_page_pv&#34;</span>&gt;&lt;/span&gt;&lt;/span&gt;
-</span></span><span style="display:flex;"><span>                  &amp;nbsp;&amp;nbsp;
-</span></span><span style="display:flex;"><span>              &lt;/span&gt;
-</span></span><span style="display:flex;"><span>          &lt;/span&gt;
-</span></span><span style="display:flex;"><span>      &lt;/span&gt;
 </span></span><span style="display:flex;"><span>&lt;/span&gt;
 </span></span></code></pre></div><p>其中关于日期的部分，参考了下列文章，将日月部分改成了中文，年份仍为数字显示。</p>
 <p>日期更改为中文显示：<a href="https://tin6.com/post/convert-hugo-dateformat-to-chinese-words/">将 HUGO 日期输出为中文</a></p>
@@ -1217,9 +1225,20 @@ var _hmt = _hmt || [];
 </span></span><span style="display:flex;"><span>&lt;/<span style="color:#8839ef">span</span>&gt;
 </span></span></code></pre></div><h3 id="singlehtml">single.html<a hidden class="anchor" aria-hidden="true" href="#singlehtml">#</a></h3>
 <p>文件<code>./layouts/_default/single.html</code>​中默认包含了post_meta.html，因此，不需要对single.html做任何更改就可以正常显示头部信息。如希望文章详情界面和分类查看文章简介界面两个部分的头部信息不同，可以在下面的注释后加入自定的头部信息。例如评论信息。可以参考：<a href="https://www.sulvblog.cn/posts/blog/hugo_postmeta/">Hugo博客修改post_meta头部信息</a> 中对评论的添加。</p>
+<p>此处将浏览量放在单独界面中进行显示，因为列表中显示会有bug，只显示第一个而不显示后续的浏览量，且浏览量是总体浏览量而不是单个文章。</p>
 <div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>{{- if not (.Param &#34;hideMeta&#34;) }}
 </span></span><span style="display:flex;"><span>&lt;<span style="color:#8839ef">div</span> <span style="color:#1e66f5">class</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;post-meta&#34;</span>&gt;
 </span></span><span style="display:flex;"><span>    {{- partial &#34;post_meta.html&#34; . -}} <span style="color:#9ca0b0;font-style:italic">&lt;!--在这里引用头部信息--&gt;</span>
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#8839ef">span</span> <span style="color:#1e66f5">style</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;opacity: 0.8;&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>          &lt;<span style="color:#8839ef">span</span> <span style="color:#1e66f5">id</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;post_meta_style_7&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>              <span style="color:#179299">&amp;nbsp;&amp;nbsp;</span>
+</span></span><span style="display:flex;"><span>              &lt;<span style="color:#8839ef">span</span> <span style="color:#1e66f5">class</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;fa fa-eye&#34;</span> &gt;&lt;/<span style="color:#8839ef">span</span>&gt;
+</span></span><span style="display:flex;"><span>              &lt;<span style="color:#8839ef">span</span>&gt;
+</span></span><span style="display:flex;"><span>                  &lt;<span style="color:#8839ef">span</span> <span style="color:#1e66f5">id</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;busuanzi_container_page_pv&#34;</span>&gt;&lt;<span style="color:#8839ef">span</span> <span style="color:#1e66f5">id</span><span style="color:#04a5e5;font-weight:bold">=</span><span style="color:#40a02b">&#34;busuanzi_value_page_pv&#34;</span>&gt;&lt;/<span style="color:#8839ef">span</span>&gt;&lt;/<span style="color:#8839ef">span</span>&gt;
+</span></span><span style="display:flex;"><span>                  <span style="color:#179299">&amp;nbsp;&amp;nbsp;</span>
+</span></span><span style="display:flex;"><span>              &lt;/<span style="color:#8839ef">span</span>&gt;
+</span></span><span style="display:flex;"><span>          &lt;/<span style="color:#8839ef">span</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;/<span style="color:#8839ef">span</span>&gt;
 </span></span><span style="display:flex;"><span>    {{- partial &#34;translation_list.html&#34; . -}}
 </span></span><span style="display:flex;"><span>    {{- partial &#34;edit_post.html&#34; . -}}
 </span></span><span style="display:flex;"><span>    {{- partial &#34;post_canonical.html&#34; . -}}
