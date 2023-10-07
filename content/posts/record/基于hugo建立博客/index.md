@@ -628,6 +628,28 @@ hugo new content /path/to/file
     color: var(--secondary);
 }
 ```
+## md的表格样式
+
+加入到`blank.css`中即可。
+
+参考：[Markdown 渲染风格](https://dvel.me/posts/hugo-papermod-config/#markdown-%e6%b8%b2%e6%9f%93%e9%a3%8e%e6%a0%bc)
+
+```shell
+/* GitHub 样式的表格 */
+.post-content table tr {
+    border: 1px solid #979da3 !important;
+}
+.post-content table tr:nth-child(2n),
+.post-content thead {
+    background-color: var(--code-bg);
+}
+.post-content table th {
+    border: 1px solid #979da3 !important;
+}
+.post-content table td {
+    border: 1px solid #979da3 !important;
+}
+```
 
 ## Hugo博客修改post_meta头部信息
 
@@ -749,16 +771,6 @@ params:
             {{- end }}
         </span>
     </span>
-    <span style="opacity: 0.8;">
-          <span id="post_meta_style_7">
-              &nbsp;&nbsp;
-              <span class="fa fa-eye" ></span>
-              <span>
-                  <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
-                  &nbsp;&nbsp;
-              </span>
-          </span>
-      </span>
 </span>
 ```
 
@@ -877,10 +889,22 @@ day:
 
 文件`./layouts/_default/single.html`​中默认包含了post_meta.html，因此，不需要对single.html做任何更改就可以正常显示头部信息。如希望文章详情界面和分类查看文章简介界面两个部分的头部信息不同，可以在下面的注释后加入自定的头部信息。例如评论信息。可以参考：[Hugo博客修改post_meta头部信息](https://www.sulvblog.cn/posts/blog/hugo_postmeta/) 中对评论的添加。
 
+此处将浏览量放在单独界面中进行显示，因为列表中显示会有bug，只显示第一个而不显示后续的浏览量，且浏览量是总体浏览量而不是单个文章。
+
 ```html
 {{- if not (.Param "hideMeta") }}
 <div class="post-meta">
     {{- partial "post_meta.html" . -}} <!--在这里引用头部信息-->
+    <span style="opacity: 0.8;">
+          <span id="post_meta_style_7">
+              &nbsp;&nbsp;
+              <span class="fa fa-eye" ></span>
+              <span>
+                  <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                  &nbsp;&nbsp;
+              </span>
+          </span>
+    </span>
     {{- partial "translation_list.html" . -}}
     {{- partial "edit_post.html" . -}}
     {{- partial "post_canonical.html" . -}}

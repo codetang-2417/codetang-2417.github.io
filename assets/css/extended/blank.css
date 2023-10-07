@@ -10,3 +10,17 @@ Read https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#bundling-custom-cs
     --hljs-bg: #282C34;
 }
 
+/* GitHub 样式的表格 */
+.post-content table tr {
+    border: 1px solid #979da3 !important;
+}
+.post-content table tr:nth-child(2n),
+.post-content thead {
+    background-color: var(--code-bg);
+}
+.post-content table th {
+    border: 1px solid #979da3 !important;
+}
+.post-content table td {
+    border: 1px solid #979da3 !important;
+}
