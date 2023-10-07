@@ -6,22 +6,31 @@
     <description>Recent content in Tags on Linglong&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Fri, 06 Oct 2023 19:10:01 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 07 Oct 2023 11:12:13 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>linux</title>
+      <link>https://codetang-2417.github.io/tags/linux/</link>
+      <pubDate>Sat, 07 Oct 2023 11:12:13 +0800</pubDate>
+      
+      <guid>https://codetang-2417.github.io/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>sysrq</title>
+      <link>https://codetang-2417.github.io/tags/sysrq/</link>
+      <pubDate>Sat, 07 Oct 2023 11:12:13 +0800</pubDate>
+      
+      <guid>https://codetang-2417.github.io/tags/sysrq/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>archlinux</title>
       <link>https://codetang-2417.github.io/tags/archlinux/</link>
       <pubDate>Fri, 06 Oct 2023 19:10:01 +0800</pubDate>
       
       <guid>https://codetang-2417.github.io/tags/archlinux/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>linux</title>
-      <link>https://codetang-2417.github.io/tags/linux/</link>
-      <pubDate>Fri, 06 Oct 2023 12:58:01 +0800</pubDate>
-      
-      <guid>https://codetang-2417.github.io/tags/linux/</guid>
       <description></description>
     </item>
     

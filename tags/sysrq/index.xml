@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>sysrq on Linglong&#39;s Blog</title>
+    <link>https://codetang-2417.github.io/tags/sysrq/</link>
+    <description>Recent content in sysrq on Linglong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sat, 07 Oct 2023 11:12:13 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/sysrq/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux中的SysRq魔术键</title>
+      <link>https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/</link>
+      <pubDate>Sat, 07 Oct 2023 11:12:13 +0800</pubDate>
+      
+      <guid>https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/</guid>
+      <description>当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏</description>
+    </item>
+    
+  </channel>
+</rss>

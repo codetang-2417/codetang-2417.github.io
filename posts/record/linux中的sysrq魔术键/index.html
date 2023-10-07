@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Archlinux  降级安装 | Linglong&#39;s Blog</title>
-<meta name="keywords" content="archlinux, downgrade">
-<meta name="description" content="参考链接：降级软件包 使用pacman的临时文件 如果一个新包刚刚被安装并且没有删除pacman cache,你可以在/var/cache/pac">
+<title>Linux中的SysRq魔术键 | Linglong&#39;s Blog</title>
+<meta name="keywords" content="linux, sysrq, reboot, freeze">
+<meta name="description" content="当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏">
 <meta name="author" content="Ling">
-<link rel="canonical" href="https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/">
+<link rel="canonical" href="https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.17c5abc5d55618d9034f239ddb99eba84bad8b4b8dc02b52b3efa5fb0184fb2a.css" integrity="sha256-F8WrxdVWGNkDTyOd25nrqEuti0uNwCtSs&#43;&#43;l&#43;wGE&#43;yo=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://codetang-2417.github.io/img/L.png">
@@ -72,16 +72,16 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 })();
 </script>
-<meta property="og:title" content="Archlinux  降级安装" />
-<meta property="og:description" content="参考链接：降级软件包 使用pacman的临时文件 如果一个新包刚刚被安装并且没有删除pacman cache,你可以在/var/cache/pac" />
+<meta property="og:title" content="Linux中的SysRq魔术键" />
+<meta property="og:description" content="当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2023-10-06T19:10:01+08:00" />
-<meta property="article:modified_time" content="2023-10-06T19:01:01+08:00" />
+<meta property="og:url" content="https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-10-07T11:12:13+08:00" />
+<meta property="article:modified_time" content="2023-10-07T11:12:13+08:00" />
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Archlinux  降级安装"/>
-<meta name="twitter:description" content="参考链接：降级软件包 使用pacman的临时文件 如果一个新包刚刚被安装并且没有删除pacman cache,你可以在/var/cache/pac"/>
+<meta name="twitter:title" content="Linux中的SysRq魔术键"/>
+<meta name="twitter:description" content="当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏"/>
 
 
 <script type="application/ld+json">
@@ -104,8 +104,8 @@ var _hmt = _hmt || [];
     {
       "@type": "ListItem",
       "position":  4 ,
-      "name": "Archlinux  降级安装",
-      "item": "https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/"
+      "name": "Linux中的SysRq魔术键",
+      "item": "https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/"
     }
   ]
 }
@@ -114,24 +114,24 @@ var _hmt = _hmt || [];
 {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  "headline": "Archlinux  降级安装",
-  "name": "Archlinux  降级安装",
-  "description": "参考链接：降级软件包 使用pacman的临时文件 如果一个新包刚刚被安装并且没有删除pacman cache,你可以在/var/cache/pac",
+  "headline": "Linux中的SysRq魔术键",
+  "name": "Linux中的SysRq魔术键",
+  "description": "当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏",
   "keywords": [
-    "archlinux", "downgrade"
+    "linux", "sysrq", "reboot", "freeze"
   ],
-  "articleBody": "参考链接：降级软件包\n使用pacman的临时文件 如果一个新包刚刚被安装并且没有删除pacman cache,你可以在/var/cache/pacman/pkg/​中找到较早版本. 安装替换现有的版本.pacman会处理依赖包但不会处理依赖库的版本冲突。如果一个其依赖库因该包降级需要降级，你需要手动降级这些包。\n# pacman -U /var/cache/pacman/pkg/package-old_version.pkg.tar.type 对老的软件包，type​ 应该是 xz​，遵循 2020 变更的新软件包，type​ 应该是 zst​。\n当成功降级该包以后，请暂时将其加入​**pacman.conf**​​​的IgnorePkg section，直到您的问题被解决。\n使用nano编辑文件/etc/pacman.conf，找到其中的IgnorePKG字段，按照下图将降级包加入到配置中。\n​ ​\n如果本地没有旧版本的cache，或者是被清理了，则需要去Arch Linux Archive下载旧版本的包，然后重复上述操作。\nArch Linux Archive Arch Linux Archive是official repositories的日更快照。\nALA能被用来降级包或者还原整个系统到过去版本。\n网站链接：归档\n自动化 downgrade — 基于Bash使用本地缓存和Arch Rollback Machine。详见downgrade(8)。\nhttps://github.com/pbrisbin/downgrade || downgrade​^AUR^\n‍\n",
-  "wordCount" : "515",
+  "articleBody": "当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏系统。但在linux内核中，有一个特殊的按键：SysRq（Sys tem R e q uest key）。如果激活SysRq键，就可以输入一些特殊的系统操作命令，用于在系统崩溃时进行一些操作（同步数据、杀进程、卸载文件系统，甚至系统重启）。可以安全的重启系统。\n参考：linux 中的 SysRq 魔术键\nSysRq 键 在 QWERT 的全尺寸键盘上与 PrtSc​ 同键，并且会在按键上标注有SysRq。使用Alt​+PrtSc​激活SysRq​。\n在一些笔记本上虽然没有标注，但可以通过Fn​+Alt​+PrtSc​组合键的方式激活SysRq按键。\n如果上面的组合都不起作用，则可以尝试下面几种：\n​Alt​+PrtSc​ ​Alt Gr​+PrtSc​ ​Ctrl​+Alt​+PrtSc​ 注意，激活SysRq​后，需要保持Alt​按键按下，并松开SysRq​或​PrtSc​\n请阅读完后续内容再尝试，并在尝试之前保存所有工作内容！\nREISUB 参考：[HowTo] reboot / turn off your frozen computer: REISUB/REISUO\nREISUB是 R eboot E ven I f S ystem U tterly B roken 的SysRq命令的助记符。表示 即使系统完全崩溃也能重启。\n激活SysRq按键后，在键盘上按下如下按键，就可以优雅的重启系统：\nSwitch the keyboard from R aw mode, used by programs such as X11 ​112 and SVGALib ​25, to XLATE (translate) mode Send an E nd signal (SIGTERM) to all processes, except the boot process, allowing all processes to end gracefully Send an I nstant kill (SIGKILL) to all processes, except the boot process, forcing​ all processes to end ​43 . S ync all mounted filesystems, allowing them to write all data to disk. U nmount and remount all mounted filesystems in read-only ​8 mode. Re B oot the system 下面是上述英文的中文解释\nR - 把键盘设置为 ASCII 模式 (用于接收后面键盘输入) SysRq: Keyboard mode set to XLATE E - 向除 init 以外所有进程发送 SIGTERM 信号 (让进程自己正常退出) SysRq: Terminate All Tasks I - 向除 init 以外所有进程发送 SIGKILL 信号 (强制结束进程) SysRq: Kill All Tasks S - 磁盘缓冲区同步 SysRq : Emergency Sync U - 重新挂载为只读模式 SysRq : Emergency Remount R/O B - 立即重启系统 SysRq: Resetting 由于系统环境与后台进程个数的不确定性，每一步按键操作执行完成所费时间无法确定。为保险起见，一般采用 R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键。\n用法 如果按照上述方法，并没有左右，则可能是SysRq​功能没有启用。\n启用 SysRq 功能 首先检查 SysRq​ 是否开启\ncat /proc/sys/kernel/sysrq 若输出为 0，则还未开启。\n在manjaro中，通过向grub写入配置命令启用Linux的SysRq功能。\n向文件/etc/default/grub​中的GRUB_CMDLINE_LINUX_DEFAULT​参数添加： sysrq_always_enabled=1​\nsudo nano /etc/default/grub 更改完后记得ctrl​+O​保存文件。\n​ ​\n然后执行\nsudo update-grub 更新grub。最后重启系统。\n实际使用过程 先激活SysRq​按键，全键盘：Alt​+SysRq​，笔记本：Fn​+Alt​+PrtSc​。激活后保持Alt​按键按下，松开PrtSc​或者SysRq​。\n根据电脑的性能不同，激活时间不一样。新硬件可能在1秒，旧的硬件可能在6秒。\n激活后，在键盘上按照R E I S U B的顺序，就可以安全的重启系统，需要注意根据上述介绍，一般采用 R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键。\n‍\n",
+  "wordCount" : "1322",
   "inLanguage": "zh",
-  "datePublished": "2023-10-06T19:10:01+08:00",
-  "dateModified": "2023-10-06T19:01:01+08:00",
+  "datePublished": "2023-10-07T11:12:13+08:00",
+  "dateModified": "2023-10-07T11:12:13+08:00",
   "author":[{
     "@type": "Person",
     "name": "Ling"
   }],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/"
+    "@id": "https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/"
   },
   "publisher": {
     "@type": "Organization",
@@ -226,7 +226,7 @@ var _hmt = _hmt || [];
   <header class="post-header">
     <div class="breadcrumbs"><a href="https://codetang-2417.github.io">主页</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/">文章</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/record/">🥝踩坑记录</a></div>
     <h1 class="post-title">
-      Archlinux  降级安装
+      Linux中的SysRq魔术键
     </h1>
     <div class="post-meta">
 
@@ -254,7 +254,7 @@ var _hmt = _hmt || [];
         <span>
             
 十月
-六日
+七日
 
             &nbsp;
             <span class="year"> 2023</span>
@@ -271,13 +271,13 @@ var _hmt = _hmt || [];
     
     <span id="post_meta_style_3">
         <span class="fa fa-file-word-o"></span>
-        <span>515字
+        <span>1322字
             &nbsp;&nbsp;
         </span>
     </span>
     <span id="post_meta_style_4">
         <span class="fa fa-clock-o"></span>
-        <span>2分钟
+        <span>3分钟
             &nbsp;&nbsp;
         </span>
     </span>
@@ -291,7 +291,8 @@ var _hmt = _hmt || [];
         <span class="fa fa-tags" style="opacity: 0.8"></span>
         <span>
             <span class="post-tags-meta">
-                <a href="https://codetang-2417.github.io/tags/archlinux/" style="color: var(--secondary)!important;">archlinux</a>
+                <a href="https://codetang-2417.github.io/tags/linux/" style="color: var(--secondary)!important;">linux</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/sysrq/" style="color: var(--secondary)!important;">sysrq</a>
             </span>
         </span>
     </span>
@@ -318,14 +319,19 @@ var _hmt = _hmt || [];
 
             <div class="inner"><ul>
                     <li>
-                        <a href="#%e4%bd%bf%e7%94%a8pacman%e7%9a%84%e4%b8%b4%e6%97%b6%e6%96%87%e4%bb%b6" aria-label="使用pacman的临时文件">使用pacman的临时文件</a><ul>
+                        <a href="#sysrqhttpsenwikipediaorgwikimagic_sysrq_key-%e9%94%ae" aria-label="SysRq 键"><a href="https://en.wikipedia.org/wiki/Magic_SysRq_key">SysRq</a> 键</a></li>
+                    <li>
+                        <a href="#reisub" aria-label="REISUB">REISUB</a></li>
+                    <li>
+                        <a href="#%e7%94%a8%e6%b3%95" aria-label="用法">用法</a><ul>
                             
                     <li>
-                        <a href="#arch-linux-archive" aria-label="Arch Linux Archive">Arch Linux Archive</a></li></ul>
-                    </li>
+                        <a href="#%e5%90%af%e7%94%a8-sysrq-%e5%8a%9f%e8%83%bd" aria-label="启用 SysRq 功能">启用 SysRq 功能</a></li>
                     <li>
-                        <a href="#%e8%87%aa%e5%8a%a8%e5%8c%96" aria-label="自动化">自动化</a>
+                        <a href="#%e5%ae%9e%e9%99%85%e4%bd%bf%e7%94%a8%e8%bf%87%e7%a8%8b" aria-label="实际使用过程">实际使用过程</a>
                     </li>
+                </ul>
+                </li>
                 </ul>
             </div>
         </details>
@@ -391,23 +397,69 @@ var _hmt = _hmt || [];
     }
 </script>
 
-  <div class="post-content"><p>参考链接：<a href="https://wiki.archlinuxcn.org/wiki/%E9%99%8D%E7%BA%A7%E8%BD%AF%E4%BB%B6%E5%8C%85">降级软件包</a></p>
-<h1 id="使用pacman的临时文件">使用pacman的临时文件<a hidden class="anchor" aria-hidden="true" href="#使用pacman的临时文件">#</a></h1>
-<p>如果一个新包刚刚被安装并且没有删除<a href="https://wiki.archlinuxcn.org/wiki/Pacman#Cleaning_the_package_cache" title="Pacman">pacman cache</a>,你可以在<code>/var/cache/pacman/pkg/</code>​中找到较早版本. 安装替换现有的版本.<a href="https://wiki.archlinuxcn.org/wiki/Pacman" title="Pacman">pacman</a>会处理依赖包但不会处理依赖库的版本冲突。如果一个其依赖库因该包降级需要降级，你需要手动降级这些包。</p>
-<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> # pacman -U /var/cache/pacman/pkg/package-old_version.pkg.tar.type
-</span></span></code></pre></div><p>对老的软件包，<code>type</code>​ 应该是 <code>xz</code>​，遵循 <a href="https://archlinux.org/news/now-using-zstandard-instead-of-xz-for-package-compression/">2020 变更</a>的新软件包，<code>type</code>​ 应该是 <code>zst</code>​。</p>
-<p>当成功降级该包以后，请<strong>暂时将其加入</strong>​<code>**pacman.conf**</code>​​​的<a href="https://wiki.archlinuxcn.org/wiki/Pacman#Skip_package_from_being_upgraded" title="Pacman">IgnorePkg section</a>，直到您的问题被解决。</p>
-<p>使用nano编辑文件/etc/pacman.conf，找到其中的IgnorePKG字段，按照下图将降级包加入到配置中。</p>
-<p>​<img loading="lazy" src="assets/image-20231006125451-oaxha8z.png" alt="image"  />
+  <div class="post-content"><p>当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏系统。但在linux内核中，有一个特殊的按键：SysRq（<strong>Sys</strong> tem <strong>R</strong> e <strong>q</strong> uest key）。如果激活SysRq键，就可以输入一些特殊的系统操作命令，用于在系统崩溃时进行一些操作（同步数据、杀进程、卸载文件系统，甚至系统重启）。可以安全的重启系统。</p>
+<p>参考：<a href="https://rqsir.github.io/2019/05/02/linux%E4%B8%AD%E7%9A%84SysRq%E9%AD%94%E6%9C%AF%E9%94%AE/">linux 中的 SysRq 魔术键</a></p>
+<h1 id="sysrqhttpsenwikipediaorgwikimagic_sysrq_key-键"><a href="https://en.wikipedia.org/wiki/Magic_SysRq_key">SysRq</a> 键<a hidden class="anchor" aria-hidden="true" href="#sysrqhttpsenwikipediaorgwikimagic_sysrq_key-键">#</a></h1>
+<p>在 QWERT 的全尺寸键盘上与 <code>PrtSc</code>​ 同键，并且会在按键上标注有SysRq。使用<code>Alt</code>​+<code>PrtSc</code>​激活<code>SysRq</code>​。</p>
+<p>在一些笔记本上虽然没有标注，但可以通过<code>Fn</code>​+<code>Alt</code>​+<code>PrtSc</code>​组合键的方式激活SysRq按键。</p>
+<p>如果上面的组合都不起作用，则可以尝试下面几种：</p>
+<ul>
+<li>​<code>Alt</code>​+<code>PrtSc</code>​</li>
+<li>​<code>Alt Gr</code>​+<code>PrtSc</code>​</li>
+<li>​<code>Ctrl</code>​+<code>Alt</code>​+<code>PrtSc</code>​</li>
+</ul>
+<p>注意，激活<code>SysRq</code>​后，需要保持<code>Alt</code>​按键按下，并松开<code>SysRq</code>​或​<code>PrtSc</code>​</p>
+<p><strong>请阅读完后续内容再尝试，并在尝试之前保存所有工作内容！</strong></p>
+<h1 id="reisub">REISUB<a hidden class="anchor" aria-hidden="true" href="#reisub">#</a></h1>
+<p>参考：<a href="https://forum.manjaro.org/t/howto-reboot-turn-off-your-frozen-computer-reisub-reisuo/3855/104?page=2">[HowTo] reboot / turn off your frozen computer: REISUB/REISUO</a></p>
+<p><strong>REISUB</strong>是 <strong>R</strong> eboot <strong>E</strong> ven <strong>I</strong> f <strong>S</strong> ystem <strong>U</strong> tterly <strong>B</strong> roken 的SysRq命令的助记符。表示 <strong>即使系统完全崩溃也能重启</strong>。</p>
+<p>激活SysRq按键后，在键盘上按下如下按键，就可以优雅的重启系统：</p>
+<ul>
+<li>Switch the keyboard from <strong>R</strong> aw mode, used by programs such as <a href="https://en.wikipedia.org/wiki/X11">X11 </a>​<a href="https://en.wikipedia.org/wiki/X11"><strong>112</strong></a> and <a href="https://en.wikipedia.org/wiki/SVGALib">SVGALib </a>​<a href="https://en.wikipedia.org/wiki/SVGALib"><strong>25</strong></a>, to XLATE (translate) mode</li>
+<li>Send an <strong>E</strong> nd signal (SIGTERM) to all processes, except the boot process, allowing all processes to end gracefully</li>
+<li>Send an <strong>I</strong> nstant kill (SIGKILL) to all processes, except the boot process, <a href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg"><em>forcing</em></a>​<a href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg"> all processes to end </a>​<a href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg"><strong>43</strong></a> .</li>
+<li><strong>S</strong> ync all mounted filesystems, allowing them to write all data to disk.</li>
+<li><strong>U</strong> nmount and remount all mounted filesystems in <a href="https://en.wikipedia.org/wiki/File_system_permissions">read-only </a>​<a href="https://en.wikipedia.org/wiki/File_system_permissions"><strong>8</strong></a> mode.</li>
+<li>Re <strong>B</strong> oot the system</li>
+</ul>
+<p>下面是上述英文的中文解释</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>R - 把键盘设置为 ASCII 模式 <span style="color:#04a5e5;font-weight:bold">(</span>用于接收后面键盘输入<span style="color:#04a5e5;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	SysRq: Keyboard mode <span style="color:#04a5e5">set</span> to XLATE
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>E - 向除 init 以外所有进程发送 SIGTERM 信号 <span style="color:#04a5e5;font-weight:bold">(</span>让进程自己正常退出<span style="color:#04a5e5;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	SysRq: Terminate All Tasks
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>I - 向除 init 以外所有进程发送 SIGKILL 信号 <span style="color:#04a5e5;font-weight:bold">(</span>强制结束进程<span style="color:#04a5e5;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	SysRq: Kill All Tasks
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>S - 磁盘缓冲区同步
+</span></span><span style="display:flex;"><span>	SysRq : Emergency Sync
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>U - 重新挂载为只读模式
+</span></span><span style="display:flex;"><span>	SysRq : Emergency Remount R/O
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>B - 立即重启系统
+</span></span><span style="display:flex;"><span>	SysRq: Resetting
+</span></span></code></pre></div><p>由于系统环境与后台进程个数的不确定性，每一步按键操作执行完成所费时间无法确定。为保险起见，一般采用 <strong>R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键</strong>。</p>
+<h1 id="用法">用法<a hidden class="anchor" aria-hidden="true" href="#用法">#</a></h1>
+<p>如果按照上述方法，并没有左右，则可能是<code>SysRq</code>​功能没有启用。</p>
+<h2 id="启用-sysrq-功能">启用 SysRq 功能<a hidden class="anchor" aria-hidden="true" href="#启用-sysrq-功能">#</a></h2>
+<p>首先检查 <code>SysRq</code>​ 是否开启</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>cat /proc/sys/kernel/sysrq
+</span></span></code></pre></div><p>若输出为 0，则还未开启。</p>
+<p>在manjaro中，通过向grub写入配置命令启用Linux的SysRq功能。</p>
+<p>向文件<code>/etc/default/grub</code>​中的<code>GRUB_CMDLINE_LINUX_DEFAULT</code>​参数添加： <code>sysrq_always_enabled=1</code>​</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo nano /etc/default/grub
+</span></span></code></pre></div><p>更改完后记得<code>ctrl</code>​+<code>O</code>​保存文件。</p>
+<p>​<img loading="lazy" src="assets/image-20231007105854-9gz3bv9.png" alt="image"  />
 ​</p>
-<p>如果本地没有旧版本的cache，或者是被清理了，则需要去Arch Linux Archive下载旧版本的包，然后重复上述操作。</p>
-<h2 id="arch-linux-archive">Arch Linux Archive<a hidden class="anchor" aria-hidden="true" href="#arch-linux-archive">#</a></h2>
-<p><a href="https://wiki.archlinuxcn.org/wiki/Arch_Linux_Archive" title="Arch Linux Archive">Arch Linux Archive</a>是<a href="https://wiki.archlinuxcn.org/wiki/Official_repositories" title="Official repositories">official repositories</a>的日更快照。</p>
-<p><em>ALA</em>能被用来降级包或者还原整个系统到过去版本。</p>
-<p>网站链接：<a href="https://archive.archlinux.org/">归档</a></p>
-<h1 id="自动化">自动化<a hidden class="anchor" aria-hidden="true" href="#自动化">#</a></h1>
-<p><strong>downgrade</strong> — 基于Bash使用本地缓存和<a href="https://wiki.archlinuxcn.org/wzh/index.php?title=Arch_Rollback_Machine&amp;action=edit&amp;redlink=1" title="Arch Rollback Machine（页面不存在）">Arch Rollback Machine</a>。详见<strong>downgrade(8)</strong>。</p>
-<p><a href="https://github.com/pbrisbin/downgrade">https://github.com/pbrisbin/downgrade</a> || <a href="https://aur.archlinux.org/packages/downgrade/">downgrade</a>​^AUR^</p>
+<p>然后执行</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo update-grub
+</span></span></code></pre></div><p>更新grub。最后重启系统。</p>
+<h2 id="实际使用过程">实际使用过程<a hidden class="anchor" aria-hidden="true" href="#实际使用过程">#</a></h2>
+<p>先激活<code>SysRq</code>​按键，全键盘：<code>Alt</code>​+<code>SysRq</code>​，笔记本：<code>Fn</code>​+<code>Alt</code>​+<code>PrtSc</code>​。激活后保持<code>Alt</code>​按键按下，松开<code>PrtSc</code>​或者<code>SysRq</code>​。</p>
+<p>根据电脑的性能不同，激活时间不一样。新硬件可能在1秒，旧的硬件可能在6秒。</p>
+<p>激活后，在键盘上按照R E I S U B的顺序，就可以安全的重启系统，需要注意根据上述介绍，一般采用 <strong>R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键</strong>。</p>
 <p>‍</p>
 
 
@@ -415,18 +467,14 @@ var _hmt = _hmt || [];
 
   <footer class="post-footer">
     <ul class="post-tags">
-      <li><a href="https://codetang-2417.github.io/tags/archlinux/">archlinux</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/linux/">linux</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/sysrq/">sysrq</a></li>
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/">
-    <span class="title">« 上一页</span>
-    <br>
-    <span>Linux中的SysRq魔术键</span>
-  </a>
-  <a class="next" href="https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/">
+  <a class="next" href="https://codetang-2417.github.io/posts/record/archilinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/">
     <span class="title">下一页 »</span>
     <br>
-    <span>WPS加粗字体显示错误，显示成一团黑</span>
+    <span>Archlinux  降级安装</span>
   </a>
 </nav>
 
