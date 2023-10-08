@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>linux | Linglong&#39;s Blog</title>
-<meta name="keywords" content="">
-<meta name="description" content="ling的个人博客，hugo,manjaro,c&#43;&#43;,单片机，qemu">
-<meta name="author" content="Linglong">
-<link rel="canonical" href="https://codetang-2417.github.io/tags/linux/">
+<title>Ryzen随机卡死问题 | Linglong&#39;s Blog</title>
+<meta name="keywords" content="AMD, Manjaro, Linux, Freeze">
+<meta name="description" content="Randomly freeze behind Manjaro with AMD Ryzen CPU">
+<meta name="author" content="Ling">
+<link rel="canonical" href="https://codetang-2417.github.io/posts/record/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.7d6c890d7dd19cf7a2c61815803e78fb9bb1b7e592021bd7ccd51754bdbfde13.css" integrity="sha256-fWyJDX3RnPeixhgVgD54&#43;5uxt&#43;WSAhvXzNUXVL2/3hM=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://codetang-2417.github.io/img/L.png">
 <link rel="icon" type="image/png" sizes="16x16" href="https://codetang-2417.github.io/img/L.png">
@@ -18,7 +18,6 @@
 <link rel="mask-icon" href="https://codetang-2417.github.io/L.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" type="application/rss+xml" href="https://codetang-2417.github.io/tags/linux/index.xml">
 <noscript>
     <style>
         #theme-toggle,
@@ -56,6 +55,8 @@
 
     </style>
 </noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
 <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
@@ -71,18 +72,80 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 })();
 </script>
-<meta property="og:title" content="linux" />
-<meta property="og:description" content="ling的个人博客，hugo,manjaro,c&#43;&#43;,单片机，qemu" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://codetang-2417.github.io/tags/linux/" />
+<meta property="og:title" content="Ryzen随机卡死问题" />
+<meta property="og:description" content="Randomly freeze behind Manjaro with AMD Ryzen CPU" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://codetang-2417.github.io/posts/record/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-10-08T22:49:25+08:00" />
+<meta property="article:modified_time" content="2023-10-08T22:49:25+08:00" />
 
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="linux"/>
-<meta name="twitter:description" content="ling的个人博客，hugo,manjaro,c&#43;&#43;,单片机，qemu"/>
+<meta name="twitter:title" content="Ryzen随机卡死问题"/>
+<meta name="twitter:description" content="Randomly freeze behind Manjaro with AMD Ryzen CPU"/>
 
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "文章",
+      "item": "https://codetang-2417.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "🥝踩坑记录",
+      "item": "https://codetang-2417.github.io/posts/record/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "Ryzen随机卡死问题",
+      "item": "https://codetang-2417.github.io/posts/record/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Ryzen随机卡死问题",
+  "name": "Ryzen随机卡死问题",
+  "description": "Randomly freeze behind Manjaro with AMD Ryzen CPU",
+  "keywords": [
+    "AMD", "Manjaro", "Linux", "Freeze"
+  ],
+  "articleBody": "现象：浏览网页，编写文字等正常工作时，会突然卡死，屏幕显示内容不动，鼠标无法移动，键盘没有反应（按下大小写键，大写提示灯不会改变）。且完全随机 ，跟打开软件没有关系。最开始怀疑是Nvidia的显卡驱动问题，但没有找到任何解决方案。因此尝试下面这个方案：Ryzen随机卡死问题、解决方案原git仓库\n原博主内容截图：\n​ ​\n根据其中的描述\n先安装守护进程服务软件\nyay -S disable-c6-systemd sudo modprobe msr 编辑/etc/modules-load.d/modules.conf，添加msr这一行，以便在启动时加载msr模块：\nmsr 最后，启动如下service，完成上述操作完成后，推荐重启电脑后才能启动。\nsudo systemctl enable disable-c6.service sudo systemctl start disable-c6.service 如果报错，就在重启后重新安装一下，再开service。\n​ ​\n补充：这个问题所有的AMD的Ryzen处理器都会遇到！根据 Bug 196683 - Random Soft Lockup on new Ryzen build 这个帖子中的讨论，从2017年就开始存在，一直到现在都没有修复，我使用的是 R7 5800H，甚至在windows下，都有一定概率发生。因此，AMD真的不能yes，下一台笔记本还是intel算了。AMD虽然整体性能已经追上来了，但仍然有一些小问题，虽然不致命，但很让人心烦。希望这个帖子可以帮助你解决问题！\n‍\n",
+  "wordCount" : "504",
+  "inLanguage": "zh",
+  "datePublished": "2023-10-08T22:49:25+08:00",
+  "dateModified": "2023-10-08T22:49:25+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "Ling"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://codetang-2417.github.io/posts/record/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Linglong's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://codetang-2417.github.io/img/L.png"
+    }
+  }
+}
+</script>
 </head>
 
-<body class="list" id="top">
+<body class="" id="top">
 <script>
     if (localStorage.getItem("pref-theme") === "dark") {
         document.body.classList.add('dark');
@@ -157,22 +220,18 @@ var _hmt = _hmt || [];
         </ul>
     </nav>
 </header>
-<main class="main"> 
-<header class="page-header"><div class="breadcrumbs"><a href="https://codetang-2417.github.io">主页</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/tags/">Tags</a></div>
-  <h1>
-    linux
-  </h1>
-</header>
+<main class="main">
 
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
-    <h2>Ryzen随机卡死问题
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>现象：浏览网页，编写文字等正常工作时，会突然卡死，屏幕显示内容不动，鼠标无法移动，键盘没有反应（按下大小写键，大写提示灯不会改变）。且完全随...</p>
-  </div>
-  <footer class="entry-footer">
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://codetang-2417.github.io">主页</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/">文章</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/record/">🥝踩坑记录</a></div>
+    <h1 class="post-title">
+      Ryzen随机卡死问题
+    </h1>
+    <div class="post-description">
+      Randomly freeze behind Manjaro with AMD Ryzen CPU
+    </div>
+    <div class="post-meta">
 
 <style>
     i[id*="post_meta_style"] {
@@ -243,171 +302,58 @@ var _hmt = _hmt || [];
         </span>
     </span>
 </span>
-</footer>
-  <a class="entry-link" aria-label="post link to Ryzen随机卡死问题" href="https://codetang-2417.github.io/posts/record/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/"></a>
-</article>
+<span style="opacity: 0.8;">
+          <span id="post_meta_style_7">
+              &nbsp;&nbsp;
+              <span class="fa fa-eye" ></span>
+              <span>
+                  <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                  &nbsp;&nbsp;
+              </span>
+          </span>
+      </span>
 
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
-    <h2>Linux中的SysRq魔术键
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏...</p>
+</div>
+  </header> 
+
+  <div class="post-content"><p>现象：浏览网页，编写文字等正常工作时，会突然卡死，屏幕显示内容不动，鼠标无法移动，键盘没有反应（按下大小写键，大写提示灯不会改变）。且完全随机 ，跟打开软件没有关系。最开始怀疑是Nvidia的显卡驱动问题，但没有找到任何解决方案。因此尝试下面这个方案：<a href="https://mrswolf.github.io/my-manjaro-log/#Ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98">Ryzen随机卡死问题</a>、<a href="https://github.com/jfredrickson/disable-c6">解决方案原git仓库</a></p>
+<p>原博主内容截图：</p>
+<p>​<img loading="lazy" src="assets/image-20231008162752-i4kjf46.png" alt="image"  />
+​</p>
+<p>根据其中的描述</p>
+<p>先安装守护进程服务软件</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>yay -S disable-c6-systemd
+</span></span><span style="display:flex;"><span>sudo modprobe msr
+</span></span></code></pre></div><p>编辑/etc/modules-load.d/modules.conf，添加msr这一行，以便在启动时加载msr模块：</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>msr
+</span></span></code></pre></div><p>最后，启动如下service，完成上述操作完成后，推荐重启电脑后才能启动。</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo systemctl <span style="color:#04a5e5">enable</span> disable-c6.service
+</span></span><span style="display:flex;"><span>sudo systemctl start disable-c6.service
+</span></span></code></pre></div><p>如果报错，就在重启后重新安装一下，再开service。</p>
+<p>​<img loading="lazy" src="assets/image-20231008162943-651uf71.png" alt="image"  />
+​</p>
+<p>补充：这个问题所有的AMD的Ryzen处理器都会遇到！根据 <a href="https://bugzilla.kernel.org/show_bug.cgi?id=196683">Bug 196683 - Random Soft Lockup on new Ryzen build</a> 这个帖子中的讨论，从2017年就开始存在，一直到现在都没有修复，我使用的是 R7 5800H，甚至在windows下，都有一定概率发生。因此，AMD真的不能yes，下一台笔记本还是intel算了。AMD虽然整体性能已经追上来了，但仍然有一些小问题，虽然不致命，但很让人心烦。希望这个帖子可以帮助你解决问题！</p>
+<p>‍</p>
+
+
   </div>
-  <footer class="entry-footer">
 
-<style>
-    i[id*="post_meta_style"] {
-        display: flex;
-        align-items: center;
-        margin: 0 0 10px 0;
-    }
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://codetang-2417.github.io/tags/amd/">AMD</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/manjaro/">Manjaro</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/linux/">linux</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/freeze/">Freeze</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Linux中的SysRq魔术键</span>
+  </a>
+</nav>
 
-    .parent-post-meta {
-        display: flex;
-        flex-wrap: wrap;
-        opacity: 0.8;
-    }
-
-    .year {
-        font-size: 14px;  
-    }
-</style>
-
-<span class="parent-post-meta">
-    <span id="post_meta_style_1">
-        <span class="fa fa-calendar-check-o"></span>
-        <span>
-            
-十月
-七日
-
-            &nbsp;
-            <span class="year"> 2023</span>
-            
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    
-    
-    
-    
-    
-    
-    
-    <span id="post_meta_style_3">
-        <span class="fa fa-file-word-o"></span>
-        <span>1322字
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    <span id="post_meta_style_4">
-        <span class="fa fa-clock-o"></span>
-        <span>3分钟
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    <span id="post_meta_style_5">
-        <span class="fa fa-user-o"></span>
-        <span>Ling
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    <span id="post_meta_style_6">
-        <span class="fa fa-tags" style="opacity: 0.8"></span>
-        <span>
-            <span class="post-tags-meta">
-                <a href="https://codetang-2417.github.io/tags/linux/" style="color: var(--secondary)!important;">linux</a>
-                &nbsp;<a href="https://codetang-2417.github.io/tags/sysrq/" style="color: var(--secondary)!important;">sysrq</a>
-            </span>
-        </span>
-    </span>
-</span>
-</footer>
-  <a class="entry-link" aria-label="post link to Linux中的SysRq魔术键" href="https://codetang-2417.github.io/posts/record/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/"></a>
-</article>
-
-<article class="post-entry tag-entry"> 
-  <header class="entry-header">
-    <h2>WPS加粗字体显示错误，显示成一团黑
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>解决方案：Wps很多字体的加粗都显示异常的问题。如图： ​ ​ 降级 freetype2 (2.13.2-1 → 2.13.0-1) 即可解决问题 如果是更新包后，出现问题，则系统应该会保留旧包的缓存，可以...</p>
-  </div>
-  <footer class="entry-footer">
-
-<style>
-    i[id*="post_meta_style"] {
-        display: flex;
-        align-items: center;
-        margin: 0 0 10px 0;
-    }
-
-    .parent-post-meta {
-        display: flex;
-        flex-wrap: wrap;
-        opacity: 0.8;
-    }
-
-    .year {
-        font-size: 14px;  
-    }
-</style>
-
-<span class="parent-post-meta">
-    <span id="post_meta_style_1">
-        <span class="fa fa-calendar-check-o"></span>
-        <span>
-            
-十月
-六日
-
-            &nbsp;
-            <span class="year"> 2023</span>
-            
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    
-    
-    
-    
-    
-    
-    
-    <span id="post_meta_style_3">
-        <span class="fa fa-file-word-o"></span>
-        <span>148字
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    <span id="post_meta_style_4">
-        <span class="fa fa-clock-o"></span>
-        <span>1分钟
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    <span id="post_meta_style_5">
-        <span class="fa fa-user-o"></span>
-        <span>Ling
-            &nbsp;&nbsp;
-        </span>
-    </span>
-    <span id="post_meta_style_6">
-        <span class="fa fa-tags" style="opacity: 0.8"></span>
-        <span>
-            <span class="post-tags-meta">
-                <a href="https://codetang-2417.github.io/tags/archlinux/" style="color: var(--secondary)!important;">archlinux</a>
-                &nbsp;<a href="https://codetang-2417.github.io/tags/wps/" style="color: var(--secondary)!important;">wps</a>
-                &nbsp;<a href="https://codetang-2417.github.io/tags/linux/" style="color: var(--secondary)!important;">linux</a>
-            </span>
-        </span>
-    </span>
-</span>
-</footer>
-  <a class="entry-link" aria-label="post link to WPS加粗字体显示错误，显示成一团黑" href="https://codetang-2417.github.io/posts/record/wps%E5%8A%A0%E7%B2%97%E5%AD%97%E4%BD%93%E6%98%BE%E7%A4%BA%E9%94%99%E8%AF%AF%E6%98%BE%E7%A4%BA%E6%88%90%E4%B8%80%E5%9B%A2%E9%BB%91/"></a>
+  </footer>
 </article>
     </main>
     
@@ -478,6 +424,53 @@ var _hmt = _hmt || [];
         }
     })
 
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
 </script>
 </body>
 
