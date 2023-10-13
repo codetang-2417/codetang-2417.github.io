@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>network on Linglong&#39;s Blog</title>
+    <link>https://codetang-2417.github.io/tags/network/</link>
+    <description>Recent content in network on Linglong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Fri, 13 Oct 2023 10:16:25 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/network/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网</title>
+      <link>https://codetang-2417.github.io/posts/record/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</link>
+      <pubDate>Fri, 13 Oct 2023 10:16:25 +0800</pubDate>
+      
+      <guid>https://codetang-2417.github.io/posts/record/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</guid>
+      <description>Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网</description>
+    </item>
+    
+  </channel>
+</rss>

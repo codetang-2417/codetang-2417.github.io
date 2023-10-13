@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网 | Linglong&#39;s Blog</title>
+<meta name="keywords" content="VPN, Manjaro, Linux, VirtualBox, host-only, network">
+<meta name="description" content="Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网">
+<meta name="author" content="Ling">
+<link rel="canonical" href="https://codetang-2417.github.io/posts/record/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.7d6c890d7dd19cf7a2c61815803e78fb9bb1b7e592021bd7ccd51754bdbfde13.css" integrity="sha256-fWyJDX3RnPeixhgVgD54&#43;5uxt&#43;WSAhvXzNUXVL2/3hM=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://codetang-2417.github.io/img/L.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://codetang-2417.github.io/img/L.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://codetang-2417.github.io/img/L.png">
+<link rel="apple-touch-icon" href="https://codetang-2417.github.io/L.png">
+<link rel="mask-icon" href="https://codetang-2417.github.io/L.png">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<script defer src="https://unpkg.com/mermaid@8.8.1/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网" />
+<meta property="og:description" content="Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://codetang-2417.github.io/posts/record/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-10-13T10:16:25+08:00" />
+<meta property="article:modified_time" content="2023-10-13T10:16:25+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网"/>
+<meta name="twitter:description" content="Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "文章",
+      "item": "https://codetang-2417.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "🥝踩坑记录",
+      "item": "https://codetang-2417.github.io/posts/record/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  4 ,
+      "name": "Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网",
+      "item": "https://codetang-2417.github.io/posts/record/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网",
+  "name": "Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网",
+  "description": "Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网",
+  "keywords": [
+    "VPN", "Manjaro", "Linux", "VirtualBox", "host-only", "network"
+  ],
+  "articleBody": "参考链接：宿主机利用在虚拟机中建立的VPN加密隧道连接内网、在宿主机中使用虚拟机的VPN连接\n整体思想是：\n建立一张单独的host-only网卡，是的虚拟机和主机之间可以通信，利用windows的网络分享功能，将VPN的网卡的网络分享到这张host-only网卡。那么访问这张host-only网卡，就可以访问到VPN的网络。而host-only网卡可以被主机访问到。因此，就是实现了主机通过虚拟机的VPN进行访问的功能。但虚拟机仍然需要一张可以直接上网的网卡。因为虚拟机需要正常和外界通信，因此主机需要为虚拟机创建两张独立的网卡。\n注意：\n在上述链接中，其中一个的host使用的是桥接网卡，另一个使用的是网络地址转换NAT。根据我的测试，host使用的是网络地址转换NAT上网时，如果虚拟机连接到的网段为10.0.0.0则不能够成功将host的访问转到虚拟机的vpn中。这应该跟网络地址转换NAT有关，因为使用该方法，虚拟机的ip地址会变成10.2.0.15，可能跟VPN中的10.0.0.0网段有冲突。导致最后host无法通过虚拟机的vpn连接上该网段。因此，如果vpn连结的内网是10.0.0.0开头，则host需要使用桥接模式。\nvirtaulBox建立host-only网卡 选中工具-\u003e网络，然后建立一个host-Only网络\n​ ​\n点击DHCP服务器，启动服务器，也可以不使用DHCP，但需要在win虚拟机中手动设置ipv4地址。\n这里需要注意，VirtualBox \u003e= 6.1.28 ​​的版本上，默认指定的网段是192.168.56.0/24，无法更改为其他网段。因此不能够像这篇文章 宿主机利用在虚拟机中建立的VPN加密隧道连接内网 中提到的，修改VirtualBox的网段。\n​ ​\n​ ​\n添加完后，可以在主机中查看\nip addr ​ ​\n‍\n为虚拟机添加用于基本网络连接的网卡 在虚拟机对应的设置中，增加一个网卡，连接方式选择 仅主机（Host-Only）网络​。但需要先关闭虚拟机，否则无法进行更改，就像我这里一样，没有关闭虚拟机，按钮是灰色的。\n​​ ​​\n添加完成后，记住这里的MAC地址结尾E124，后续识别网卡的时候会用。打开虚拟机，进入设置-\u003e网络和Internet-\u003e高级网络设置-\u003e更多网络适配器选项。\n​ ​\n这里的三个网卡，其中一个是深信服的Sanfor的网卡，也就是我这里的vpn软件。以太网是桥接网络的网卡，以太网2是host-only网卡。\n可以在win11中的终端中输入命令Get-NetAdapter​查看，前面添加网卡的时候提到，E124结尾的是Host-Only，所以这里就可以区分出哪一些是VPN的网卡，哪一些是主机的。\n​ ​\n然后开启VPN，转到网络适配器界面。右键VPN对应的网卡，选择 属性-\u003e共享，然后选择Host-Only网卡。\n​ ​\n这里win10以前的系统可能弹出提示窗，说会前行设置以太网2的IP为192.168.137.1，我是安装的win11，没有弹窗，但是会默认更改。因此，我们需要手动将Host-Only网卡的IP修改回原来的设定好的地址。\n右键Host-Only网卡，选择属性，Internet 协议版本 4，然后双击，就会弹出修改IP的弹窗。\n​​ ​​\n如果前面开启了DHCP，则可以点自动获取IP，否则需要手动改动IP为Host-Only网络段中与前面设置不同的IP地址。比如前面已经使用了 192.168.56.1 和 192.168.56.2，则就现在就需要设置为192.168.56.3。\n设置完成后，回到host。\n连通性测试和路由 设置完成后，在host的终端中，应该可以ping通虚拟机中的host网卡的地址\n​ ​\n关闭win11防火墙 如果ping的时候，ping不通，显示无法到达，很可能是win11的防火墙没有开启报文回复功能。参考：知乎回答\n在设置中按照 隐私安全性 -\u003e Windows安全中心 -\u003e 防火墙和网络保护，打开防火墙设置\n​ ​\n然后打开高级设置，将入站和出站的ICMPv4回显请求​功能打开。\n​ ​\n添加路由规则 我使用的manjaro，默认安装的是ip工具，先查看当前路由表\nsudo ip route ​ ​\n可以看到192.168.56.0/24的网络段都会被路由到virtualBox的地址上去。但没有将VPN内网地址路由到虚拟机的表项。\n因此需要添加路由规则，将VPN访问的网段路由到192.168.56.3，也就是之前在虚拟机中的host-only网卡中修改的地址。vboxnet0就是之前添加网卡时，系统中显示的网卡。\nsudo ip route del 10.0.0.0/8 via 192.168.56.3 dev vboxnet0 我要访问的VPN网段为10.0.0.0/8，需要更改为自己的内网网段。\n添加完成后再次查看\n​ ​\n然后就可以PING 自己的内网网段，就可以ping的通了。如果这里发现，一直收不到回复包，则在win11中重新将VPN的网卡分享到host-only网卡，然后修改host-only网卡。下一次开机时，也需要重复这个步骤，否则也会出现没有回复的情况。\n​ ​\n设置完成后，如果重启虚拟机，则会自动将host-only网址增加192.168.137.1，手动将其移除也不能正常通信。需要重新分享网络，然后再更改ip。\n​ ​\n目前还没有添加永久路由的方法\n在主机中访问对应网段 当可以ping通时，就能够在主机中正常访问了。实测ssh到内网网段服务器也是可以的。\n​ ​\n且不会和主机中的vpn冲突。我的主机使用的是v2ray进行科学上网，实测对本文中的行为没有影响，如果使用其他方式，不能保证。\n‍\n",
+  "wordCount" : "2235",
+  "inLanguage": "zh",
+  "datePublished": "2023-10-13T10:16:25+08:00",
+  "dateModified": "2023-10-13T10:16:25+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "Ling"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://codetang-2417.github.io/posts/record/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Linglong's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://codetang-2417.github.io/img/L.png"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://codetang-2417.github.io" accesskey="h" title="Linglong&#39;s Blog (Alt + H)">
+                <img src="https://codetang-2417.github.io/img/ball.png" alt="" aria-label="logo"
+                    height="35">Linglong&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://codetang-2417.github.io/search" title="🔍搜索 (Alt &#43; /)" accesskey=/>
+                    <span>🔍搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://codetang-2417.github.io/" title="🏠主页">
+                    <span>🏠主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://codetang-2417.github.io/posts" title="📚文章">
+                    <span>📚文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://codetang-2417.github.io/archives" title="⏱时间轴">
+                    <span>⏱时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://codetang-2417.github.io/tags" title="🔖标签">
+                    <span>🔖标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://codetang-2417.github.io/about" title="🙋🏻‍♂️关于">
+                    <span>🙋🏻‍♂️关于</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://codetang-2417.github.io">主页</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/">文章</a>&nbsp;»&nbsp;<a href="https://codetang-2417.github.io/posts/record/">🥝踩坑记录</a></div>
+    <h1 class="post-title">
+      Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网
+    </h1>
+    <div class="post-description">
+      Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网
+    </div>
+    <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+
+    .year {
+        font-size: 14px;  
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>
+            
+十月
+十三日
+
+            &nbsp;
+            <span class="year"> 2023</span>
+            
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>2235字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>5分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>Ling
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+            <span class="post-tags-meta">
+                <a href="https://codetang-2417.github.io/tags/vpn/" style="color: var(--secondary)!important;">VPN</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/manjaro/" style="color: var(--secondary)!important;">Manjaro</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/linux/" style="color: var(--secondary)!important;">Linux</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/virtualbox/" style="color: var(--secondary)!important;">VirtualBox</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/host-only/" style="color: var(--secondary)!important;">host-only</a>
+                &nbsp;<a href="https://codetang-2417.github.io/tags/network/" style="color: var(--secondary)!important;">network</a>
+            </span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+          <span id="post_meta_style_7">
+              &nbsp;&nbsp;
+              <span class="fa fa-eye" ></span>
+              <span>
+                  <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                  &nbsp;&nbsp;
+              </span>
+          </span>
+      </span>
+
+</div>
+  </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+            <summary accesskey="c" title="(Alt + C)">
+                <span class="details">目录</span>
+            </summary>
+
+            <div class="inner"><ul>
+                    <li>
+                        <a href="#virtaulbox%e5%bb%ba%e7%ab%8bhost-only%e7%bd%91%e5%8d%a1" aria-label="virtaulBox建立host-only网卡">virtaulBox建立host-only网卡</a></li>
+                    <li>
+                        <a href="#%e4%b8%ba%e8%99%9a%e6%8b%9f%e6%9c%ba%e6%b7%bb%e5%8a%a0%e7%94%a8%e4%ba%8e%e5%9f%ba%e6%9c%ac%e7%bd%91%e7%bb%9c%e8%bf%9e%e6%8e%a5%e7%9a%84%e7%bd%91%e5%8d%a1" aria-label="为虚拟机添加用于基本网络连接的网卡">为虚拟机添加用于基本网络连接的网卡</a></li>
+                    <li>
+                        <a href="#%e8%bf%9e%e9%80%9a%e6%80%a7%e6%b5%8b%e8%af%95%e5%92%8c%e8%b7%af%e7%94%b1" aria-label="连通性测试和路由">连通性测试和路由</a><ul>
+                            
+                    <li>
+                        <a href="#%e5%85%b3%e9%97%adwin11%e9%98%b2%e7%81%ab%e5%a2%99" aria-label="关闭win11防火墙">关闭win11防火墙</a></li></ul>
+                    </li>
+                    <li>
+                        <a href="#%e6%b7%bb%e5%8a%a0%e8%b7%af%e7%94%b1%e8%a7%84%e5%88%99" aria-label="添加路由规则">添加路由规则</a></li>
+                    <li>
+                        <a href="#%e5%9c%a8%e4%b8%bb%e6%9c%ba%e4%b8%ad%e8%ae%bf%e9%97%ae%e5%af%b9%e5%ba%94%e7%bd%91%e6%ae%b5" aria-label="在主机中访问对应网段">在主机中访问对应网段</a>
+                    </li>
+                </ul>
+            </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+         
+         activeElement = elements[0];
+         const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+         document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+     }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        activeElement = Array.from(elements).find((element) => {
+            if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                return element;
+            }
+        }) || activeElement
+
+        elements.forEach(element => {
+             const id = encodeURI(element.getAttribute('id')).toLowerCase();
+             if (element === activeElement){
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+             } else {
+                 document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+             }
+         })
+     }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+
+  <div class="post-content"><p>参考链接：<a href="https://www.freebuf.com/sectool/234695.html">宿主机利用在虚拟机中建立的VPN加密隧道连接内网</a>、<a href="https://blog.zenggyu.com/posts/zh/2022-05-04-%E5%9C%A8%E5%AE%BF%E4%B8%BB%E6%9C%BA%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84vpn%E8%BF%9E%E6%8E%A5/#%E4%B8%BA%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%B7%BB%E5%8A%A0%E7%94%A8%E4%BA%8E%E5%9F%BA%E6%9C%AC%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%BD%91%E5%8D%A1">在宿主机中使用虚拟机的VPN连接</a></p>
+<p>整体思想是：</p>
+<p>建立一张单独的host-only网卡，是的虚拟机和主机之间可以通信，利用windows的网络分享功能，将VPN的网卡的网络分享到这张host-only网卡。那么访问这张host-only网卡，就可以访问到VPN的网络。而host-only网卡可以被主机访问到。因此，就是实现了主机通过虚拟机的VPN进行访问的功能。但虚拟机仍然需要一张可以直接上网的网卡。因为虚拟机需要正常和外界通信，因此主机需要为虚拟机创建两张独立的网卡。</p>
+<p>注意：</p>
+<p>在上述链接中，其中一个的host使用的是桥接网卡，另一个使用的是网络地址转换NAT。根据我的测试，host使用的是网络地址转换NAT上网时，如果虚拟机连接到的网段为10.0.0.0则不能够成功将host的访问转到虚拟机的vpn中。这应该跟网络地址转换NAT有关，因为使用该方法，虚拟机的ip地址会变成10.2.0.15，可能跟VPN中的10.0.0.0网段有冲突。导致最后host无法通过虚拟机的vpn连接上该网段。因此，如果vpn连结的内网是10.0.0.0开头，则host需要使用桥接模式。</p>
+<h1 id="virtaulbox建立host-only网卡">virtaulBox建立host-only网卡<a hidden class="anchor" aria-hidden="true" href="#virtaulbox建立host-only网卡">#</a></h1>
+<p>选中工具-&gt;网络，然后建立一个host-Only网络</p>
+<p>​<img loading="lazy" src="assets/image-20231012111516-d29y5m4.png" alt="image"  />
+​</p>
+<p>点击DHCP服务器，启动服务器，也可以不使用DHCP，但需要在win虚拟机中手动设置ipv4地址。</p>
+<p>这里需要注意，<code>VirtualBox &gt;= 6.1.28 ​</code>​的版本上，默认指定的网段是192.168.56.0/24，无法更改为其他网段。因此不能够像这篇文章 <a href="https://www.freebuf.com/sectool/234695.html">宿主机利用在虚拟机中建立的VPN加密隧道连接内网</a> 中提到的，修改VirtualBox的网段。</p>
+<p>​<img loading="lazy" src="assets/image-20231012111702-el6bvrq.png" alt="image"  />
+​</p>
+<p>​<img loading="lazy" src="assets/image-20231012111721-nfmelkb.png" alt="image"  />
+​</p>
+<p>添加完后，可以在主机中查看</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>ip addr
+</span></span></code></pre></div><p>​<img loading="lazy" src="assets/image-20231012154705-gpygtv4.png" alt="image"  />
+​</p>
+<p>‍</p>
+<h1 id="为虚拟机添加用于基本网络连接的网卡">为虚拟机添加用于基本网络连接的网卡<a hidden class="anchor" aria-hidden="true" href="#为虚拟机添加用于基本网络连接的网卡">#</a></h1>
+<p>在虚拟机对应的设置中，增加一个网卡，连接方式选择 <code>仅主机（Host-Only）网络</code>​。但需要先关闭虚拟机，否则无法进行更改，就像我这里一样，没有关闭虚拟机，按钮是灰色的。</p>
+<p>​​<img loading="lazy" src="assets/image-20231012151700-y3wbm32.png" alt="image"  />
+​​</p>
+<p>添加完成后，记住这里的MAC地址结尾E124，后续识别网卡的时候会用。打开虚拟机，进入设置-&gt;网络和Internet-&gt;高级网络设置-&gt;更多网络适配器选项。</p>
+<p>​<img loading="lazy" src="assets/image-20231012150818-7du5bqc.png" alt="image"  />
+​</p>
+<p>这里的三个网卡，其中一个是深信服的Sanfor的网卡，也就是我这里的vpn软件。以太网是桥接网络的网卡，以太网2是host-only网卡。</p>
+<p>可以在win11中的终端中输入命令<code>Get-NetAdapter</code>​查看，前面添加网卡的时候提到，E124结尾的是Host-Only，所以这里就可以区分出哪一些是VPN的网卡，哪一些是主机的。</p>
+<p>​<img loading="lazy" src="assets/image-20231012151602-ym2qt1z.png" alt="image"  />
+​</p>
+<p>然后开启VPN，转到网络适配器界面。右键VPN对应的网卡，选择 属性-&gt;共享，然后选择Host-Only网卡。</p>
+<p>​<img loading="lazy" src="assets/image-20231012152132-xydjf1p.png" alt="image"  />
+​</p>
+<p>这里win10以前的系统可能弹出提示窗，说会前行设置以太网2的IP为192.168.137.1，我是安装的win11，没有弹窗，但是会默认更改。因此，我们需要手动将Host-Only网卡的IP修改回原来的设定好的地址。</p>
+<p>右键Host-Only网卡，选择属性，Internet 协议版本 4，然后双击，就会弹出修改IP的弹窗。</p>
+<p>​​<img loading="lazy" src="assets/image-20231012152540-j4c3j0u.png" alt="image"  />
+​​</p>
+<p>如果前面开启了DHCP，则可以点自动获取IP，否则需要手动改动IP为Host-Only网络段中与前面设置不同的IP地址。比如前面已经使用了 192.168.56.1 和 192.168.56.2，则就现在就需要设置为192.168.56.3。</p>
+<p>设置完成后，回到host。</p>
+<h1 id="连通性测试和路由">连通性测试和路由<a hidden class="anchor" aria-hidden="true" href="#连通性测试和路由">#</a></h1>
+<p>设置完成后，在host的终端中，应该可以ping通虚拟机中的host网卡的地址<br>
+​<img loading="lazy" src="assets/image-20231012153053-5ij923e.png" alt="image"  />
+​</p>
+<h2 id="关闭win11防火墙">关闭win11防火墙<a hidden class="anchor" aria-hidden="true" href="#关闭win11防火墙">#</a></h2>
+<p>如果ping的时候，ping不通，显示无法到达，很可能是win11的防火墙没有开启报文回复功能。参考：<a href="https://www.zhihu.com/question/37301003?utm_id=0">知乎回答</a></p>
+<p>在设置中按照 隐私安全性 -&gt; Windows安全中心 -&gt; 防火墙和网络保护，打开防火墙设置</p>
+<p>​<img loading="lazy" src="assets/image-20231012153330-1j6cctx.png" alt="image"  />
+​</p>
+<p>然后打开高级设置，将入站和出站的<code>ICMPv4回显请求</code>​功能打开。</p>
+<p>​<img loading="lazy" src="assets/image-20231012153548-0dwqzv1.png" alt="image"  />
+​</p>
+<h1 id="添加路由规则">添加路由规则<a hidden class="anchor" aria-hidden="true" href="#添加路由规则">#</a></h1>
+<p>我使用的manjaro，默认安装的是ip工具，先查看当前路由表</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo ip route
+</span></span></code></pre></div><p>​<img loading="lazy" src="assets/image-20231012153952-d3tfmfr.png" alt="image"  />
+​</p>
+<p>可以看到192.168.56.0/24的网络段都会被路由到virtualBox的地址上去。但没有将VPN内网地址路由到虚拟机的表项。</p>
+<p>因此需要添加路由规则，将VPN访问的网段路由到192.168.56.3，也就是之前在虚拟机中的host-only网卡中修改的地址。vboxnet0就是之前添加网卡时，系统中显示的网卡。</p>
+<div class="highlight"><pre tabindex="0" style="color:#4c4f69;background-color:#eff1f5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo ip route del 10.0.0.0/8 via 192.168.56.3 dev vboxnet0
+</span></span></code></pre></div><p>我要访问的VPN网段为10.0.0.0/8，需要更改为自己的内网网段。</p>
+<p>添加完成后再次查看</p>
+<p>​<img loading="lazy" src="assets/image-20231012153914-35e5clx.png" alt="image"  />
+​</p>
+<p>然后就可以PING 自己的内网网段，就可以ping的通了。如果这里发现，一直收不到回复包，则在win11中重新将VPN的网卡分享到host-only网卡，然后修改host-only网卡。下一次开机时，也需要重复这个步骤，否则也会出现没有回复的情况。</p>
+<p>​<img loading="lazy" src="assets/image-20231012155146-grfnylf.png" alt="image"  />
+​</p>
+<p>设置完成后，如果重启虚拟机，则会自动将host-only网址增加192.168.137.1，手动将其移除也不能正常通信。需要重新分享网络，然后再更改ip。</p>
+<p>​<img loading="lazy" src="assets/image-20231012160633-csbnpcr.png" alt="image"  />
+​</p>
+<p>目前还没有添加永久路由的方法</p>
+<h1 id="在主机中访问对应网段">在主机中访问对应网段<a hidden class="anchor" aria-hidden="true" href="#在主机中访问对应网段">#</a></h1>
+<p>当可以ping通时，就能够在主机中正常访问了。实测ssh到内网网段服务器也是可以的。</p>
+<p>​<img loading="lazy" src="assets/image-20231012155540-3e0311o.png" alt="image"  />
+​</p>
+<p>且不会和主机中的vpn冲突。我的主机使用的是v2ray进行科学上网，实测对本文中的行为没有影响，如果使用其他方式，不能保证。</p>
+<p>‍</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://codetang-2417.github.io/tags/vpn/">VPN</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/manjaro/">Manjaro</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/linux/">Linux</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/virtualbox/">VirtualBox</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/host-only/">host-only</a></li>
+      <li><a href="https://codetang-2417.github.io/tags/network/">network</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://codetang-2417.github.io/posts/record/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Ryzen随机卡死问题</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://codetang-2417.github.io">Linglong&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
