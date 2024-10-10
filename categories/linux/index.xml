@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on LingLong</title><link>https://codetang-2417.github.io/categories/linux/</link><description>Recent content in Linux on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Fri, 13 Oct 2023 10:16:25 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网</title><link>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</link><pubDate>Fri, 13 Oct 2023 10:16:25 +0800</pubDate><guid>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</guid><description>&lt;p>参考链接：&lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a>、&lt;a class="link" href="https://blog.zenggyu.com/posts/zh/2022-05-04-%E5%9C%A8%E5%AE%BF%E4%B8%BB%E6%9C%BA%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84vpn%E8%BF%9E%E6%8E%A5/#%E4%B8%BA%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%B7%BB%E5%8A%A0%E7%94%A8%E4%BA%8E%E5%9F%BA%E6%9C%AC%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%BD%91%E5%8D%A1" target="_blank" rel="noopener"
+>在宿主机中使用虚拟机的VPN连接&lt;/a>&lt;/p>
+&lt;p>整体思想是：&lt;br>
+建立一张单独的host-only网卡，使得虚拟机和主机之间可以通信，利用windows的网络分享功能，将VPN的网卡的网络分享到这张host-only网卡。那么访问这张host-only网卡，就可以访问到VPN的网络。而host-only网卡可以被主机访问到。因此，就是实现了主机通过虚拟机的VPN进行访问的功能。但虚拟机仍然需要一张可以直接上网的网卡。因为虚拟机需要正常和外界通信，因此主机需要为虚拟机创建两张独立的网卡。&lt;/p>
+&lt;p>注意：&lt;br>
+在上述链接中，其中一个的host使用的是桥接网卡，另一个使用的是网络地址转换NAT。根据我的测试，host使用的是网络地址转换NAT上网时，如果虚拟机连接到的网段为10.0.0.0则不能够成功将host的访问转到虚拟机的vpn中。这应该跟网络地址转换NAT有关，因为使用该方法，虚拟机的ip地址会变成10.2.0.15，可能跟VPN中的10.0.0.0网段有冲突。导致最后host无法通过虚拟机的vpn连接上该网段。因此，如果vpn连结的内网是10.0.0.0开头，则host需要使用桥接模式。&lt;/p>
+&lt;h2 id="virtaulbox建立host-only网卡">virtaulBox建立host-only网卡
+&lt;/h2>&lt;p>选中工具-&amp;gt;网络，然后建立一个host-Only网络&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111516-d29y5m4.png"
+width="835"
+height="443"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="188"
+data-flex-basis="452px"
+>​&lt;/p>
+&lt;p>点击DHCP服务器，启动服务器，也可以不使用DHCP，但需要在win虚拟机中手动设置ipv4地址。&lt;/p>
+&lt;p>这里需要注意，&lt;code>VirtualBox &amp;gt;= 6.1.28 ​&lt;/code>​的版本上，默认指定的网段是192.168.56.0/24，无法更改为其他网段。因此不能够像这篇文章 &lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a> 中提到的，修改VirtualBox的网段。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111702-el6bvrq.png"
+width="879"
+height="1016"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111721-nfmelkb.png"
+width="836"
+height="973"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="85"
+data-flex-basis="206px"
+>​&lt;/p>
+&lt;p>添加完后，可以在主机中查看&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ip addr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012154705-gpygtv4.png"
+width="842"
+height="326"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="258"
+data-flex-basis="619px"
+>​&lt;/p>
+&lt;p>‍&lt;/p>
+&lt;h2 id="为虚拟机添加用于基本网络连接的网卡">为虚拟机添加用于基本网络连接的网卡
+&lt;/h2>&lt;p>在虚拟机对应的设置中，增加一个网卡，连接方式选择 &lt;code>仅主机（Host-Only）网络&lt;/code>​。但需要先关闭虚拟机，否则无法进行更改，就像我这里一样，没有关闭虚拟机，按钮是灰色的。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151700-y3wbm32.png"
+width="790"
+height="567"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+>​​&lt;/p>
+&lt;p>添加完成后，记住这里的MAC地址结尾E124，后续识别网卡的时候会用。打开虚拟机，进入设置-&amp;gt;网络和Internet-&amp;gt;高级网络设置-&amp;gt;更多网络适配器选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012150818-7du5bqc.png"
+width="1267"
+height="1126"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="112"
+data-flex-basis="270px"
+>​&lt;/p>
+&lt;p>这里的三个网卡，其中一个是深信服的Sanfor的网卡，也就是我这里的vpn软件。以太网是桥接网络的网卡，以太网2是host-only网卡。&lt;/p>
+&lt;p>可以在win11中的终端中输入命令&lt;code>Get-NetAdapter&lt;/code>​查看，前面添加网卡的时候提到，E124结尾的是Host-Only，所以这里就可以区分出哪一些是VPN的网卡，哪一些是主机的。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151602-ym2qt1z.png"
+width="1105"
+height="176"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="627"
+data-flex-basis="1506px"
+>​&lt;/p>
+&lt;p>然后开启VPN，转到网络适配器界面。右键VPN对应的网卡，选择 属性-&amp;gt;共享，然后选择Host-Only网卡。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152132-xydjf1p.png"
+width="1038"
+height="604"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="171"
+data-flex-basis="412px"
+>​&lt;/p>
+&lt;p>这里win10以前的系统可能弹出提示窗，说会前行设置以太网2的IP为192.168.137.1，我是安装的win11，没有弹窗，但是会默认更改。因此，我们需要手动将Host-Only网卡的IP修改回原来的设定好的地址。&lt;/p>
+&lt;p>右键Host-Only网卡，选择属性，Internet 协议版本 4，然后双击，就会弹出修改IP的弹窗。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152540-j4c3j0u.png"
+width="1322"
+height="840"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>​​&lt;/p>
+&lt;p>如果前面开启了DHCP，则可以点自动获取IP，否则需要手动改动IP为Host-Only网络段中与前面设置不同的IP地址。比如前面已经使用了 192.168.56.1 和 192.168.56.2，则就现在就需要设置为192.168.56.3。&lt;/p>
+&lt;p>设置完成后，回到host。&lt;/p>
+&lt;h2 id="连通性测试和路由">连通性测试和路由
+&lt;/h2>&lt;p>设置完成后，在host的终端中，应该可以ping通虚拟机中的host网卡的地址&lt;br>
+​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153053-5ij923e.png"
+width="510"
+height="213"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="239"
+data-flex-basis="574px"
+>​&lt;/p>
+&lt;h3 id="关闭win11防火墙">关闭win11防火墙
+&lt;/h3>&lt;p>如果ping的时候，ping不通，显示无法到达，很可能是win11的防火墙没有开启报文回复功能。参考：&lt;a class="link" href="https://www.zhihu.com/question/37301003?utm_id=0" target="_blank" rel="noopener"
+>知乎回答&lt;/a>&lt;/p>
+&lt;p>在设置中按照 隐私安全性 -&amp;gt; Windows安全中心 -&amp;gt; 防火墙和网络保护，打开防火墙设置&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153330-1j6cctx.png"
+width="1425"
+height="996"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+>​&lt;/p>
+&lt;p>然后打开高级设置，将入站和出站的&lt;code>ICMPv4回显请求&lt;/code>​功能打开。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153548-0dwqzv1.png"
+width="1474"
+height="928"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="381px"
+>​&lt;/p>
+&lt;h2 id="添加路由规则">添加路由规则
+&lt;/h2>&lt;p>我使用的manjaro，默认安装的是ip工具，先查看当前路由表&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153952-d3tfmfr.png"
+width="662"
+height="66"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1003"
+data-flex-basis="2407px"
+>​&lt;/p>
+&lt;p>可以看到192.168.56.0/24的网络段都会被路由到virtualBox的地址上去。但没有将VPN内网地址路由到虚拟机的表项。&lt;/p>
+&lt;p>因此需要添加路由规则，将VPN访问的网段路由到192.168.56.3，也就是之前在虚拟机中的host-only网卡中修改的地址。vboxnet0就是之前添加网卡时，系统中显示的网卡。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route del 10.0.0.0/8 via 192.168.56.3 dev vboxnet0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>我要访问的VPN网段为10.0.0.0/8，需要更改为自己的内网网段。&lt;/p>
+&lt;p>添加完成后再次查看&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153914-35e5clx.png"
+width="656"
+height="111"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="590"
+data-flex-basis="1418px"
+>​&lt;/p>
+&lt;p>然后就可以PING 自己的内网网段，就可以ping的通了。如果这里发现，一直收不到回复包，则在win11中重新将VPN的网卡分享到host-only网卡，然后修改host-only网卡。下一次开机时，也需要重复这个步骤，否则也会出现没有回复的情况。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155146-grfnylf.png"
+width="583"
+height="169"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="344"
+data-flex-basis="827px"
+>​&lt;/p>
+&lt;p>设置完成后，如果重启虚拟机，则会自动将host-only网址增加192.168.137.1，手动将其移除也不能正常通信。需要重新分享网络，然后再更改ip。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012160633-csbnpcr.png"
+width="412"
+height="560"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="73"
+data-flex-basis="176px"
+>​&lt;/p>
+&lt;p>目前还没有添加永久路由的方法&lt;/p>
+&lt;h2 id="在主机中访问对应网段">在主机中访问对应网段
+&lt;/h2>&lt;p>当可以ping通时，就能够在主机中正常访问了。实测ssh到内网网段服务器也是可以的。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155540-3e0311o.png"
+width="710"
+height="351"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="485px"
+>​&lt;/p>
+&lt;p>且不会和主机中的vpn冲突。我的主机使用的是v2ray进行科学上网，实测对本文中的行为没有影响，如果使用其他方式，不能保证。&lt;/p>
+&lt;p>‍&lt;/p></description></item><item><title>Linux中的SysRq魔术键</title><link>https://codetang-2417.github.io/p/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/</link><pubDate>Sat, 07 Oct 2023 11:12:13 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/</guid><description>&lt;p>当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏系统。但在linux内核中，有一个特殊的按键：SysRq（&lt;strong>Sys&lt;/strong> tem &lt;strong>R&lt;/strong> e &lt;strong>q&lt;/strong> uest key）。如果激活SysRq键，就可以输入一些特殊的系统操作命令，用于在系统崩溃时进行一些操作（同步数据、杀进程、卸载文件系统，甚至系统重启）。可以安全的重启系统。&lt;/p>
+&lt;p>参考：&lt;a class="link" href="https://rqsir.github.io/2019/05/02/linux%E4%B8%AD%E7%9A%84SysRq%E9%AD%94%E6%9C%AF%E9%94%AE/" target="_blank" rel="noopener"
+>linux 中的 SysRq 魔术键&lt;/a>&lt;/p>
+&lt;h2 id="sysrqhttpsenwikipediaorgwikimagic_sysrq_key-键">&lt;a class="link" href="https://en.wikipedia.org/wiki/Magic_SysRq_key" target="_blank" rel="noopener"
+>SysRq&lt;/a> 键
+&lt;/h2>&lt;p>在 QWERT 的全尺寸键盘上与 &lt;code>PrtSc&lt;/code>​ 同键，并且会在按键上标注有SysRq。使用&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​激活&lt;code>SysRq&lt;/code>​。&lt;/p>
+&lt;p>在一些笔记本上虽然没有标注，但可以通过&lt;code>Fn&lt;/code>​+&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​组合键的方式激活SysRq按键。&lt;/p>
+&lt;p>如果上面的组合都不起作用，则可以尝试下面几种：&lt;/p>
+&lt;ul>
+&lt;li>​&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​&lt;/li>
+&lt;li>​&lt;code>Alt Gr&lt;/code>​+&lt;code>PrtSc&lt;/code>​&lt;/li>
+&lt;li>​&lt;code>Ctrl&lt;/code>​+&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​&lt;/li>
+&lt;/ul>
+&lt;p>注意，激活&lt;code>SysRq&lt;/code>​后，需要保持&lt;code>Alt&lt;/code>​按键按下，并松开&lt;code>SysRq&lt;/code>​或​&lt;code>PrtSc&lt;/code>​&lt;/p>
+&lt;p>&lt;strong>请阅读完后续内容再尝试，并在尝试之前保存所有工作内容！&lt;/strong>&lt;/p>
+&lt;h2 id="reisub">REISUB
+&lt;/h2>&lt;p>参考：&lt;a class="link" href="https://forum.manjaro.org/t/howto-reboot-turn-off-your-frozen-computer-reisub-reisuo/3855/104?page=2" target="_blank" rel="noopener"
+>[HowTo] reboot / turn off your frozen computer: REISUB/REISUO&lt;/a>&lt;/p>
+&lt;p>&lt;strong>REISUB&lt;/strong>是 &lt;strong>R&lt;/strong> eboot &lt;strong>E&lt;/strong> ven &lt;strong>I&lt;/strong> f &lt;strong>S&lt;/strong> ystem &lt;strong>U&lt;/strong> tterly &lt;strong>B&lt;/strong> roken 的SysRq命令的助记符。表示 &lt;strong>即使系统完全崩溃也能重启&lt;/strong>。&lt;/p>
+&lt;p>激活SysRq按键后，在键盘上按下如下按键，就可以优雅的重启系统：&lt;/p>
+&lt;ul>
+&lt;li>Switch the keyboard from &lt;strong>R&lt;/strong> aw mode, used by programs such as &lt;a class="link" href="https://en.wikipedia.org/wiki/X11" target="_blank" rel="noopener"
+>X11 &lt;/a>​&lt;a class="link" href="https://en.wikipedia.org/wiki/X11" target="_blank" rel="noopener"
+>&lt;strong>112&lt;/strong>&lt;/a> and &lt;a class="link" href="https://en.wikipedia.org/wiki/SVGALib" target="_blank" rel="noopener"
+>SVGALib &lt;/a>​&lt;a class="link" href="https://en.wikipedia.org/wiki/SVGALib" target="_blank" rel="noopener"
+>&lt;strong>25&lt;/strong>&lt;/a>, to XLATE (translate) mode&lt;/li>
+&lt;li>Send an &lt;strong>E&lt;/strong> nd signal (SIGTERM) to all processes, except the boot process, allowing all processes to end gracefully&lt;/li>
+&lt;li>Send an &lt;strong>I&lt;/strong> nstant kill (SIGKILL) to all processes, except the boot process, &lt;a class="link" href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg" target="_blank" rel="noopener"
+>&lt;em>forcing&lt;/em>&lt;/a>​&lt;a class="link" href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg" target="_blank" rel="noopener"
+> all processes to end &lt;/a>​&lt;a class="link" href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg" target="_blank" rel="noopener"
+>&lt;strong>43&lt;/strong>&lt;/a> .&lt;/li>
+&lt;li>&lt;strong>S&lt;/strong> ync all mounted filesystems, allowing them to write all data to disk.&lt;/li>
+&lt;li>&lt;strong>U&lt;/strong> nmount and remount all mounted filesystems in &lt;a class="link" href="https://en.wikipedia.org/wiki/File_system_permissions" target="_blank" rel="noopener"
+>read-only &lt;/a>​&lt;a class="link" href="https://en.wikipedia.org/wiki/File_system_permissions" target="_blank" rel="noopener"
+>&lt;strong>8&lt;/strong>&lt;/a> mode.&lt;/li>
+&lt;li>Re &lt;strong>B&lt;/strong> oot the system&lt;/li>
+&lt;/ul>
+&lt;p>下面是上述英文的中文解释&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">R - 把键盘设置为 ASCII 模式 &lt;span class="o">(&lt;/span>用于接收后面键盘输入&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Keyboard mode &lt;span class="nb">set&lt;/span> to XLATE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">E - 向除 init 以外所有进程发送 SIGTERM 信号 &lt;span class="o">(&lt;/span>让进程自己正常退出&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Terminate All Tasks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">I - 向除 init 以外所有进程发送 SIGKILL 信号 &lt;span class="o">(&lt;/span>强制结束进程&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Kill All Tasks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">S - 磁盘缓冲区同步
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq : Emergency Sync
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">U - 重新挂载为只读模式
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq : Emergency Remount R/O
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">B - 立即重启系统
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Resetting
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>由于系统环境与后台进程个数的不确定性，每一步按键操作执行完成所费时间无法确定。为保险起见，一般采用 &lt;strong>R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键&lt;/strong>。&lt;/p>
+&lt;h2 id="用法">用法
+&lt;/h2>&lt;p>如果按照上述方法，并没有左右，则可能是&lt;code>SysRq&lt;/code>​功能没有启用。&lt;/p>
+&lt;h3 id="启用-sysrq-功能">启用 SysRq 功能
+&lt;/h3>&lt;p>首先检查 &lt;code>SysRq&lt;/code>​ 是否开启&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat /proc/sys/kernel/sysrq
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>若输出为 0，则还未开启。&lt;/p>
+&lt;p>在manjaro中，通过向grub写入配置命令启用Linux的SysRq功能。&lt;/p>
+&lt;p>向文件&lt;code>/etc/default/grub&lt;/code>​中的&lt;code>GRUB_CMDLINE_LINUX_DEFAULT&lt;/code>​参数添加： &lt;code>sysrq_always_enabled=1&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo nano /etc/default/grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>更改完后记得&lt;code>ctrl&lt;/code>​+&lt;code>O&lt;/code>​保存文件。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/assets/image-20231007105854-9gz3bv9.png"
+width="972"
+height="292"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="332"
+data-flex-basis="798px"
+>​&lt;/p>
+&lt;p>然后执行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo update-grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>更新grub。最后重启系统。&lt;/p>
+&lt;h3 id="实际使用过程">实际使用过程
+&lt;/h3>&lt;p>先激活&lt;code>SysRq&lt;/code>​按键，全键盘：&lt;code>Alt&lt;/code>​+&lt;code>SysRq&lt;/code>​，笔记本：&lt;code>Fn&lt;/code>​+&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​。激活后保持&lt;code>Alt&lt;/code>​按键按下，松开&lt;code>PrtSc&lt;/code>​或者&lt;code>SysRq&lt;/code>​。&lt;/p>
+&lt;p>根据电脑的性能不同，激活时间不一样。新硬件可能在1秒，旧的硬件可能在6秒。&lt;/p>
+&lt;p>激活后，在键盘上按照R E I S U B的顺序，就可以安全的重启系统，需要注意根据上述介绍，一般采用 &lt;strong>R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键&lt;/strong>。&lt;/p>
+&lt;p>‍&lt;/p></description></item><item><title>Archlinux 降级安装</title><link>https://codetang-2417.github.io/p/archlinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/</link><pubDate>Fri, 06 Oct 2023 19:10:01 +0800</pubDate><guid>https://codetang-2417.github.io/p/archlinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/</guid><description>&lt;p>参考链接：&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/%E9%99%8D%E7%BA%A7%E8%BD%AF%E4%BB%B6%E5%8C%85" target="_blank" rel="noopener"
+>降级软件包&lt;/a>&lt;/p>
+&lt;h2 id="使用pacman的临时文件">使用pacman的临时文件
+&lt;/h2>&lt;p>如果一个新包刚刚被安装并且没有删除&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Pacman#Cleaning_the_package_cache" title="Pacman"
+target="_blank" rel="noopener"
+>pacman cache&lt;/a>,你可以在&lt;code>/var/cache/pacman/pkg/&lt;/code>​中找到较早版本. 安装替换现有的版本.&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Pacman" title="Pacman"
+target="_blank" rel="noopener"
+>pacman&lt;/a>会处理依赖包但不会处理依赖库的版本冲突。如果一个其依赖库因该包降级需要降级，你需要手动降级这些包。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl"> &lt;span class="o">$&lt;/span> &lt;span class="n">pacman&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">U&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">pacman&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">pkg&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">package&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">old_version&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">pkg&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">tar&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">type&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>对老的软件包，&lt;code>type&lt;/code>​ 应该是 &lt;code>xz&lt;/code>​，遵循 &lt;a class="link" href="https://archlinux.org/news/now-using-zstandard-instead-of-xz-for-package-compression/" target="_blank" rel="noopener"
+>2020 变更&lt;/a>的新软件包，&lt;code>type&lt;/code>​ 应该是 &lt;code>zst&lt;/code>​。&lt;/p>
+&lt;p>当成功降级该包以后，请&lt;strong>暂时将其加入&lt;/strong>​&lt;code>**pacman.conf**&lt;/code>​​​的&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Pacman#Skip_package_from_being_upgraded" title="Pacman"
+target="_blank" rel="noopener"
+>IgnorePkg section&lt;/a>，直到您的问题被解决。&lt;/p>
+&lt;p>使用nano编辑文件/etc/pacman.conf，找到其中的IgnorePKG字段，按照下图将降级包加入到配置中。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/archlinux-%E9%99%8D%E7%BA%A7%E5%AE%89%E8%A3%85/assets/image-20231006125451-oaxha8z.png"
+width="979"
+height="734"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="133"
+data-flex-basis="320px"
+>​&lt;/p>
+&lt;p>如果本地没有旧版本的cache，或者是被清理了，则需要去Arch Linux Archive下载旧版本的包，然后重复上述操作。&lt;/p>
+&lt;h2 id="arch-linux-archive">Arch Linux Archive
+&lt;/h2>&lt;p>&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Arch_Linux_Archive" title="Arch Linux Archive"
+target="_blank" rel="noopener"
+>Arch Linux Archive&lt;/a>是&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Official_repositories" title="Official repositories"
+target="_blank" rel="noopener"
+>official repositories&lt;/a>的日更快照。&lt;/p>
+&lt;p>&lt;em>ALA&lt;/em>能被用来降级包或者还原整个系统到过去版本。&lt;/p>
+&lt;p>网站链接：&lt;a class="link" href="https://archive.archlinux.org/" target="_blank" rel="noopener"
+>归档&lt;/a>&lt;/p>
+&lt;h2 id="自动化">自动化
+&lt;/h2>&lt;p>&lt;strong>downgrade&lt;/strong> — 基于Bash使用本地缓存和&lt;a class="link" href="https://wiki.archlinuxcn.org/wzh/index.php?title=Arch_Rollback_Machine&amp;amp;action=edit&amp;amp;redlink=1" title="Arch Rollback Machine（页面不存在）"
+target="_blank" rel="noopener"
+>Arch Rollback Machine&lt;/a>。详见&lt;strong>downgrade(8)&lt;/strong>。&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/pbrisbin/downgrade" target="_blank" rel="noopener"
+>https://github.com/pbrisbin/downgrade&lt;/a> || &lt;a class="link" href="https://aur.archlinux.org/packages/downgrade/" target="_blank" rel="noopener"
+>downgrade&lt;/a>​^AUR^&lt;/p>
+&lt;p>‍&lt;/p></description></item></channel></rss>
