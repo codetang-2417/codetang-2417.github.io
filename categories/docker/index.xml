@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on LingLong</title><link>https://codetang-2417.github.io/categories/docker/</link><description>Recent content in Docker on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Wed, 16 Oct 2024 23:00:53 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/categories/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>离线方式传输 Docker 镜像</title><link>https://codetang-2417.github.io/p/%E7%A6%BB%E7%BA%BF%E6%96%B9%E5%BC%8F%E4%BC%A0%E8%BE%93-docker-%E9%95%9C%E5%83%8F/</link><pubDate>Wed, 16 Oct 2024 22:47:00 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E7%A6%BB%E7%BA%BF%E6%96%B9%E5%BC%8F%E4%BC%A0%E8%BE%93-docker-%E9%95%9C%E5%83%8F/</guid><description>&lt;p>　　目前国内的镜像加速网站被墙，个人电脑可以通过代理的方式下载镜像，但服务器可能无法使用代理，或者无法访问网络，因此可以通过离线的方式，或者使用自建私有镜像仓库的形式来管理镜像。&lt;/p>
+&lt;p>　　本文说明如何通过离线的方式向服务器上传镜像：将 Docker 镜像导出并传输到服务器，然后再导入镜像。&lt;/p>
+&lt;h2 id="步骤">步骤
+&lt;/h2>&lt;h3 id="导出镜像到本地文件">导出镜像到本地文件
+&lt;/h3>&lt;pre>&lt;code>在本地，将 Docker 镜像导出为 `.tar`​ 文件：
+```bash
+docker save -o ubuntu24.tar ubuntu:24.04
+```
+这会将名为 `ubuntu:24.04`​ 的镜像保存为 `ubuntu24.tar`​ 文件。
+&lt;/code>&lt;/pre>
+&lt;h3 id="将文件传输到服务">将文件传输到服务
+&lt;/h3>&lt;pre>&lt;code>通过 USB 或局域网的文件传输工具（如 `scp`​、`rsync`​、FTP 等）将 `ubuntu24.tar`​ 文件传输到服务器。
+例如使用 `scp`​：
+```bash
+scp ubuntu24.tar user@server:/path/to/destination
+```
+&lt;/code>&lt;/pre>
+&lt;h3 id="在服务器上导入镜像">在服务器上导入镜像
+&lt;/h3>&lt;pre>&lt;code>将文件传输到服务器后，在服务器上使用以下命令导入该镜像：
+```bash
+docker load -i /path/to/destination/ubuntu24.tar
+```
+这会将 `ubuntu24.tar`​ 文件中的 Docker 镜像加载到服务器的 Docker 环境中。
+&lt;/code>&lt;/pre>
+&lt;p>　　如果镜像过大，或者使用人数较多的情况，需要考虑自建镜像仓库，有一些免费的管理软件可供使用，不再本文介绍范围内，后续如果有需要再进行总结。&lt;/p></description></item></channel></rss>

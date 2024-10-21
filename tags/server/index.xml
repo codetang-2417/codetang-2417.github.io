@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Server on LingLong</title><link>https://codetang-2417.github.io/tags/server/</link><description>Recent content in Server on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Mon, 21 Oct 2024 11:38:45 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/server/index.xml" rel="self" type="application/rss+xml"/><item><title>离线方式传输 Docker 镜像</title><link>https://codetang-2417.github.io/p/%E7%A6%BB%E7%BA%BF%E6%96%B9%E5%BC%8F%E4%BC%A0%E8%BE%93-docker-%E9%95%9C%E5%83%8F/</link><pubDate>Wed, 16 Oct 2024 22:47:00 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E7%A6%BB%E7%BA%BF%E6%96%B9%E5%BC%8F%E4%BC%A0%E8%BE%93-docker-%E9%95%9C%E5%83%8F/</guid><description>&lt;p>　　目前国内的镜像加速网站被墙，个人电脑可以通过代理的方式下载镜像，但服务器可能无法使用代理，或者无法访问网络，因此可以通过离线的方式，或者使用自建私有镜像仓库的形式来管理镜像。&lt;/p>
+&lt;p>　　本文说明如何通过离线的方式向服务器上传镜像：将 Docker 镜像导出并传输到服务器，然后再导入镜像。&lt;/p>
+&lt;h2 id="步骤">步骤
+&lt;/h2>&lt;h3 id="导出镜像到本地文件">导出镜像到本地文件
+&lt;/h3>&lt;pre>&lt;code>在本地，将 Docker 镜像导出为 `.tar`​ 文件：
+```bash
+docker save -o ubuntu24.tar ubuntu:24.04
+```
+这会将名为 `ubuntu:24.04`​ 的镜像保存为 `ubuntu24.tar`​ 文件。
+&lt;/code>&lt;/pre>
+&lt;h3 id="将文件传输到服务">将文件传输到服务
+&lt;/h3>&lt;pre>&lt;code>通过 USB 或局域网的文件传输工具（如 `scp`​、`rsync`​、FTP 等）将 `ubuntu24.tar`​ 文件传输到服务器。
+例如使用 `scp`​：
+```bash
+scp ubuntu24.tar user@server:/path/to/destination
+```
+&lt;/code>&lt;/pre>
+&lt;h3 id="在服务器上导入镜像">在服务器上导入镜像
+&lt;/h3>&lt;pre>&lt;code>将文件传输到服务器后，在服务器上使用以下命令导入该镜像：
+```bash
+docker load -i /path/to/destination/ubuntu24.tar
+```
+这会将 `ubuntu24.tar`​ 文件中的 Docker 镜像加载到服务器的 Docker 环境中。
+&lt;/code>&lt;/pre>
+&lt;p>　　如果镜像过大，或者使用人数较多的情况，需要考虑自建镜像仓库，有一些免费的管理软件可供使用，不再本文介绍范围内，后续如果有需要再进行总结。&lt;/p></description></item><item><title>linux ubuntu搭建不同用户的VNC</title><link>https://codetang-2417.github.io/p/linux-ubuntu%E6%90%AD%E5%BB%BA%E4%B8%8D%E5%90%8C%E7%94%A8%E6%88%B7%E7%9A%84vnc/</link><pubDate>Wed, 25 Oct 2023 20:36:04 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux-ubuntu%E6%90%AD%E5%BB%BA%E4%B8%8D%E5%90%8C%E7%94%A8%E6%88%B7%E7%9A%84vnc/</guid><description>&lt;h1 id="linux-ubuntu搭建不同用户的vnc">linux ubuntu搭建不同用户的VNC
+&lt;/h1>&lt;h1 id="安装tigervnc">安装tigervnc
+&lt;/h1>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install tigervnc-standalone-server
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="安装gnome桌面">安装gnome桌面
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install gnome-panel gnome-settings-daemon metacity nautilus gnome-terminal ubuntu-desktop
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　因为自带的桌面在后续登陆输入密码时有问题，没办法输入文字。因此使用此gnome桌面。安装后还需要配置启动脚本，使得启动后使用ubuntu的默认gnome桌面。&lt;/p>
+&lt;h1 id="配置xstartup">配置xstartup
+&lt;/h1>&lt;p>　　如果已经有默认的脚本，则将其备份，如果没有可以直接编辑&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cp ~/.vnc/xstartup ~/.vnc/xstartup.bak
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nano ~/.vnc/xstartup
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在用户home目录下的.vnc目录下创建xstartup，并添加如下内容&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/sh
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">XKL_XMODMAP_DISABLE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_CURRENT_DESKTOP&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;GNOME-Flashback:GNOME&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_MENU_PREFIX&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;gnome-flashback-&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 服务器物理显示器会默认使用显示端口 5901，需要确保 VNC端口以及配置 不与现有的 GNOME 会话发生冲突。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> SESSION_MANAGER
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> DBUS_SESSION_BUS_ADDRESS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gnome-session --session&lt;span class="o">=&lt;/span>gnome-flashback-metacity --disable-acceleration-check
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　然后赋予执行权限&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">chmod &lt;span class="m">777&lt;/span> ~/.vnc/xstartup
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="测试">测试
+&lt;/h1>&lt;p>　　使用下列命令将vnc服务运行在5902端口，不建议使用5901作为默认显示端口，因为物理显示器会默认使用5901。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">vncserver -geometry 1920x1080 :2 -localhost no
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　使用 &lt;code>vncserver -list&lt;/code>​ 获取端口号：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-ubuntu%E6%90%AD%E5%BB%BA%E4%B8%8D%E5%90%8C%E7%94%A8%E6%88%B7%E7%9A%84vnc/assets/image-20231025213936-9flei5k.png"
+width="554"
+height="111"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="499"
+data-flex-basis="1197px"
+>​&lt;/p>
+&lt;h1 id="vnc脚本">vnc脚本
+&lt;/h1>&lt;p>　　将启动脚本写成sh文件，便于执行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#! /bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>vncserver -geometry 1920x1080 :2 -localhost no &lt;span class="c1"># :1 reserved for local connection offline.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　添加权限&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">chmod &lt;span class="m">777&lt;/span> vnc_run.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　:2表示使用的端口为5902，如果不指定，会自动分配，这样的话，就需要先shell登陆，查看端口号，然后再登陆vnc。&lt;/p>
+&lt;h1 id="打开其他图形应用没有反应">打开其他图形应用没有反应
+&lt;/h1>&lt;p>　　如果可以右键打开终端，但是&lt;strong>打开文件夹之类的应用没有反应&lt;/strong>。就在终端中输入：&lt;code>xhost +&lt;/code>​。（仅仅在图形界面下有效，shell中无效）&lt;/p>
+&lt;h1 id="登陆shell自动启动vnc">登陆shell自动启动vnc
+&lt;/h1>&lt;p>　　为了能够让每个用户都使用vnc，需要让每个用户登录时自启动vnc，在用户目录下的&lt;code>.profile&lt;/code>​文件中添加运行vnc的脚本。当用户登录shell时，就会运行一次vnc启动脚本。（这样就需要固定显示端口，否则将建立多个vnc端口）&lt;/p>
+&lt;p>　　例如，在&lt;code> ～/.profile&lt;/code>​中的末尾添加一行：&lt;code>/home/user/vnc_run.sh&lt;/code>​&lt;/p>
+&lt;p>　　​&lt;code>～/.bash_profile&lt;/code>​ 或&lt;code> ～/.profile&lt;/code>​ ：每个用户都可使用该文件，输入专用于当前用户使用的shell信息。当用户登录时，该文件仅仅执行一次！默认情况下，设一些环境变量，执行用户的.bashrc文件。&lt;/p>
+&lt;h1 id="为新用户添加vnc">为新用户添加vnc
+&lt;/h1>&lt;p>　　若为一个新用户添加vnc支持，则需要完成本文中的 &lt;strong>配置xstartup&lt;/strong>、&lt;strong>vnc脚本&lt;/strong>、&lt;strong>登陆shell自动启动vnc&lt;/strong> 等三个部分。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item></channel></rss>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>循环队列 on LingLong</title><link>https://codetang-2417.github.io/tags/%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97/</link><description>Recent content in 循环队列 on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Sun, 29 Sep 2024 17:43:56 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97/index.xml" rel="self" type="application/rss+xml"/><item><title>数据结构知识点集合</title><link>https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/</link><pubDate>Sun, 29 Sep 2024 09:45:17 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/</guid><description>&lt;h2 id="循环队列">循环队列
+&lt;/h2>&lt;p>　　队列：先进先出的数据结构，有多种实现方式，比较简单的是通过数组模拟。还可以用链表。&lt;/p>
+&lt;p>　　循环队列则是为了解决顺序队列的”假溢出“问题而提出。&lt;/p>
+&lt;p>　　假溢出：顺序队列的数组空间没有真正被填满，但因为队列的头指针已经向后移动了一定距离，导致在继续入队时，队列判定为溢出。如果不使用循环队列，动态的修改队列的头尾指针的指向，则需要不断的将队列中的元素移动到数组的头部，保证不溢出。&lt;/p>
+&lt;p>　　循环队列需要考虑队空和队满的判别条件。&lt;/p>
+&lt;p>　　有两种方法区分队空和队满：&lt;/p>
+&lt;ol>
+&lt;li>创建变量 size，记录循环队列大小。&lt;code>size = 0&lt;/code>​为队空。&lt;code>size = array.length&lt;/code>​为队满。&lt;/li>
+&lt;li>数组只使用&lt;code>array.length-1&lt;/code>​的空间，留出1个元素作为缓冲。front指向队列中首元素，而rear指向队列尾元素的下一个元素。因此&lt;code>front == rear&lt;/code>​为队空，&lt;code>front == (rear + 1) % capacity&lt;/code>​为队满。&lt;/li>
+&lt;/ol>
+&lt;p>　　例题：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">假设以数组A[70]存放循环队列的元素, 其头指针是front=47, 当前队列有50个元素, 则队列的尾指针值为（ ）。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">A.70 B.27 C.37 D.20
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　front到数组末尾共有 70 - 47 = 23个元素，则数组头部开始应再存 50 - 23 = 27个元素，默认情况下，采用第2种循环队列判空和判满的方式，则rear指向的应该是27，也就是第28个元素。&lt;/p>
+&lt;h2 id="图">图
+&lt;/h2>&lt;p>　　参考：&lt;a class="link" href="https://www.hello-algo.com/chapter_graph/graph/" target="_blank" rel="noopener"
+>Hello 算法：图&lt;/a>&lt;/p>
+&lt;h3 id="图的分类">图的分类
+&lt;/h3>&lt;p>　　图是非线性数据结构，由顶点和边组成。根据边的特性，分为有向图和无向图。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929143933-imuuq16.png"
+width="1064"
+height="794"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="134"
+data-flex-basis="321px"
+>​&lt;/p>
+&lt;p>　　而根据顶点是否连通，又可以分为连通图和非连通图。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929144027-nmiayku.png"
+width="1049"
+height="756"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="138"
+data-flex-basis="333px"
+>​&lt;/p>
+&lt;p>　　 还可以为每一条边添加权重，从而转变为有权图&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929144337-utj2xta.png"
+width="1068"
+height="782"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="136"
+data-flex-basis="327px"
+>​&lt;/p>
+&lt;h3 id="图的术语">图的术语
+&lt;/h3>&lt;p>　　参考：&lt;a class="link" href="http://t.csdnimg.cn/b4sNJ" target="_blank" rel="noopener"
+>图（Graph）详解 - 数据结构 - CSDN App&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>邻接（adjacency）：当两顶点之间存在边相连时，称这两顶点“邻接”。在图 9-4 中，顶点 1 的邻接顶点为顶点 2、3、5。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>路径（path）：从顶点 A 到顶点 B 经过的边构成的序列被称为从 A 到 B 的“路径”。在图 9-4 中，边序列 1-5-2-4 是顶点 1 到顶点 4 的一条路径。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>度（degree）：一个顶点拥有的边数。对于有向图，入度（in-degree）表示有多少条边指向该顶点，出度（out-degree）表示有多少条边从该顶点指出。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>完全图&lt;/strong>： 在有 n 个顶点的无向图中，若有 n*(n-1)/2 条边，即任意两个顶点之间有且仅有一条边，则称此图为无向&lt;a class="link" href="https://so.csdn.net/so/search?q=%E5%AE%8C%E5%85%A8%E5%9B%BE&amp;amp;spm=1001.2101.3001.7020" target="_blank" rel="noopener"
+>完全图&lt;/a>；在 n 个顶点的有向图中，若有 n*(n-1) 条边，即任意两个顶点之间有且仅有方向相反的边，此图称为有向完全图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>路径： 在图 G = (V， E) 中，若从顶点 vi 出发有一组边使其可到达顶点 vj，则称顶点 vi 到顶点 vj 的顶点序列为从顶点 vi 到顶点 vj 的路径。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>路径长度&lt;/strong>： 对于不带权的图，一条路径的路径长度是指该路径上的边的条数；对于带权的图，一&lt;br>
+条路径的路径长度是指该路径上各个边权值的总和。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>连通图&lt;/strong>： 在&lt;strong>无向图&lt;/strong>中，若从顶点 v1 到顶点 v2 有路径，则称顶点 v1 与顶点 v2 是连通的。&lt;strong>若图中任意一对顶点都是连通的&lt;/strong>，则称此图为连通图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>强连通图&lt;/strong>： 在&lt;strong>有向图&lt;/strong>中，若在每一对顶点 vi 和 vj 之间都存在一条从 vi 到 vj 的路径，也存在一条从 vj 到 vi 的路径，则称此图是强连通图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>弱连通图&lt;/strong>：在&lt;strong>有向图&lt;/strong>中，如果将图中的所有有向边转换为无向边后，图是连通的，则称为弱连通图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>生成树&lt;/strong>： 在&lt;strong>无向图&lt;/strong>中，一个&lt;strong>连通图&lt;/strong>的最小连通无环子图称作该图的生成树。生成树有且只有 n 个顶点和 n-1 条边。&lt;/p>
+&lt;p>注：最小连通无环子图中的”最小“应当从连通图上来理解，“最小连通子图”，指一个连通图中，边数最小的子图，但要求顶点数不变。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>无向图的连通分量：是在图中具有连通性的一部分，是图中能够相互连通的&lt;strong>极大顶点集合&lt;/strong>。因为一个图并不总是连通图、强连通图、弱连通图。往往是其中存在一些连通子图，为了描述这类图，提出的连通分量的概念，需要注意，连通分量一定是极大连通子图，如果一个顶点存在于某一个连通子图，那么这个顶点在的连通分量一定就是包含了所有和其连通的顶点的子图。&lt;/p>
+&lt;p>例题：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">对于一个具有n个顶点的无向连通图，其连通分量的个数为：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">A.n B.n+1 C.1 D.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>连通分量是极大连通子图，对于连通图来说，其本身就是连通图，则极大连通子图就是其自身。因此，连通分量个数为1。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>强连通分量：&lt;strong>有向图&lt;/strong>中的一个子图，其中任意两个顶点之间都有&lt;strong>双向可达的路径&lt;/strong>。即对于任意顶点 $u$ 和 $v$，存在从 $u$ 到 $v$ 的路径，且也存在从 $v$ 到 $u$ 的路径。或者简单的说，图的某个子图是一个强连通图，则称这个子图为强连通分量。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>弱连通分量：有向图中，如果我们忽略边的方向，把所有边都当作无向边，那么能够连通的极大子图就是弱连通分量。或者简单的说，图的某个子图是一个弱连通图，则称这个子图为弱连通分量。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="图的表示">图的表示
+&lt;/h2>&lt;h3 id="邻接矩阵">邻接矩阵
+&lt;/h3>&lt;p>　　设图的顶点数量为 n ，邻接矩阵（adjacency matrix）使用一个 n×n 大小的矩阵来表示图，每一行（列）代表一个顶点，矩阵元素代表边，用 1 或 0 表示两个顶点之间是否存在边。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929173911-jdgnp3a.png"
+width="1062"
+height="738"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="345px"
+>​&lt;/p>
+&lt;p>　　邻接矩阵具有以下特性。&lt;/p>
+&lt;ul>
+&lt;li>顶点不能与自身相连，因此邻接矩阵主对角线元素没有意义。&lt;/li>
+&lt;li>对于无向图，两个方向的边等价，此时邻接矩阵关于主对角线对称。&lt;/li>
+&lt;li>将邻接矩阵的元素从 1 和 0 替换为权重，则可表示有权图。&lt;/li>
+&lt;/ul>
+&lt;p>　　使用邻接矩阵表示图时，我们可以直接访问矩阵元素以获取边，因此增删查改操作的效率很高，时间复杂度均为 $O(1)$ 。然而，矩阵的空间复杂度为 $O(n^2)$ ，内存占用较多。&lt;/p>
+&lt;h3 id="邻接表">邻接表
+&lt;/h3>&lt;p>　　邻接表（adjacency list）使用 n 个链表来表示图，链表节点表示顶点。第 i 个链表对应顶点 i ，其中存储了该顶点的所有邻接顶点（与该顶点相连的顶点）。图 9-6 展示了一个使用邻接表存储的图的示例。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929174243-jnhg32b.png"
+width="1056"
+height="663"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="159"
+data-flex-basis="382px"
+>​&lt;/p>
+&lt;p>　　邻接表仅存储实际存在的边，而边的总数通常远小于 $n^2$ ，因此它更加节省空间。然而，在邻接表中需要通过遍历链表来查找边，因此其时间效率不如邻接矩阵。&lt;/p>
+&lt;p>　　观察图 9-6 ，&lt;strong>邻接表结构与哈希表中的“链式地址”非常相似，因此我们也可以采用类似的方法来优化效率&lt;/strong>。比如当链表较长时，可以将链表转化为 AVL 树或红黑树，从而将时间效率从 $O(n)$ 优化至 $O(log⁡\ n)$ ；还可以把&lt;strong>链表转换为哈希表&lt;/strong>，从而将时间复杂度降至 $O(1)$ 。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item></channel></rss>

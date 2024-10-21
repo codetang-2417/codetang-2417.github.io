@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ubuntu on LingLong</title><link>https://codetang-2417.github.io/tags/ubuntu/</link><description>Recent content in Ubuntu on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Mon, 21 Oct 2024 11:38:45 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/ubuntu/index.xml" rel="self" type="application/rss+xml"/><item><title>ubuntu创建新用户并分配VNC远程桌面</title><link>https://codetang-2417.github.io/p/ubuntu%E5%88%9B%E5%BB%BA%E6%96%B0%E7%94%A8%E6%88%B7%E5%B9%B6%E5%88%86%E9%85%8Dvnc%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2/</link><pubDate>Sat, 08 Jun 2024 09:56:31 +0800</pubDate><guid>https://codetang-2417.github.io/p/ubuntu%E5%88%9B%E5%BB%BA%E6%96%B0%E7%94%A8%E6%88%B7%E5%B9%B6%E5%88%86%E9%85%8Dvnc%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2/</guid><description>&lt;p>　　使用命令&lt;code>useradd&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ useradd -h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Usage: useradd &lt;span class="o">[&lt;/span>options&lt;span class="o">]&lt;/span> LOGIN
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> useradd -D
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> useradd -D &lt;span class="o">[&lt;/span>options&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Options:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --badnames &lt;span class="k">do&lt;/span> not check &lt;span class="k">for&lt;/span> bad names
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -b, --base-dir BASE_DIR base directory &lt;span class="k">for&lt;/span> the home directory of the
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --btrfs-subvolume-home use BTRFS subvolume &lt;span class="k">for&lt;/span> home directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -c, --comment COMMENT GECOS field of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -d, --home-dir HOME_DIR home directory of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -D, --defaults print or change default useradd configuration
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -e, --expiredate EXPIRE_DATE expiration date of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -f, --inactive INACTIVE password inactivity period of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -g, --gid GROUP name or ID of the primary group of the new
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -G, --groups GROUPS list of supplementary groups of the new
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> account 新用户需要添加到的其他组的组名的列表
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -h, --help display this &lt;span class="nb">help&lt;/span> message and &lt;span class="nb">exit&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -k, --skel SKEL_DIR use this alternative skeleton directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -K, --key &lt;span class="nv">KEY&lt;/span>&lt;span class="o">=&lt;/span>VALUE override /etc/login.defs defaults
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -l, --no-log-init &lt;span class="k">do&lt;/span> not add the user to the lastlog and
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> faillog databases
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -m, --create-home create the user&lt;span class="s1">&amp;#39;s home directory
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> -M, --no-create-home do not create the user&amp;#39;&lt;/span>s home directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -N, --no-user-group &lt;span class="k">do&lt;/span> not create a group with the same name as
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> the user
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -o, --non-unique allow to create users with duplicate
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">(&lt;/span>non-unique&lt;span class="o">)&lt;/span> UID
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -p, --password PASSWORD encrypted password of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -r, --system create a system account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -R, --root CHROOT_DIR directory to chroot into
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -P, --prefix PREFIX_DIR prefix directory where are located the /etc/* files
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -s, --shell SHELL login shell of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -u, --uid UID user ID of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -U, --user-group create a group with the same name as the user
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -Z, --selinux-user SEUSER use a specific SEUSER &lt;span class="k">for&lt;/span> the SELinux user mapping
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --extrausers Use the extra users database
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　使用useradd创建新用户，创建家目录，指定用户id和组id，以及默认的shell，并将其添加到sudo组。需要保证组id在useradd之前已经创建。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">groupadd -g &lt;span class="m">1000&lt;/span> dev &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> useradd -ms /bin/bash -u &lt;span class="m">1000&lt;/span> -g &lt;span class="m">1000&lt;/span> -G sudo &lt;span class="si">${&lt;/span>&lt;span class="nv">username&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p>
+&lt;p>　　添加到sudo组：&lt;/p>
+&lt;p>　　用 usermod 命令可以将现有用户添加到附加组，例如：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo usermod -aG sudo &lt;span class="si">${&lt;/span>&lt;span class="nv">user&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">-a 选项表示追加（append），即将用户添加到指定组而不从现有组中移除。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo usermod -aG docker &lt;span class="nv">$USER&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">将当前用户添加到docker组
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　删除用户以及其用户目录&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">userdel&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="n">username&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="脚本">脚本
+&lt;/h2>&lt;p>　　使用方法：先按照下面的脚本建立 xstartup、vnc_run.sh、addUser.sh 并放在通用路径。然后运行 &lt;code>./addUser.sh username&lt;/code>​&lt;/p>
+&lt;p>　　脚本：/home/vnc_example/xstartup，避免使用ubuntu自带的gnome，目前的版本中出现锁屏无法输入密码的问题。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/sh
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">XKL_XMODMAP_DISABLE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_CURRENT_DESKTOP&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;GNOME-Flashback:GNOME&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_MENU_PREFIX&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;gnome-flashback-&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 服务器物理显示器会默认使用显示端口 5901，需要确保 VNC端口以及配置 不与现有的 GNOME 会话发生冲突。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> SESSION_MANAGER
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> DBUS_SESSION_BUS_ADDRESS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gnome-session --session&lt;span class="o">=&lt;/span>gnome-flashback-metacity --disable-acceleration-check
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　脚本：/home/vnc_run.sh&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#! /bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>vncserver -geometry 1920x1080 :2 -localhost no &lt;span class="c1"># :1 reserved for local connection offline.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　脚本：&lt;code>addUser.sh&lt;/code>​，创建新用户，并为其分配home空间、vnc设置（需要手动更改端口号）。创建过程中会使用上面提到的两个脚本。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">set&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="err">若有命令出错，立即退出&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># set -x # 调试模式
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 检查是否输入了用户名
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">z&lt;/span> &lt;span class="s">&amp;#34;$1&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mError: Please provide a username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 获取用户名
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 创建用户并将其添加到 docker 组
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">useradd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">ms&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bash&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">G&lt;/span> &lt;span class="n">docker&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mUser $username added successfully and added to docker group.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mFailed to add user $username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 设置用户密码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[33mPlease set the password for the new user: $username&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 确保 .vnc 目录存在
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">sudo&lt;/span> &lt;span class="n">mkdir&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">p&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 复制 VNC 脚本
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">cp&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">vnc_run&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sh&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">vnc_run&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sh&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mvnc.sh copied successfully to /home/$username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mFailed to copy vnc.sh to /home/$username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 复制 xstartup 配置文件
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">cp&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">vnc_example&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">xstartup&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">xstartup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chmod&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">xstartup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mxstartup copied successfully to /home/$username/.vnc.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mFailed to copy xstartup to /home/$username/.vnc.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 在 ~/.profile 文件中添加自动启动 VNC 的命令
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">vnc_run_script&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/home/$username/vnc_run.sh&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">profile_file&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/home/$username/.profile&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="o">!&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">grep&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">q&lt;/span> &lt;span class="s">&amp;#34;$vnc_run_script&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;$profile_file&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;$vnc_run_script&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">tee&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">a&lt;/span> &lt;span class="s">&amp;#34;$profile_file&amp;#34;&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">dev&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">null&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;$profile_file&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mAdded VNC auto-start to $username&amp;#39;s .profile.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[33mVNC auto-start script already exists in $username&amp;#39;s .profile.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 输出提示修改 VNC 端口
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mPlease modify the VNC port manually for user $username in /home/$username/vnc.sh if needed.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 添加成功创建用户的提示
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mAdd user $username in this server successfully.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p></description></item><item><title>linux ubuntu搭建不同用户的VNC</title><link>https://codetang-2417.github.io/p/linux-ubuntu%E6%90%AD%E5%BB%BA%E4%B8%8D%E5%90%8C%E7%94%A8%E6%88%B7%E7%9A%84vnc/</link><pubDate>Wed, 25 Oct 2023 20:36:04 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux-ubuntu%E6%90%AD%E5%BB%BA%E4%B8%8D%E5%90%8C%E7%94%A8%E6%88%B7%E7%9A%84vnc/</guid><description>&lt;h1 id="linux-ubuntu搭建不同用户的vnc">linux ubuntu搭建不同用户的VNC
+&lt;/h1>&lt;h1 id="安装tigervnc">安装tigervnc
+&lt;/h1>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install tigervnc-standalone-server
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="安装gnome桌面">安装gnome桌面
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install gnome-panel gnome-settings-daemon metacity nautilus gnome-terminal ubuntu-desktop
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　因为自带的桌面在后续登陆输入密码时有问题，没办法输入文字。因此使用此gnome桌面。安装后还需要配置启动脚本，使得启动后使用ubuntu的默认gnome桌面。&lt;/p>
+&lt;h1 id="配置xstartup">配置xstartup
+&lt;/h1>&lt;p>　　如果已经有默认的脚本，则将其备份，如果没有可以直接编辑&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cp ~/.vnc/xstartup ~/.vnc/xstartup.bak
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nano ~/.vnc/xstartup
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在用户home目录下的.vnc目录下创建xstartup，并添加如下内容&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/sh
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">XKL_XMODMAP_DISABLE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_CURRENT_DESKTOP&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;GNOME-Flashback:GNOME&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_MENU_PREFIX&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;gnome-flashback-&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 服务器物理显示器会默认使用显示端口 5901，需要确保 VNC端口以及配置 不与现有的 GNOME 会话发生冲突。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> SESSION_MANAGER
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> DBUS_SESSION_BUS_ADDRESS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gnome-session --session&lt;span class="o">=&lt;/span>gnome-flashback-metacity --disable-acceleration-check
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　然后赋予执行权限&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">chmod &lt;span class="m">777&lt;/span> ~/.vnc/xstartup
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="测试">测试
+&lt;/h1>&lt;p>　　使用下列命令将vnc服务运行在5902端口，不建议使用5901作为默认显示端口，因为物理显示器会默认使用5901。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">vncserver -geometry 1920x1080 :2 -localhost no
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　使用 &lt;code>vncserver -list&lt;/code>​ 获取端口号：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-ubuntu%E6%90%AD%E5%BB%BA%E4%B8%8D%E5%90%8C%E7%94%A8%E6%88%B7%E7%9A%84vnc/assets/image-20231025213936-9flei5k.png"
+width="554"
+height="111"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="499"
+data-flex-basis="1197px"
+>​&lt;/p>
+&lt;h1 id="vnc脚本">vnc脚本
+&lt;/h1>&lt;p>　　将启动脚本写成sh文件，便于执行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#! /bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>vncserver -geometry 1920x1080 :2 -localhost no &lt;span class="c1"># :1 reserved for local connection offline.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　添加权限&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">chmod &lt;span class="m">777&lt;/span> vnc_run.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　:2表示使用的端口为5902，如果不指定，会自动分配，这样的话，就需要先shell登陆，查看端口号，然后再登陆vnc。&lt;/p>
+&lt;h1 id="打开其他图形应用没有反应">打开其他图形应用没有反应
+&lt;/h1>&lt;p>　　如果可以右键打开终端，但是&lt;strong>打开文件夹之类的应用没有反应&lt;/strong>。就在终端中输入：&lt;code>xhost +&lt;/code>​。（仅仅在图形界面下有效，shell中无效）&lt;/p>
+&lt;h1 id="登陆shell自动启动vnc">登陆shell自动启动vnc
+&lt;/h1>&lt;p>　　为了能够让每个用户都使用vnc，需要让每个用户登录时自启动vnc，在用户目录下的&lt;code>.profile&lt;/code>​文件中添加运行vnc的脚本。当用户登录shell时，就会运行一次vnc启动脚本。（这样就需要固定显示端口，否则将建立多个vnc端口）&lt;/p>
+&lt;p>　　例如，在&lt;code> ～/.profile&lt;/code>​中的末尾添加一行：&lt;code>/home/user/vnc_run.sh&lt;/code>​&lt;/p>
+&lt;p>　　​&lt;code>～/.bash_profile&lt;/code>​ 或&lt;code> ～/.profile&lt;/code>​ ：每个用户都可使用该文件，输入专用于当前用户使用的shell信息。当用户登录时，该文件仅仅执行一次！默认情况下，设一些环境变量，执行用户的.bashrc文件。&lt;/p>
+&lt;h1 id="为新用户添加vnc">为新用户添加vnc
+&lt;/h1>&lt;p>　　若为一个新用户添加vnc支持，则需要完成本文中的 &lt;strong>配置xstartup&lt;/strong>、&lt;strong>vnc脚本&lt;/strong>、&lt;strong>登陆shell自动启动vnc&lt;/strong> 等三个部分。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item></channel></rss>

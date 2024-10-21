@@ -1,0 +1,428 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="\u3000目前搭建个人博客网站分为动态网站和静态网站两种。其中动态网站需要购买服务器，并且需要维护网站安全，虽然功能比静态网站更多更丰富，也有后台管理系统，可以在线写博客，但成本还是太高。这类网站框架有：wordpress（主流，功能丰富但需要时间和优化知识），typecho（轻量级，最近团队开始重新维护），Halo等。\n"><meta name=keywords content="Hugo,Github pages,Blog"><title>基于 Hugo 和 github pages搭建bolg</title>
+<link rel=canonical href=https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="基于 Hugo 和 github pages搭建bolg"><meta property='og:description' content="\u3000目前搭建个人博客网站分为动态网站和静态网站两种。其中动态网站需要购买服务器，并且需要维护网站安全，虽然功能比静态网站更多更丰富，也有后台管理系统，可以在线写博客，但成本还是太高。这类网站框架有：wordpress（主流，功能丰富但需要时间和优化知识），typecho（轻量级，最近团队开始重新维护），Halo等。\n"><meta property='og:url' content='https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/'><meta property='og:site_name' content='LingLong'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Hugo'><meta property='article:tag' content='Github pages'><meta property='article:tag' content='Blog'><meta property='article:published_time' content='2024-09-15T09:09:00+08:00'><meta property='article:modified_time' content='2024-09-17T12:45:41+08:00'><meta name=twitter:title content="基于 Hugo 和 github pages搭建bolg"><meta name=twitter:description content="\u3000目前搭建个人博客网站分为动态网站和静态网站两种。其中动态网站需要购买服务器，并且需要维护网站安全，虽然功能比静态网站更多更丰富，也有后台管理系统，可以在线写博客，但成本还是太高。这类网站框架有：wordpress（主流，功能丰富但需要时间和优化知识），typecho（轻量级，最近团队开始重新维护），Halo等。\n"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu5592724390443866707.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>LingLong</a></h1><h2 class=site-description></h2></div></header><ol class=menu-social><li><a href=https://github.com/codetang-2417/ target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#github-page类型选择>github page类型选择</a></li><li><a href=#hugo搭建>Hugo搭建</a><ol><li><a href=#安装>安装</a></li><li><a href=#安装主题>安装主题</a><ol><li><a href=#使用-git-模板>使用 git 模板</a></li><li><a href=#手动安装>手动安装</a></li></ol></li></ol></li><li><a href=#配置-stack-主题>配置 stack 主题</a><ol><li><a href=#一些基本信息的配置>一些基本信息的配置</a></li><li><a href=#配置导航栏>配置导航栏</a></li><li><a href=#配置评论>配置评论</a></li></ol></li><li><a href=#下面给出常见的几种-frontmatter>下面给出常见的几种 frontmatter</a><ol><li><a href=#page>page</a></li><li><a href=#post>post</a></li></ol></li><li><a href=#编写和发布>编写和发布</a></li><li><a href=#参考来源>参考来源</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/internet/>Internet</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/>基于 Hugo 和 github pages搭建bolg</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Sep 15, 2024</time></div></footer></div></header><section class=article-content><p>　　目前搭建个人博客网站分为动态网站和静态网站两种。其中动态网站需要购买服务器，并且需要维护网站安全，虽然功能比静态网站更多更丰富，也有后台管理系统，可以在线写博客，但成本还是太高。这类网站框架有：wordpress（主流，功能丰富但需要时间和优化知识），typecho（轻量级，最近团队开始重新维护），Halo等。</p><p>　　静态网站则功能有限，只能显示静态编译好的html，不能在线写博客，没有管理系统。但好在可以0成本搭建，结合github page功能，无需服务器就可以搭建。这类网站框架有Hugo（go语言编写，大量博客加载速度快，新框架，但目前已经发展的挺不错的了），Hexo（老牌，网络资源丰富，但大量博文加载很慢）等。</p><p>　　结合我自己的需求，静态网站就足够我的使用场景了。并考虑到日后的博客数量会很多，选择Hugo。</p><p>　　且之前也用hugo搭过一个博客网站，但是由于发布太过于繁琐（即使使用了github action），后面没有怎么更新了。但现在思源的发布插件已经支持了一键自动发布，和思源配合，<del>能够解放双手，为这个博客发布的工作流补上最后一块拼图</del>。由于其效果不好，最终还是不能使用这个一键发布工具，不过考虑参考采用这个发布工具，开发一个针对我的应用场景的发布工具。Todo++</p><p>　　补充：如果想建立类似于书籍或者使用说明的这种形式的博客网站，可以选择 mkdocs，mdbook可能存在一些小问题。</p><h2 id=github-page类型选择>github page类型选择</h2><p>　　我们使用github pages作为静态网站的部署方式，个人用户只有两种 GitHub Pages 网站的类型：一种是 <code>user</code>​(用户)，一种是<code>project</code>​(项目)。</p><p>　　​<code>user</code>​类型的网址只能对应唯一的用户，而且仓库的名字必须为 <code>&lt;username>.github.io</code>​，对应的网址为 <code>http(s)://&lt;username>.github.io</code>​。</p><p>　　​<code>project</code>​类型的仓库则可以新建很多，只要仓库的名字不为 <code>&lt;username>.github.io</code>​ 即可，对应的网址为 <code>http(s)://&lt;username>.github.io/&lt;repository></code>​。</p><p>　　本文采用多种仓库的形式进行管理，因为为了可能会引入不同的网站框架。</p><p>　　需要注意，我们可以同时拥有<code>user</code>​和<code>project</code>​ pages。因此，我们可以将个人博客放到<code>user</code>​上，而其他的网页，例如专为某一个项目写的说明文档，放在单独的仓库中。这样访问博客站点只需要访问<code>https://&lt;username>.github.io</code>​即可，而访问其他项目就加上后缀，例如：<code>https://&lt;username>.github.io/HugoStack</code>​。</p><p>　　并且按照<a class=link href=https://krislinzhao.github.io/docs/create-a-wesite-using-github-pages-and-hugo/#1-%E6%A6%82%E5%BF%B5%E6%90%AD%E5%BB%BA%E6%80%9D%E8%B7%AF%E5%92%8C%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83 target=_blank rel=noopener>这篇博客</a>中的方式，只公开编译好的站点，隐藏源码仓库。</p><h2 id=hugo搭建>Hugo搭建</h2><p>　　最开始按照 <a class=link href="https://www.bilibili.com/video/BV1pRYPetEWy/?share_source=copy_web&amp;vd_source=762b4cada29221a2afa3d8ad6dc132fd" target=_blank rel=noopener>【Hugo+PaperMod搭建博客】</a> 中的教程进行搭建。但后续发现这个主题文档不完善，使用过程中的小问题很多，因此不建议使用。转而使用 <a class=link href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener>stack</a> 主题。</p><p>　　涉及到的工具：</p><ul><li><a class=link href=https://gohugo.io/ target=_blank rel=noopener>hugo</a></li><li><a class=link href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener>stack</a> 主题</li><li><a class=link href=https://github.com/ target=_blank rel=noopener>github</a></li><li><a class=link href=https://giscus.app/zh-CN target=_blank rel=noopener>giscus</a> 是评论接口，也很快。使用的也是 github 的服务，利用的是 github discussion，所以，比 discus 之类的小厂要快。稳定性倒是差不多。以及，github 的用户是比较多的，所以会更方便大家评论交流，这一点很重要。</li><li><a class=link href=https://neovim.io/ target=_blank rel=noopener>neovim</a>/<a class=link href=https://code.visualstudio.com/ target=_blank rel=noopener>vscode</a></li><li><a class=link href=https://git-scm.com/ target=_blank rel=noopener>git</a></li><li><a class=link href=https://www.flaticon.com/ target=_blank rel=noopener>flaticon</a> 用来挑选网站的 favicon 的。</li></ul><h3 id=安装>安装</h3><p>　　本文在Manjaro系统下操作。</p><p>　　首先需要安装一些依赖软件：<code>go</code>​ <code>hugo</code>​ <code>dart-sass</code>​</p><p>　　参考链接：<a class=link href=https://flynx.dev/post/manjaro_go_env_2021/ target=_blank rel=noopener>manjaro go环境搭建</a>、<a class=link href=https://github.com/adityatelange/hugo-PaperMod/wiki/Installation target=_blank rel=noopener>PaperMod Installation</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo pacman -S go
+</span></span><span class=line><span class=cl>sudo pacman -S hugo
+</span></span><span class=line><span class=cl>sudo pacman -S dart-sass
+</span></span></code></pre></td></tr></table></div></div><h3 id=安装主题>安装主题</h3><p>　　两种方式：使用主题给出的模板仓库直接创建仓库；本地建立仓库，通过 git submoudle 安装。</p><p>　　第一种直接使用模板的方式不会下载主题仓库，修改起来较为麻烦。且使用的配置文件格式是 toml，写起来也繁琐。但好处是不需要自己对网页做各种修改，可以直接使用。</p><p>　　第二种方式可以修改主题，但是连同一些网页基础的设置也需要自己手动配，可以参考主题仓库中的示例。</p><p>　　值得注意的是，第二种方式下载的主题其各种配置和hugo所创建的新的站点文件夹结构很类似，我们优先在hugo的根目录下进行修改，hogu会优先使用根目录下的文件，这样就可以覆盖主题中的一些配置。例如</p><p>　　存在文件 themes/Stack/assets/icons/user.svg，我们可以直接在根目录下创建同名文件，hugo就会优先使用根目录下的 user.svg，而不是themes下的。</p><h4 id=使用-git-模板>使用 git 模板</h4><p>　　参考 <a class=link href=https://github.com/CaiJimmy/hugo-theme-stack-starter target=_blank rel=noopener>github.com/CaiJimmy/hugo-theme-stack-starter</a>。</p><p>　　采用 github template 的形式直接使用主题提供的模板创建仓库，并将仓库设置为github page。且该模板已经配置了github action。</p><p>　　先按照 readme 中的指示，使用 stack starter 作为模板创建仓库。点击<code>Use this template</code>​。</p><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240916105942-nc1qlft.png width=1176 height=214 loading=lazy alt=image class=gallery-image data-flex-grow=549 data-flex-basis=1318px>​</p><p>　　这里注意，用这个模板创建的不是<code>&lt;username>.github.io</code>​为名称的仓库，而是创建一个其他命名的私有仓库，因为这里存放的是源码，我们期望源码为私有仓库，在部署的时候再将其部署到<code>&lt;username>.github.io</code>​为名称的仓库。</p><p>　　然后将源码下载到本地，我们对其部署的方式进行修改。</p><p>　　要从源码仓库部署到站点仓库，则需要我们使用 PAT（Personal access tokens）访问权限。</p><h5 id=生成pat>生成PAT</h5><p>　　只有从源码仓库部署到其他仓库需要生成PAT，并在源码仓库中将PAT保存为<code>Actions secrets</code>​变量。</p><p>　　使用时，在<code>action</code>​文件中引用<code>secrets</code>​设置的变量即可。</p><p>　　例如，在源码仓库设置的 PAT 名称为HUGO_BUILD，就可以按照下列方式使用。具体语法要查看使用的<code>action</code>​方法的说明文档。例如<code>JamesIves/github-pages-deploy-action@v4</code>​。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=w> </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Deploy 🚀</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>JamesIves/github-pages-deploy-action@v4</span><span class=w> </span><span class=c># 一个自动发布github pages的action</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>with</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>repository-name</span><span class=p>:</span><span class=w> </span><span class=l>codetang-2417/codetang-2417.github.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>token</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.HUGO_BUILD }}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>branch</span><span class=p>:</span><span class=w> </span><span class=l>main</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>folder</span><span class=p>:</span><span class=w> </span><span class=l>public</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>clean</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>single-commit</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ol><li><p>生成Personal access tokens</p><p>点击个人头像，选择 <code>Setting</code>​，拉到最低下，选择<code>Developer Settings</code>​-><code>Personal Access Tokens</code>​-><code>Tokens</code>​。</p><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917111849-74cespr.png width=1987 height=514 loading=lazy alt=image class=gallery-image data-flex-grow=386 data-flex-basis=927px>​</p><p>选择<code>Generate new token</code>​</p><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917112909-0zt1f4u.png width=1609 height=1046 loading=lazy alt=image class=gallery-image data-flex-grow=153 data-flex-basis=369px>​</p><p>创建后需要马上复制生成的<code>Personal Access Tokens</code>​，因为后续将看不到该<code>Personal Access Tokens</code>​。</p></li><li><p>生成Actions secrets</p><p>接下来在源码repo中添加上面的personal access token，进入repo的 <code>Settings</code>​-><code>Secrets and variable</code>​-><code>Actions secrets</code>​一栏，选择<code>New repository secret</code>​并添加。</p><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917113836-jz2fzrp.png width=1562 height=928 loading=lazy alt=image class=gallery-image data-flex-grow=168 data-flex-basis=403px>​</p></li></ol><h5 id=配置>配置</h5><p>　　在hugo的配置文件 config/_default/config.toml 更改 base url：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># Change baseurl before deploy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>baseurl = &#34;https://codetang-2417.github.io/&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　然后 git push 到 github，等待 deploy 任务完成，就可以正常通过网址 <code>https://codetang-2417.github.io</code>​ 访问了。如果直接使用源码仓库作为 git page的域名仓库，则需要在网址最后加上仓库名，否则会导致访问网站时 css 加载不出来等问题（且涉及到绝对域名地址引用位置的也需要修改）。</p><p>　　下面的部分就是修改模板中的<code>git action</code>​文件，使之部署到其他仓库</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yml data-lang=yml><span class=line><span class=cl><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Deploy to Github Pages</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>on</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>push</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>branches</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>master]</span><span class=w> </span><span class=c># 这里的意思是当 master 分支发生push的时候，运行下面的jobs</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>pull_request</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>branches</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=l>master]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>jobs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>build</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>runs-on</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu-latest</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>permissions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c># Give the default GITHUB_TOKEN write permission to commit and push the</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=c># added or changed files to the repository.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>contents</span><span class=p>:</span><span class=w> </span><span class=l>write</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>steps</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>actions/checkout@v4</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>with</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>submodules</span><span class=p>:</span><span class=w> </span><span class=l>recursive</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>fetch-depth</span><span class=p>:</span><span class=w> </span><span class=m>0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Cache Hugo resources</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>actions/cache@v4</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>env</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>cache-name</span><span class=p>:</span><span class=w> </span><span class=l>cache-hugo-resources</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>with</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>resources</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>key</span><span class=p>:</span><span class=w> </span><span class=l>${{ env.cache-name }}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>actions/setup-go@v5</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>with</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>go-version</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;^1.17.0&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>go version</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Setup Hugo</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>peaceiris/actions-hugo@v2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>with</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>hugo-version</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;latest&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>extended</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Build</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=l>hugo --minify --gc --cleanDestinationDir</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Deploy 🚀</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>JamesIves/github-pages-deploy-action@v4</span><span class=w> </span><span class=c># 一个自动发布github pages的action</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>              </span><span class=nt>with</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>repository-name</span><span class=p>:</span><span class=w> </span><span class=l>codetang-2417/codetang-2417.github.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>token</span><span class=p>:</span><span class=w> </span><span class=l>${{ secrets.HUGO_BUILD }}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>branch</span><span class=p>:</span><span class=w> </span><span class=l>main</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>folder</span><span class=p>:</span><span class=w> </span><span class=l>public</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>clean</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                  </span><span class=nt>single-commit</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=手动安装>手动安装</h4><p>　　创建一个新站点，这里可以参考 hugo 官网的<a class=link href=https://gohugo.io/getting-started/quick-start/ target=_blank rel=noopener>指导</a>。</p><p>　　以及这篇文章，介绍的很详细：<a class=link href=https://krislinzhao.github.io/docs/create-a-wesite-using-github-pages-and-hugo/ target=_blank rel=noopener>krislinzhao.github.io/docs/create-a-wesite-using-github-pages-an&mldr;</a></p><p>　　有一些主题默认的配置文件格式是yaml，需要使用 &ndash;format 指定为yaml。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>hugo new site &lt;name of site&gt; --format yaml
+</span></span></code></pre></td></tr></table></div></div><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240915184226-gjgase5.png width=1042 height=313 loading=lazy alt=image class=gallery-image data-flex-grow=332 data-flex-basis=798px>​</p><p>　　然后进入站点文件夹，配置git</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>cd</span> LingLong
+</span></span><span class=line><span class=cl>git init
+</span></span><span class=line><span class=cl>git add .
+</span></span><span class=line><span class=cl>git branch -m main
+</span></span><span class=line><span class=cl>git commit -m <span class=s2>&#34;Framwork: Init Hugo new site.&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　导入子模块</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>git submodule add https://github.com/CaiJimmy/hugo-theme-stack/ themes/hugo-theme-stack</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　同样需要注意，在hugo的配置文件中，将仓库名加在 base url后。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># Change baseurl before deploy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>baseurl = &#34;https://codetang-2417.github.io/HugoStack/&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　这种方式由于hugo根目录中没有任何配置，因此需要自己手动配置。参考主题目录中的 exampleSite文件夹。</p><p>　　简单介绍hugo的目录中各个文件夹的含义。</p><ul><li><strong>archetypes</strong>：存放用 hugo 命令新建的 Markdown 文件应用的 front matter 模版</li><li><strong>content</strong>：存放内容页面，比如「博客」、「读书笔记」等</li><li><strong>layouts</strong>：存放定义网站的样式，写在<code>layouts</code>​文件下的样式会覆盖安装的主题中的 <code>layouts</code>​文件同名的样式</li><li><strong>static</strong>：存放所有静态文件，如图片</li><li><strong>data</strong>：存放创建站点时 Hugo 使用的其他数据</li><li><strong>public</strong>：存放 Hugo 生成的静态网页</li><li><strong>themes</strong>：存放主题文件</li><li><strong>config.toml</strong>：网站配置文件</li></ul><p>　　本文不采用这种方式，节省时间。</p><h2 id=配置-stack-主题>配置 stack 主题</h2><p>　　这里不选用 PaperMod，因为这个主题总有一些小问题，还需要自行修改大量的代码。</p><p>　　以下基于 git 模板的仓库。</p><p>　　参考：<a class=link href=https://stack.jimmycai.com/config/ target=_blank rel=noopener>stack.jimmycai.com/config/</a>，说明中写的很详细，每一个字段的作用。</p><p>　　简单说明一下该主题中的各个文件夹的作用</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>$ tree -d</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>├── assets</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   ├── img</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   └── scss</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>├── config</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   └── _default</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>├── content</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   ├── categories</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   │   └── example-category</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   ├── page</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   │   ├── archives</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   │   ├── links</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   │   └── search</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│   └── post</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│       ├── hello-world</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│       ├── image-gallery</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│       ├── markdown-syntax</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│       ├── math-typesetting</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>│       └── shortcodes</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　assets：存放图片，scss样式</p><p>　　config：存放hugo和主题配置，toml 格式，分文件配置各个参数，比较清晰明了。</p><p>　　content：博文内容存放位置。</p><p>　　 其中 page 存放是导航栏的内容，post 存放文章的内容，categories 为分类。page和post的文件结构一样，每一篇文章单独一个文件夹，里面的 index.md为正文内容，还可以存放一些图片，可以直接在文章中引用。区别在与page和post的 frontmatter 中的layout字段不同，也就是布局。</p><p>　　pages的 frontmatter如下（即在正文之前的最开头的文字）</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>title</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Archives&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>date</span><span class=p>:</span><span class=w> </span><span class=ld>2022-03-06</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>layout</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;archives&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>slug</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;archives&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>menu</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>main</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>weight</span><span class=p>:</span><span class=w> </span><span class=m>2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>params</span><span class=p>:</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>icon</span><span class=p>:</span><span class=w> </span><span class=l>archives</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　menu后续的内容是菜单层级。</p><p>　　post frontmatter如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>title</span><span class=p>:</span><span class=w> </span><span class=l>Hello World</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>description</span><span class=p>:</span><span class=w> </span><span class=l>Welcome to Hugo Theme Stack</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>slug</span><span class=p>:</span><span class=w> </span><span class=l>hello-world</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>date</span><span class=p>:</span><span class=w> </span><span class=ld>2022-03-06 00:00:00</span><span class=m>+0000</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>cover.jpg</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>categories</span><span class=p>:</span><span class=w> </span><span class=c># 分类，可以在归档界面看到</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>Example Category</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>tags</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>Example Tag</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>weight</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>       </span><span class=c># You can add weight to some posts to override the default sorting (date descending)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　以上是我们在平时写文章时最主要用到的部分。</p><p>　　categories 为分类，在这下面创建的文件和显示在分类栏，即便没有文件被分在这个类别也会显示。如果categories中没有，但是文章中的 frontmatter引用了，则会自动显示，而不需要在这个目录下创建。</p><p>　　其格式如下：content/categories/example-category/_index.md</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>title</span><span class=p>:</span><span class=w> </span><span class=l>Example Category</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>description</span><span class=p>:</span><span class=w> </span><span class=l>A description of this category</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>image</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># Badge style</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>style</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>background</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;#2a9d8f&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>color</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;#fff&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=一些基本信息的配置>一些基本信息的配置</h3><p>　　修改文件：config/_default/config.toml</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># Change baseurl before deploy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>baseurl = &#34;https://codetang-2417.github.io/&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>copyright = &#34;LingLong&#39;s Blog&#34;</span><span class=w> </span><span class=c># 网站的版权声明，通常显示在页脚</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>languageCode = &#34;zh-cn&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>title = &#34;LingLong&#34;</span><span class=w> </span><span class=c># 站点标题</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># Theme i18n support</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># Available values: en, fr, id, ja, ko, pt-br, zh-cn, zh-tw, es, de, nl, it, th, el, uk, ar</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>defaultContentLanguage = &#34;zh-cn&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># Set hasCJKLanguage to true if DefaultContentLanguage is in [zh-cn ja ko]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># This will make .Summary and .WordCount behave correctly for CJK languages.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>hasCJKLanguage = true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># Change it to your Disqus shortname before using</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>disqusShortname = &#34;Ling&#34;</span><span class=w> </span><span class=c># 标签页简称</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>enableRobotsTXT = true</span><span class=w> </span><span class=c># 允许生成 robots.txt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>buildDrafts = false</span><span class=w> </span><span class=c># 构建时是否包括草稿</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>buildFuture = false</span><span class=w> </span><span class=c># 构建未来发布的内容</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>buildExpired = false</span><span class=w> </span><span class=c># 构建过期的内容</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>enableEmoji = true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>[</span><span class=l>pagination]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>pagerSize = 8</span><span class=w> </span><span class=c># 首页最多容纳的文章数量</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=配置导航栏>配置导航栏</h3><p>　　修改文件：config/_default/menu.toml，这里的导航栏只能新增，不能修改已有的。</p><p>　　推荐直接在 page文件夹中添加page时，在 frontmatter 里添加。</p><p>　　详见：<a class=link href=https://stack.jimmycai.com/config/menu target=_blank rel=noopener>stack.jimmycai.com/config/menu</a></p><h3 id=配置评论>配置评论</h3><p>　　这里的评论使用了 giscus 插件。</p><p>　　根据 giscus 官网的 <a class=link href=https://giscus.app/zh-CN target=_blank rel=noopener>指导</a>，最后生成一份代码，主要是安装 github app和开启discussion</p><p>　　<a class=link href=https://github.com/apps/giscus target=_blank rel=noopener>giscus app安装</a></p><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917122641-syz1flc.png width=1745 height=1332 loading=lazy alt=image class=gallery-image data-flex-grow=131 data-flex-basis=314px>​</p><p>　　然后点击 app 旁边的链接进入app页面。</p><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917122800-2w4ilp0.png width=1629 height=413 loading=lazy alt=image class=gallery-image data-flex-grow=394 data-flex-basis=946px>​</p><p>　　然后可以先去站点仓库，Setting -> General -> Features，打开<code>disscusion</code>​。</p><p>　　打开后，回到<code>giscus</code>​，填一些配置，主要是仓库名称，mapping方式。</p><p>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240915202248-d9cobl1.png width=657 height=525 loading=lazy alt=image class=gallery-image data-flex-grow=125 data-flex-basis=300px>​</p><p>　　然后在该网页中的找到这段配置代码：<br>​<img src=/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240915203142-wl8gzt2.png width=933 height=586 loading=lazy alt=image class=gallery-image data-flex-grow=159 data-flex-basis=382px>​</p><p>　　将其填入到配置文件 config/_default/params.toml 中，主要是 repoId，categoryId</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=p>[</span><span class=l>comments.giscus]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>repo = &#34;codetang-2417/codetang-2417.github.io&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>repoID = &#34;xxxxxxxxx&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>category = &#34;Announcements&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>categoryID = &#34;xxxxxxxxx&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>mapping = &#34;pathname&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>lightTheme = &#34;light&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>darkTheme = &#34;dark&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>reactionsEnabled = 1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>emitMetadata = 0</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=下面给出常见的几种-frontmatter>下面给出常见的几种 frontmatter</h2><h3 id=page>page</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>title</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Archives&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>date</span><span class=p>:</span><span class=w> </span><span class=ld>2022-03-06</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>layout</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;archives&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>slug</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;archives&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>menu</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>main</span><span class=p>:</span><span class=w>        </span><span class=c># 菜单层级</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>weight</span><span class=p>:</span><span class=w> </span><span class=m>2</span><span class=w> </span><span class=c># 用于排序</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>params</span><span class=p>:</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>icon</span><span class=p>:</span><span class=w> </span><span class=l>archives</span><span class=w> </span><span class=c># 图标</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　其中 icon存放于 themes/xxx/assets/icons 或者 根目录assets/icons。</p><p>　　主题自带的icon有：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>archives.svg    back.svg          brand-twitter.svg  clock.svg      date.svg  home.svg      language.svg  messages.svg  search.svg  toggle-left.svg   user.svg</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>arrow-back.svg  brand-github.svg  categories.svg     copyright.svg  hash.svg  infinity.svg  link.svg      rss.svg       tag.svg     toggle-right.svg</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=post>post</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>title</span><span class=p>:</span><span class=w> </span><span class=l>Markdown Syntax Guide</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>date</span><span class=p>:</span><span class=w> </span><span class=ld>2023-09-07</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>description</span><span class=p>:</span><span class=w> </span><span class=l>Sample article showcasing basic Markdown syntax and formatting for HTML elements.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>tags</span><span class=p>:</span><span class=w> </span><span class=c># 自定义tag</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>markdown</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>css</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>html</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>themes</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>categories</span><span class=p>:</span><span class=w> </span><span class=c># 自定义分类，可以在 content/categories/ 创建更详细描述</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>themes</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>syntax</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　例如，分类 example-category，其文件夹下存放文件 _index.md</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>$ ls content/categories/example-category                                                                    ✔ </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>_index.md</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>　　_index.md内容为</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>title</span><span class=p>:</span><span class=w> </span><span class=l>Example Category</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>description</span><span class=p>:</span><span class=w> </span><span class=l>A description of this category</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>image</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># Badge style</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>style</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>background</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;#2a9d8f&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>color</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;#fff&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nn>---</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=编写和发布>编写和发布</h2><p>　　在博客搭建起来以后，我尝试过 siyuan 的一键发布工具，但是效果不好，不能处理本地图片，需要图床，但 hugo 本身是静态网页，图片也是存在 git 仓库中，是可以直接访问的。因此，还是选择在 siyuan 中编写完导出 md 文件夹，手动复制到本地仓库并上传。</p><h2 id=参考来源>参考来源</h2><p>　　<a class=link href=https://martins3.github.io/setup-github-pages.html target=_blank rel=noopener>使用 Github 记录笔记和搭建 blog</a></p><p>　　<a class=link href="https://zhuanlan.zhihu.com/p/685090023?utm_id=0" target=_blank rel=noopener>思源笔记一键发布至Hexo、Hugo、Jekyll、Vitepress、Vuepress博客（github）并通过github action构建page并同步gitee page</a>、<a class=link href=https://yang-xijie.github.io/BLOG/Markdown/github-pages/ target=_blank rel=noopener>GitHub Pages</a></p><p>　　<a class=link href="https://www.bilibili.com/video/BV1bovfeaEtQ/?share_source=copy_web&amp;amp;vd_source=762b4cada29221a2afa3d8ad6dc132fd" target=_blank rel=noopener>Hugo + Github免费搭建博客，并实现自动化部署</a></p><p>　　‍</p></section><footer class=article-footer><section class=article-tags><a href=/tags/hugo/>Hugo</a>
+<a href=/tags/github-pages/>Github Pages</a>
+<a href=/tags/blog/>Blog</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>最后更新于 Sep 17, 2024 12:45 +0800</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E6%94%B6%E5%BD%95%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2-seo%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E4%BC%98%E5%8C%96/><div class=article-details><h2 class=article-title>搜索引擎收录个人博客-SEO（搜索引擎优化）</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=codetang-2417/codetang-2417.github.io data-repo-id=R_kgDOMyu4sg data-category=Announcements data-category-id=DIC_kwDOMyu4ss4CiiW6 data-mapping=title data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=zh-CN data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2024 LingLong's Blog</section><section class=powerby>Simple is enough.<br>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.28.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
