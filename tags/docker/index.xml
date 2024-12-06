@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on LingLong</title><link>https://codetang-2417.github.io/tags/docker/</link><description>Recent content in Docker on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Thu, 31 Oct 2024 16:06:22 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>QEMU开发环境搭建</title><link>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link><pubDate>Wed, 30 Oct 2024 19:57:03 +0800</pubDate><guid>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid><description>&lt;p>　　QEMU开源软件在Linux上进行开发。在windows上可以采用WSL Linux，也可以自行在电脑上安装Linux原生系统。一般采用vscode作为IDE 开发QEMU。&lt;/p>
+&lt;p>　　本文采用 vscode 连接校内 ubuntu 服务器的方式进行开发环境搭建。ubuntu服务器多人使用，采用docker 容器建立各自独立的开发环境。&lt;/p>
+&lt;h2 id="docker环境">docker环境
+&lt;/h2>&lt;p>　　使用docker启动作为编译的系统环境。可以将 docker 视作轻量级虚拟机，先创建 docker镜像，再以镜像为基础启动容器。每一个容器视作虚拟机，系统环境数据存在容器中，工作文件夹等需要保存在硬盘上的重要文件，以共享文件夹的方式映射到容器。镜像不保存任何运行数据。&lt;/p>
+&lt;h3 id="dockfile">dockfile
+&lt;/h3>&lt;p>　　创建名为 &lt;code>Dockerfile&lt;/code>​ 的文件，并填入下列内容。并可以根据自行需要（用户\组 id，软件依赖等），增删其中的内容。&lt;/p>
+&lt;p>　　注意：存放 &lt;code>Dockerfile&lt;/code>​ 的文件夹中最好不要存放任何其他无关的文件，在创建镜像时，docker 会将该文件夹中的所有内容都复制到容器中，这会大大增加镜像创建的时间。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">FROM&lt;/span> &lt;span class="nl">ubuntu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">24.04&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 定义构建时变量，可以在docker build构建通过--build-arg来修改
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ARG&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">developer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 设置 DEBIAN_FRONTEND 环境变量以避免交互式对话框，否则可能会卡在一些交互式输入中
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">noninteractive&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改ubuntu的镜像源为阿里云
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># ubuntu24.04版本修改软件源的位置：/etc/apt/sources.list 替换为 /etc/apt/sources.list.d/ubuntu.sources
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">archive&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">security&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">update&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">locales&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">clean&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;%sudo ALL=(ALL) NOPASSWD:ALL&amp;#34;&lt;/span> &lt;span class="o">&amp;gt;&amp;gt;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sudoers&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改容器或系统中的 sudoers 文件，允许属于 sudo 组的用户执行 sudo 命令时无需输入密码。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改语言环境（locale）设置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">locale&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">gen&lt;/span> &lt;span class="n">en_US&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UTF&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">8&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">update&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">locale&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 添加用户：赋予sudo权限，指定密码123，建议docker的密码不要太复杂，太多了很容易忘记。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 注：用户id和组id尽可能的和当前用户id一致，使得读写共享文件时的权限一致，否则可能出现docker无法写入共享文件的问题。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 命令 id 可以查看用户的各种id
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">group&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">groupadd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">useradd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">ms&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bash&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">u&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">UID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">G&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;${username}:123&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="nl">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">123&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 安装各种以依赖软件，可以根据需要定制，也可以后续手动安装。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># QEMU编译需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> &lt;span class="n">meson&lt;/span> &lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">pkg&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">config&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">diffutils&lt;/span> &lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">venv&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libusb&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">1.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libncursesw5&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libpixman&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libepoxy&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libv4l&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpng&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">image&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgtk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgdk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pixbuf2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libasound2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpulse&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libx11&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libfdt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libiscsi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># riscv-gnu-toolchain 需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">autoconf&lt;/span> &lt;span class="n">automake&lt;/span> &lt;span class="n">autotools&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">curl&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pip&lt;/span> &lt;span class="n">libmpc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libmpfr&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgmp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">gawk&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bison&lt;/span> &lt;span class="n">flex&lt;/span> &lt;span class="n">texinfo&lt;/span> &lt;span class="n">gperf&lt;/span> &lt;span class="n">libtool&lt;/span> &lt;span class="n">patchutils&lt;/span> &lt;span class="n">bc&lt;/span> &lt;span class="n">zlib1g&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libexpat&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libslirp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">gdb&lt;/span> &lt;span class="n">clang&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">vim&lt;/span> &lt;span class="n">gdb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 还原 DEBIAN_FRONTEND 环境变量（可选）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dialog&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的工作目录
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">WORKDIR&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的登录用户
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">USER&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="创建镜像">创建镜像
+&lt;/h3>&lt;p>　　基础构建&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 &lt;code>-t&lt;/code>​ 后跟镜像名称，可任意更改。&lt;code>docker build -t tc-qemu .&lt;/code>​ 这条命令会从当前目录（&lt;code>.&lt;/code>​）中寻找 &lt;code>Dockerfile&lt;/code>​，然后根据其中的指令构建一个名为 &lt;code>tc-qemu&lt;/code>​ 的 Docker 镜像。&lt;/p>
+&lt;p>　　若在创建镜像时希望动态修改 &lt;code>Dockerfile&lt;/code>​ 中的ARG参数，则在构建时，添加参数 &lt;code>--build-arg ARG_name=value&lt;/code>​ ，将 &lt;code>ARG_name&lt;/code>​ 修改为 &lt;code>value&lt;/code>​。&lt;/p>
+&lt;p>　　由于每个用户 id 和组 id 不一样，需要在终端中运行命令&lt;code>id&lt;/code>​查询到当前用户的group和user id，并在构建时修改参数：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　修改用户 id 和组 id 和当前的账户一致，是为了确保在写入共享文件夹的时候有相同的权限，否则可能造成在容器中无法正常写入的情况。&lt;/p>
+&lt;h3 id="创建容器">创建容器
+&lt;/h3>&lt;p>　　下面的命令创建一个名为 tc_qemu_dev 的容器，并将主机的文件夹 &lt;code>/home/tiancheng.tang/Desktop/work/&lt;/code>​ 共享到容器中的 &lt;code>/home/developer/work&lt;/code>​ 文件夹。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">it&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">tc_qemu_dev&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">mount&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">bind&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">source&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">tiancheng&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tang&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Desktop&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">developer&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　注：如果需要使用代理网络，可以通过ssh隧道将流量代理到本机（例如：&lt;a class="link" href="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/#%E5%8F%8D%E5%90%91-ssh-%E9%9A%A7%E9%81%93" target="_blank" rel="noopener"
+>个人Linux主机通过SSH隧道使服务器访问外网&lt;/a>），在创建容器时添加参数&lt;code>--network host&lt;/code>​，让docker位于host网络中。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在设置代理时，可以手动设置 &lt;code>export http_proxy=&amp;quot;localhost:7897&amp;quot; export https_proxy=&amp;quot;localhost:7897&amp;quot;&lt;/code>​，也可以在启动容器时，添加参数直接设置代理环境 &lt;code>-e HTTP_PROXY=http://localhost:7897&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host -e &lt;span class="nv">HTTP_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 -e &lt;span class="nv">HTTPS_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　上述命令的含义自行询问GPT或者查询网络。&lt;/p>
+&lt;h2 id="qemu-源码">QEMU 源码
+&lt;/h2>&lt;p>　　QEMU 是一个大型开源软件，会不断的发布稳定版本，并在 master 主分支上不断更新新的功能。为了便于对旧版本进行维护、修复和发布更新，QEMU 为每一个稳定版本都创建了 stable 分支，并会不断的维护。&lt;/p>
+&lt;p>　　本文以 qemu 9.0 分支版本作为基础，进行开发。&lt;/p>
+&lt;p>　　官方源码仓库：&lt;a class="link" href="https://github.com/qemu/qemu.git" target="_blank" rel="noopener"
+>github.com/qemu/qemu.git&lt;/a>&lt;/p>
+&lt;h3 id="官方仓库-fork-到私人仓库">官方仓库 fork 到私人仓库
+&lt;/h3>&lt;p>　　以 gitee 为例&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031151316-pxi596o.png"
+width="930"
+height="877"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="106"
+data-flex-basis="254px"
+>​&lt;/p>
+&lt;p>　　将私人仓库 clone 到本地：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="nl">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="c1">//gitee.com/code-tang/qemu-sayram2.0.git
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="私人仓库建立工作分支">私人仓库建立工作分支
+&lt;/h3>&lt;p>　　在稳定分支 9.0 基础上，在本地新建新分支 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​，并将本地新建的两个分支 push 远程仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">fetch&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">stable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">9.0&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">checkout&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">b&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　然后查看本地分支情况：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ git branch -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> master 58d49b5895 Merge tag &lt;span class="s1">&amp;#39;net-pull-request&amp;#39;&lt;/span> of https://github.com/jasowang/qemu into staging
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sayram2 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* sayram2-dev 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中，&lt;code>sayram2-dev&lt;/code>​ 作为开发分支，开发稳定后，merge 到稳定分支 &lt;code>sayram2&lt;/code>​ 中。若后续官方的 &lt;code>stable-9.0&lt;/code>​ 分支出现重大更新，可将其 pull 到本地，和 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​两个分支进行 &lt;code>merge&lt;/code>​。&lt;/p>
+&lt;p>　　注意：需要更新官方仓库时，不要在仓库点击强制同步，这样会覆盖仓库代码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031160032-rtr0qeg.png"
+width="720"
+height="64"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1125"
+data-flex-basis="2700px"
+>​&lt;/p>
+&lt;p>　　若要更新官方仓库，需在本地添加官方 github 仓库源，并 pull 代码到对应的分支，完成 merge 工作后，再推送到私有仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git remote add official https://github.com/qemu/qemu.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git checkout sayram2-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0 --rebase
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　执行该命令后，本地分支将基于 &lt;code>official&lt;/code>​ 的 &lt;code>stable-9.0&lt;/code>​ 分支的最新提交进行变基，相当于先将远程的更改应用在当前分支上，再重新应用本地的更改，从而避免出现合并提交。出现冲突需要手动解决。&lt;/p>
+&lt;p>　　如果后续 &lt;code>stable-9.0&lt;/code> 出现更新，并希望将更新应用到 &lt;code>sayram2&lt;/code> 分支，则可以直接 pull &lt;code>stable-9.0&lt;/code>。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git checkout sayram2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="常规编译流程">常规编译流程
+&lt;/h2>&lt;p>　　参考官方文档：&lt;a class="link" href="https://www.qemu.org/docs/master/devel/build-system.html" target="_blank" rel="noopener"
+>www.qemu.org/docs/master/devel/build-system.html&lt;/a>&lt;/p>
+&lt;p>　　一般的开发仅关注于源码，不会对编译脚本做过多改动。&lt;br>
+从源码编译 qemu 总共两步：1. configure 2. build&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>configure&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">riscv32&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">softmmu&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">enable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">debug&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>关于 &lt;code>configure&lt;/code>​ 的更多选项可以参考 &lt;code>./configure --help&lt;/code>​ 的输出。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">developer&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">AS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4124&lt;/span>&lt;span class="n">GS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nl">TNR&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">~/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">official&lt;/span>&lt;span class="err">$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Using&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="n">as&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">directory&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">output&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Usage&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">configure&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">options&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Options&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">defaults&lt;/span> &lt;span class="n">in&lt;/span> &lt;span class="n">brackets&lt;/span> &lt;span class="n">after&lt;/span> &lt;span class="n">descriptions&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Standard&lt;/span> &lt;span class="nl">options&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span> &lt;span class="n">print&lt;/span> &lt;span class="n">this&lt;/span> &lt;span class="n">message&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">LIST&lt;/span> &lt;span class="n">set&lt;/span> &lt;span class="n">target&lt;/span> &lt;span class="nf">list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">default&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">all&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Available&lt;/span> &lt;span class="nl">targets&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">aarch64&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">aarch64_be&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span> &lt;span class="n">alpha&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>build&lt;/p>
+&lt;p>可以使用 make 和 ninja 进行编译，两者都行。区别是 ninja 自动开启多线程加速编译，而 make 需要手动加上参数 &lt;code>-j&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">or&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">make&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">j&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>个人喜欢用 ninja，输出的编译信息不会占满整个屏幕。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="vscode远程开发项目">vscode远程开发项目
+&lt;/h2>&lt;p>　　vscode 实际上就是一个编辑器，但是可以通过各种插件将其变为一个IDE。例如远程开发功能，vscode 需要安装扩展：&lt;code>Remote - SSH&lt;/code>​、 &lt;code>Dev Containers&lt;/code>​。vscode 可以运行在任意电脑上，通过远程网络连接到同一个工作服务器上开发。&lt;/p>
+&lt;h3 id="ssh连接服务器">SSH连接服务器
+&lt;/h3>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211448-d4j9gd9.png"
+width="593"
+height="437"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="135"
+data-flex-basis="325px"
+>​&lt;/p>
+&lt;p>　　新建远程后，会在顶部弹出界面，提示输入 ssh 连接命令。如图所示输入账号和ip地址&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211607-8yard8u.png"
+width="983"
+height="238"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="413"
+data-flex-basis="991px"
+>​&lt;/p>
+&lt;p>　　顶部会弹出选项框，要求选择一个配置文件，保存当前连接的服务器信息。选择第一个即可。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211646-6hsiz16.png"
+width="854"
+height="190"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="449"
+data-flex-basis="1078px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030221157-pqslqt2.png"
+width="417"
+height="332"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="301px"
+>​&lt;/p>
+&lt;p>　　这里的配置文件可以后续再进行修改，其中 &lt;code>Host&lt;/code>​ 表示 ssh 服务器名称，可以任意更改，&lt;code>Hostname&lt;/code>​ 保存服务器 ip地址， &lt;code>User&lt;/code>​ 保存用户名。&lt;/p>
+&lt;p>　　然后远程资源管理器会更新输入的服务器信息。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211726-aibbt0d.png"
+width="602"
+height="524"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="114"
+data-flex-basis="275px"
+>​&lt;/p>
+&lt;p>　　点击连接按钮后，顶部弹出输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211938-9ymbm7u.png"
+width="695"
+height="177"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="392"
+data-flex-basis="942px"
+>​&lt;/p>
+&lt;p>　　首次连接，或者更新 vscode 后，服务器会下载 vscode 服务器，需要一定时间。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212255-07r1nod.png"
+width="1030"
+height="797"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="310px"
+>​&lt;/p>
+&lt;h3 id="vscode连接容器">vscode连接容器
+&lt;/h3>&lt;p>　　当安装完 &lt;code>Dev Containers&lt;/code>​ 扩展后，远程资源管理器会多一个开发容器的选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212814-liiy75b.png"
+width="420"
+height="444"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="94"
+data-flex-basis="227px"
+>​&lt;/p>
+&lt;p>　　已经连接的容器会显示在 &lt;code>开发容器&lt;/code>​ 这一栏，没有连接过的容器显示在 &lt;code>其他容器&lt;/code>​ 这一栏。和 SSH 同理，点击容器连接即可，不需要输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212916-fz5eol8.png"
+width="665"
+height="890"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="74"
+data-flex-basis="179px"
+>​&lt;/p>
+&lt;p>　　连接后，所有的开发环境都存在于 docker 容器，在本文创建镜像时，共享了主机的 &lt;code>work&lt;/code>​ 目录，因此，将代码存放于该目录。&lt;/p>
+&lt;h3 id="vscode-中调试">vscode 中调试
+&lt;/h3>&lt;p>　　vscode 只是编辑器，还需要配置 &lt;code>task.json&lt;/code>​ 调试文件，和 &lt;code>launch.json&lt;/code>​ 文件来决定调试需要运行的文件，调试工具的位置等。&lt;/p>
+&lt;p>　　qemu 在 Linux 上的调试文件如下：&lt;/p>
+&lt;p>　　​&lt;code>.vscode/launch.json&lt;/code>​：调试文件，F5快捷键进入调试模式&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Use IntelliSense to learn about possible attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// Hover to view descriptions of existing attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;0.2.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;configurations&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="c1">//&amp;#34;-init_data&amp;#34;,&amp;#34;${workspaceFolder}/Hmatrix0.dat &amp;#34;ultichip-u1,pipeline=true&amp;#34;,&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --disable-werror --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;(gdb) Launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cppdbg&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;request&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;program&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}/build/qemu-system-riscv32&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// QEMU 启动时的参数，需要根据需要，自行调整。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;args&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;-machine&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ub&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-cpu&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ultichip-u1,pipeline=true&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-bios&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#39;&amp;#39;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-m&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;128M&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-d&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;in_asm&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-display&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;none&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-ulog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/runtime.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;-rlog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/reg.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-savedmem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;./test_sayram/outlog/dmemory.dat&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-nographic&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-kernel&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;./test_sayram/input/dl/vp0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-device&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;loader,file=./test_sayram/input/dl/qemu_indmem.bin,addr=0x17b40&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-lbr&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;32&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;stopAtEntry&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;cwd&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;environment&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;PATH&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;%PATH%;&lt;/span>&lt;span class="se">\b&lt;/span>&lt;span class="s">in&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//&amp;#34;console&amp;#34;: &amp;#34;externalTerminal&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;MIMode&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;miDebuggerArgs&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-q -ex quit; wait() { fg &amp;gt;/dev/null; }; /bin/gdb -q --interpreter=mi&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// &amp;#34;miDebuggerPath&amp;#34;: &amp;#34;F:/msys/mingw64/bin/gdb.exe&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;setupCommands&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;description&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;Enable pretty-printing for gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;text&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-enable-pretty-printing&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;ignoreFailures&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;preLaunchTask&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>.vscode/task.json&lt;/code>​：编译任务，决定如何编译项目&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// See https://go.microsoft.com/fwlink/?LinkId=733558
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// for the documentation about the tasks.json format
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;2.0.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;tasks&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;label&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;shell&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 手动运行一次：./configure --enable-debug --target-list=riscv32-softmmu --disable-werror
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;command&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cd build; ninja; cd ..&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;problemMatcher&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;group&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;kind&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;isDefault&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p></description></item><item><title>离线方式传输 Docker 镜像</title><link>https://codetang-2417.github.io/p/%E7%A6%BB%E7%BA%BF%E6%96%B9%E5%BC%8F%E4%BC%A0%E8%BE%93-docker-%E9%95%9C%E5%83%8F/</link><pubDate>Wed, 16 Oct 2024 22:47:00 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E7%A6%BB%E7%BA%BF%E6%96%B9%E5%BC%8F%E4%BC%A0%E8%BE%93-docker-%E9%95%9C%E5%83%8F/</guid><description>&lt;p>　　目前国内的镜像加速网站被墙，个人电脑可以通过代理的方式下载镜像，但服务器可能无法使用代理，或者无法访问网络，因此可以通过离线的方式，或者使用自建私有镜像仓库的形式来管理镜像。&lt;/p>
+&lt;p>　　本文说明如何通过离线的方式向服务器上传镜像：将 Docker 镜像导出并传输到服务器，然后再导入镜像。&lt;/p>
+&lt;h2 id="步骤">步骤
+&lt;/h2>&lt;h3 id="导出镜像到本地文件">导出镜像到本地文件
+&lt;/h3>&lt;pre>&lt;code>在本地，将 Docker 镜像导出为 `.tar`​ 文件：
+```bash
+docker save -o ubuntu24.tar ubuntu:24.04
+```
+这会将名为 `ubuntu:24.04`​ 的镜像保存为 `ubuntu24.tar`​ 文件。
+&lt;/code>&lt;/pre>
+&lt;h3 id="将文件传输到服务">将文件传输到服务
+&lt;/h3>&lt;pre>&lt;code>通过 USB 或局域网的文件传输工具（如 `scp`​、`rsync`​、FTP 等）将 `ubuntu24.tar`​ 文件传输到服务器。
+例如使用 `scp`​：
+```bash
+scp ubuntu24.tar user@server:/path/to/destination
+```
+&lt;/code>&lt;/pre>
+&lt;h3 id="在服务器上导入镜像">在服务器上导入镜像
+&lt;/h3>&lt;pre>&lt;code>将文件传输到服务器后，在服务器上使用以下命令导入该镜像：
+```bash
+docker load -i /path/to/destination/ubuntu24.tar
+```
+这会将 `ubuntu24.tar`​ 文件中的 Docker 镜像加载到服务器的 Docker 环境中。
+&lt;/code>&lt;/pre>
+&lt;p>　　如果镜像过大，或者使用人数较多的情况，需要考虑自建镜像仓库，有一些免费的管理软件可供使用，不再本文介绍范围内，后续如果有需要再进行总结。&lt;/p></description></item></channel></rss>
