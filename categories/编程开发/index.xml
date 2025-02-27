@@ -1,0 +1,2064 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>编程开发 on LingLong</title><link>https://codetang-2417.github.io/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/</link><description>Recent content in 编程开发 on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Thu, 31 Oct 2024 16:06:22 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml"/><item><title>QEMU开发环境搭建</title><link>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link><pubDate>Wed, 30 Oct 2024 19:57:03 +0800</pubDate><guid>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid><description>&lt;p>　　QEMU开源软件在Linux上进行开发。在windows上可以采用WSL Linux，也可以自行在电脑上安装Linux原生系统。一般采用vscode作为IDE 开发QEMU。&lt;/p>
+&lt;p>　　本文采用 vscode 连接校内 ubuntu 服务器的方式进行开发环境搭建。ubuntu服务器多人使用，采用docker 容器建立各自独立的开发环境。&lt;/p>
+&lt;h2 id="docker环境">docker环境
+&lt;/h2>&lt;p>　　使用docker启动作为编译的系统环境。可以将 docker 视作轻量级虚拟机，先创建 docker镜像，再以镜像为基础启动容器。每一个容器视作虚拟机，系统环境数据存在容器中，工作文件夹等需要保存在硬盘上的重要文件，以共享文件夹的方式映射到容器。镜像不保存任何运行数据。&lt;/p>
+&lt;h3 id="dockfile">dockfile
+&lt;/h3>&lt;p>　　创建名为 &lt;code>Dockerfile&lt;/code>​ 的文件，并填入下列内容。并可以根据自行需要（用户\组 id，软件依赖等），增删其中的内容。&lt;/p>
+&lt;p>　　注意：存放 &lt;code>Dockerfile&lt;/code>​ 的文件夹中最好不要存放任何其他无关的文件，在创建镜像时，docker 会将该文件夹中的所有内容都复制到容器中，这会大大增加镜像创建的时间。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">FROM&lt;/span> &lt;span class="nl">ubuntu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">24.04&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 定义构建时变量，可以在docker build构建通过--build-arg来修改
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ARG&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">developer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 设置 DEBIAN_FRONTEND 环境变量以避免交互式对话框，否则可能会卡在一些交互式输入中
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">noninteractive&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改ubuntu的镜像源为阿里云
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># ubuntu24.04版本修改软件源的位置：/etc/apt/sources.list 替换为 /etc/apt/sources.list.d/ubuntu.sources
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">archive&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">security&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">update&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">locales&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">clean&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;%sudo ALL=(ALL) NOPASSWD:ALL&amp;#34;&lt;/span> &lt;span class="o">&amp;gt;&amp;gt;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sudoers&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改容器或系统中的 sudoers 文件，允许属于 sudo 组的用户执行 sudo 命令时无需输入密码。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改语言环境（locale）设置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">locale&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">gen&lt;/span> &lt;span class="n">en_US&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UTF&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">8&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">update&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">locale&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 添加用户：赋予sudo权限，指定密码123，建议docker的密码不要太复杂，太多了很容易忘记。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 注：用户id和组id尽可能的和当前用户id一致，使得读写共享文件时的权限一致，否则可能出现docker无法写入共享文件的问题。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 命令 id 可以查看用户的各种id
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">group&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">groupadd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">useradd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">ms&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bash&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">u&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">UID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">G&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;${username}:123&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="nl">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">123&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 安装各种以依赖软件，可以根据需要定制，也可以后续手动安装。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># QEMU编译需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> &lt;span class="n">meson&lt;/span> &lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">pkg&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">config&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">diffutils&lt;/span> &lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">venv&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libusb&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">1.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libncursesw5&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libpixman&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libepoxy&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libv4l&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpng&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">image&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgtk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgdk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pixbuf2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libasound2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpulse&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libx11&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libfdt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libiscsi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># riscv-gnu-toolchain 需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">autoconf&lt;/span> &lt;span class="n">automake&lt;/span> &lt;span class="n">autotools&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">curl&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pip&lt;/span> &lt;span class="n">libmpc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libmpfr&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgmp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">gawk&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bison&lt;/span> &lt;span class="n">flex&lt;/span> &lt;span class="n">texinfo&lt;/span> &lt;span class="n">gperf&lt;/span> &lt;span class="n">libtool&lt;/span> &lt;span class="n">patchutils&lt;/span> &lt;span class="n">bc&lt;/span> &lt;span class="n">zlib1g&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libexpat&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libslirp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">gdb&lt;/span> &lt;span class="n">clang&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">vim&lt;/span> &lt;span class="n">gdb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 还原 DEBIAN_FRONTEND 环境变量（可选）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dialog&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的工作目录
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">WORKDIR&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的登录用户
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">USER&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="创建镜像">创建镜像
+&lt;/h3>&lt;p>　　基础构建&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 &lt;code>-t&lt;/code>​ 后跟镜像名称，可任意更改。&lt;code>docker build -t tc-qemu .&lt;/code>​ 这条命令会从当前目录（&lt;code>.&lt;/code>​）中寻找 &lt;code>Dockerfile&lt;/code>​，然后根据其中的指令构建一个名为 &lt;code>tc-qemu&lt;/code>​ 的 Docker 镜像。&lt;/p>
+&lt;p>　　若在创建镜像时希望动态修改 &lt;code>Dockerfile&lt;/code>​ 中的ARG参数，则在构建时，添加参数 &lt;code>--build-arg ARG_name=value&lt;/code>​ ，将 &lt;code>ARG_name&lt;/code>​ 修改为 &lt;code>value&lt;/code>​。&lt;/p>
+&lt;p>　　由于每个用户 id 和组 id 不一样，需要在终端中运行命令&lt;code>id&lt;/code>​查询到当前用户的group和user id，并在构建时修改参数：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　修改用户 id 和组 id 和当前的账户一致，是为了确保在写入共享文件夹的时候有相同的权限，否则可能造成在容器中无法正常写入的情况。&lt;/p>
+&lt;h3 id="创建容器">创建容器
+&lt;/h3>&lt;p>　　下面的命令创建一个名为 tc_qemu_dev 的容器，并将主机的文件夹 &lt;code>/home/tiancheng.tang/Desktop/work/&lt;/code>​ 共享到容器中的 &lt;code>/home/developer/work&lt;/code>​ 文件夹。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">it&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">tc_qemu_dev&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">mount&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">bind&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">source&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">tiancheng&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tang&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Desktop&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">developer&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　注：如果需要使用代理网络，可以通过ssh隧道将流量代理到本机（例如：&lt;a class="link" href="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/#%E5%8F%8D%E5%90%91-ssh-%E9%9A%A7%E9%81%93" target="_blank" rel="noopener"
+>个人Linux主机通过SSH隧道使服务器访问外网&lt;/a>），在创建容器时添加参数&lt;code>--network host&lt;/code>​，让docker位于host网络中。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在设置代理时，可以手动设置 &lt;code>export http_proxy=&amp;quot;localhost:7897&amp;quot; export https_proxy=&amp;quot;localhost:7897&amp;quot;&lt;/code>​，也可以在启动容器时，添加参数直接设置代理环境 &lt;code>-e HTTP_PROXY=http://localhost:7897&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host -e &lt;span class="nv">HTTP_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 -e &lt;span class="nv">HTTPS_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　上述命令的含义自行询问GPT或者查询网络。&lt;/p>
+&lt;h2 id="qemu-源码">QEMU 源码
+&lt;/h2>&lt;p>　　QEMU 是一个大型开源软件，会不断的发布稳定版本，并在 master 主分支上不断更新新的功能。为了便于对旧版本进行维护、修复和发布更新，QEMU 为每一个稳定版本都创建了 stable 分支，并会不断的维护。&lt;/p>
+&lt;p>　　本文以 qemu 9.0 分支版本作为基础，进行开发。&lt;/p>
+&lt;p>　　官方源码仓库：&lt;a class="link" href="https://github.com/qemu/qemu.git" target="_blank" rel="noopener"
+>github.com/qemu/qemu.git&lt;/a>&lt;/p>
+&lt;h3 id="官方仓库-fork-到私人仓库">官方仓库 fork 到私人仓库
+&lt;/h3>&lt;p>　　以 gitee 为例&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031151316-pxi596o.png"
+width="930"
+height="877"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="106"
+data-flex-basis="254px"
+>​&lt;/p>
+&lt;p>　　将私人仓库 clone 到本地：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="nl">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="c1">//gitee.com/code-tang/qemu-sayram2.0.git
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="私人仓库建立工作分支">私人仓库建立工作分支
+&lt;/h3>&lt;p>　　在稳定分支 9.0 基础上，在本地新建新分支 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​，并将本地新建的两个分支 push 远程仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">fetch&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">stable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">9.0&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">checkout&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">b&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　然后查看本地分支情况：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ git branch -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> master 58d49b5895 Merge tag &lt;span class="s1">&amp;#39;net-pull-request&amp;#39;&lt;/span> of https://github.com/jasowang/qemu into staging
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sayram2 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* sayram2-dev 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中，&lt;code>sayram2-dev&lt;/code>​ 作为开发分支，开发稳定后，merge 到稳定分支 &lt;code>sayram2&lt;/code>​ 中。若后续官方的 &lt;code>stable-9.0&lt;/code>​ 分支出现重大更新，可将其 pull 到本地，和 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​两个分支进行 &lt;code>merge&lt;/code>​。&lt;/p>
+&lt;p>　　注意：需要更新官方仓库时，不要在仓库点击强制同步，这样会覆盖仓库代码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031160032-rtr0qeg.png"
+width="720"
+height="64"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1125"
+data-flex-basis="2700px"
+>​&lt;/p>
+&lt;p>　　若要更新官方仓库，需在本地添加官方 github 仓库源，并 pull 代码到对应的分支，完成 merge 工作后，再推送到私有仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git remote add official https://github.com/qemu/qemu.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git checkout sayram2-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0 --rebase
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　执行该命令后，本地分支将基于 &lt;code>official&lt;/code>​ 的 &lt;code>stable-9.0&lt;/code>​ 分支的最新提交进行变基，相当于先将远程的更改应用在当前分支上，再重新应用本地的更改，从而避免出现合并提交。出现冲突需要手动解决。&lt;/p>
+&lt;p>　　如果后续 &lt;code>stable-9.0&lt;/code> 出现更新，并希望将更新应用到 &lt;code>sayram2&lt;/code> 分支，则可以直接 pull &lt;code>stable-9.0&lt;/code>。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git checkout sayram2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="常规编译流程">常规编译流程
+&lt;/h2>&lt;p>　　参考官方文档：&lt;a class="link" href="https://www.qemu.org/docs/master/devel/build-system.html" target="_blank" rel="noopener"
+>www.qemu.org/docs/master/devel/build-system.html&lt;/a>&lt;/p>
+&lt;p>　　一般的开发仅关注于源码，不会对编译脚本做过多改动。&lt;br>
+从源码编译 qemu 总共两步：1. configure 2. build&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>configure&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">riscv32&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">softmmu&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">enable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">debug&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>关于 &lt;code>configure&lt;/code>​ 的更多选项可以参考 &lt;code>./configure --help&lt;/code>​ 的输出。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">developer&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">AS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4124&lt;/span>&lt;span class="n">GS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nl">TNR&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">~/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">official&lt;/span>&lt;span class="err">$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Using&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="n">as&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">directory&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">output&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Usage&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">configure&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">options&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Options&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">defaults&lt;/span> &lt;span class="n">in&lt;/span> &lt;span class="n">brackets&lt;/span> &lt;span class="n">after&lt;/span> &lt;span class="n">descriptions&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Standard&lt;/span> &lt;span class="nl">options&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span> &lt;span class="n">print&lt;/span> &lt;span class="n">this&lt;/span> &lt;span class="n">message&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">LIST&lt;/span> &lt;span class="n">set&lt;/span> &lt;span class="n">target&lt;/span> &lt;span class="nf">list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">default&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">all&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Available&lt;/span> &lt;span class="nl">targets&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">aarch64&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">aarch64_be&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span> &lt;span class="n">alpha&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>build&lt;/p>
+&lt;p>可以使用 make 和 ninja 进行编译，两者都行。区别是 ninja 自动开启多线程加速编译，而 make 需要手动加上参数 &lt;code>-j&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">or&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">make&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">j&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>个人喜欢用 ninja，输出的编译信息不会占满整个屏幕。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="vscode远程开发项目">vscode远程开发项目
+&lt;/h2>&lt;p>　　vscode 实际上就是一个编辑器，但是可以通过各种插件将其变为一个IDE。例如远程开发功能，vscode 需要安装扩展：&lt;code>Remote - SSH&lt;/code>​、 &lt;code>Dev Containers&lt;/code>​。vscode 可以运行在任意电脑上，通过远程网络连接到同一个工作服务器上开发。&lt;/p>
+&lt;h3 id="ssh连接服务器">SSH连接服务器
+&lt;/h3>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211448-d4j9gd9.png"
+width="593"
+height="437"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="135"
+data-flex-basis="325px"
+>​&lt;/p>
+&lt;p>　　新建远程后，会在顶部弹出界面，提示输入 ssh 连接命令。如图所示输入账号和ip地址&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211607-8yard8u.png"
+width="983"
+height="238"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="413"
+data-flex-basis="991px"
+>​&lt;/p>
+&lt;p>　　顶部会弹出选项框，要求选择一个配置文件，保存当前连接的服务器信息。选择第一个即可。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211646-6hsiz16.png"
+width="854"
+height="190"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="449"
+data-flex-basis="1078px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030221157-pqslqt2.png"
+width="417"
+height="332"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="301px"
+>​&lt;/p>
+&lt;p>　　这里的配置文件可以后续再进行修改，其中 &lt;code>Host&lt;/code>​ 表示 ssh 服务器名称，可以任意更改，&lt;code>Hostname&lt;/code>​ 保存服务器 ip地址， &lt;code>User&lt;/code>​ 保存用户名。&lt;/p>
+&lt;p>　　然后远程资源管理器会更新输入的服务器信息。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211726-aibbt0d.png"
+width="602"
+height="524"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="114"
+data-flex-basis="275px"
+>​&lt;/p>
+&lt;p>　　点击连接按钮后，顶部弹出输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211938-9ymbm7u.png"
+width="695"
+height="177"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="392"
+data-flex-basis="942px"
+>​&lt;/p>
+&lt;p>　　首次连接，或者更新 vscode 后，服务器会下载 vscode 服务器，需要一定时间。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212255-07r1nod.png"
+width="1030"
+height="797"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="310px"
+>​&lt;/p>
+&lt;h3 id="vscode连接容器">vscode连接容器
+&lt;/h3>&lt;p>　　当安装完 &lt;code>Dev Containers&lt;/code>​ 扩展后，远程资源管理器会多一个开发容器的选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212814-liiy75b.png"
+width="420"
+height="444"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="94"
+data-flex-basis="227px"
+>​&lt;/p>
+&lt;p>　　已经连接的容器会显示在 &lt;code>开发容器&lt;/code>​ 这一栏，没有连接过的容器显示在 &lt;code>其他容器&lt;/code>​ 这一栏。和 SSH 同理，点击容器连接即可，不需要输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212916-fz5eol8.png"
+width="665"
+height="890"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="74"
+data-flex-basis="179px"
+>​&lt;/p>
+&lt;p>　　连接后，所有的开发环境都存在于 docker 容器，在本文创建镜像时，共享了主机的 &lt;code>work&lt;/code>​ 目录，因此，将代码存放于该目录。&lt;/p>
+&lt;h3 id="vscode-中调试">vscode 中调试
+&lt;/h3>&lt;p>　　vscode 只是编辑器，还需要配置 &lt;code>task.json&lt;/code>​ 调试文件，和 &lt;code>launch.json&lt;/code>​ 文件来决定调试需要运行的文件，调试工具的位置等。&lt;/p>
+&lt;p>　　qemu 在 Linux 上的调试文件如下：&lt;/p>
+&lt;p>　　​&lt;code>.vscode/launch.json&lt;/code>​：调试文件，F5快捷键进入调试模式&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Use IntelliSense to learn about possible attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// Hover to view descriptions of existing attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;0.2.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;configurations&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="c1">//&amp;#34;-init_data&amp;#34;,&amp;#34;${workspaceFolder}/Hmatrix0.dat &amp;#34;ultichip-u1,pipeline=true&amp;#34;,&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --disable-werror --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;(gdb) Launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cppdbg&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;request&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;program&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}/build/qemu-system-riscv32&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// QEMU 启动时的参数，需要根据需要，自行调整。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;args&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;-machine&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ub&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-cpu&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ultichip-u1,pipeline=true&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-bios&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#39;&amp;#39;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-m&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;128M&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-d&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;in_asm&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-display&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;none&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-ulog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/runtime.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;-rlog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/reg.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-savedmem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;./test_sayram/outlog/dmemory.dat&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-nographic&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-kernel&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;./test_sayram/input/dl/vp0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-device&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;loader,file=./test_sayram/input/dl/qemu_indmem.bin,addr=0x17b40&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-lbr&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;32&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;stopAtEntry&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;cwd&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;environment&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;PATH&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;%PATH%;&lt;/span>&lt;span class="se">\b&lt;/span>&lt;span class="s">in&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//&amp;#34;console&amp;#34;: &amp;#34;externalTerminal&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;MIMode&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;miDebuggerArgs&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-q -ex quit; wait() { fg &amp;gt;/dev/null; }; /bin/gdb -q --interpreter=mi&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// &amp;#34;miDebuggerPath&amp;#34;: &amp;#34;F:/msys/mingw64/bin/gdb.exe&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;setupCommands&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;description&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;Enable pretty-printing for gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;text&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-enable-pretty-printing&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;ignoreFailures&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;preLaunchTask&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>.vscode/task.json&lt;/code>​：编译任务，决定如何编译项目&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// See https://go.microsoft.com/fwlink/?LinkId=733558
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// for the documentation about the tasks.json format
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;2.0.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;tasks&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;label&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;shell&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 手动运行一次：./configure --enable-debug --target-list=riscv32-softmmu --disable-werror
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;command&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cd build; ninja; cd ..&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;problemMatcher&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;group&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;kind&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;isDefault&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p></description></item><item><title>QEMU 命令参数解析</title><link>https://codetang-2417.github.io/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/</link><pubDate>Tue, 29 Oct 2024 16:41:42 +0800</pubDate><guid>https://codetang-2417.github.io/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/</guid><description>&lt;p>　　QEMU 9.1.50 版本为例。&lt;/p>
+&lt;h2 id="数据结构及初始化">数据结构及初始化
+&lt;/h2>&lt;p>　　QEMU 在 &lt;code>softmmu/vl.c&lt;/code>​ 文件中定义了 &lt;code>QEMUOption&lt;/code>​ 结构体来描述不同的命令行参数，其代码如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">QEMUOption&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">flags&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">index&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">uint32_t&lt;/span> &lt;span class="n">arch_mask&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="n">QEMUOption&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 &lt;code>name&lt;/code>​ 表示参数名称，&lt;code>flags&lt;/code>​ 表示参数属性，为 1 表示拥有子参数，为 0 则表示无子参数，&lt;code>index&lt;/code>​ 表示命令索引 (QEMU_OPTION_cmd)，&lt;code>arch_mask&lt;/code>​ 表示参数支持的架构。在 &lt;code>softmmu/vl.c&lt;/code>​ 文件中还定义了一个全局 &lt;code>QEMUOption&lt;/code>​ 数组 &lt;code>qemu_options&lt;/code>​ 来描述 QEMU 的全部可用参数，具体如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">enum&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define DEF(option, opt_arg, opt_enum, opt_help, arch_mask) \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> opt_enum,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define DEFHEADING(text)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define ARCHHEADING(text, arch_mask)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;qemu-options.def&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">QEMUOption&lt;/span> &lt;span class="n">qemu_options&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="s">&amp;#34;h&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">QEMU_OPTION_h&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">QEMU_ARCH_ALL&lt;/span> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define DEF(option, opt_arg, opt_enum, opt_help, arch_mask) \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> { option, opt_arg, opt_enum, arch_mask },
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define DEFHEADING(text)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define ARCHHEADING(text, arch_mask)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;qemu-options.def&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="cm">/* end of list */&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　可以看到，&lt;code>qemu_options&lt;/code>​ 数组中首先定义了一个参数 &lt;code>h&lt;/code>​，其使用方法为 &lt;code>qemu-system-riscv64 -h&lt;/code>​，作用是打印帮助信息。其余所有的可用参数都都通过 &lt;code>DEF&lt;/code>​ 宏定义在 &lt;code>&amp;lt;qemu_build_dir&amp;gt;/qemu-options.def&lt;/code>​ 文件中。需要注意的是，&lt;code>qemu-options.def&lt;/code>​ 文件是由 &lt;code>scripts/hxtool&lt;/code>​ 脚本在编译时根据 &lt;code>qemu-options.hx&lt;/code>​ 文件生成的，因此不在 QEMU 源代码目录中。&lt;/p>
+&lt;blockquote>
+&lt;p>这里需要说明一下，在 QEMU 中常用的一种编程方式：将可重复利用的配置信息通过宏定义的方式放在一个文件中，在正式使用时，通过重新定义宏来实现同一个配置信息文件生成不同结构体或数组的功能。例如需要定义的 &lt;code>qemu_options&lt;/code>​ 静态数组和各个选项的 &lt;code>enum&lt;/code>​类型，其中对 &lt;code>DEF&lt;/code>​ 宏进行了重新定义，并包含了同一个文件 &amp;ldquo;qemu-options.def&amp;rdquo;，但由于 &lt;code>DEF&lt;/code>​ 两次定义的内容不同，最终生成的数据结构不同。实现一次配置，多次重复利用。&lt;/p>&lt;/blockquote>
+&lt;p>　　​&lt;code>QEMUOption&lt;/code>​ 只定义了每一个大选项的名称、是否有子选项、支持的体系结构，但并没有定义子选项。子选项则是由文件 &lt;code>include/qemu/option_int.h&lt;/code>​ 中定义的两个结构体 &lt;code>QemuOpt&lt;/code>​、&lt;code>QemuOpts&lt;/code>​进行描述。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="n">QemuOpt&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">str&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QemuOptDesc&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">desc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">union&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">bool&lt;/span> &lt;span class="n">boolean&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">uint64_t&lt;/span> &lt;span class="n">uint&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QemuOpts&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">opts&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">QTAILQ_ENTRY&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QemuOpt&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">next&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="n">QemuOpts&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QemuOptsList&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Location&lt;/span> &lt;span class="n">loc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">QTAILQ_HEAD&lt;/span>&lt;span class="p">(,&lt;/span> &lt;span class="n">QemuOpt&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">head&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">QTAILQ_ENTRY&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QemuOpts&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">next&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>QemuOpt&lt;/code>​ 保存每一个子选项的具体信息，每一个子选项会通过 &lt;code>TailQueue&lt;/code>​ 连接成一个双向尾队列 &lt;code>QemuOpts&lt;/code>​。因此，也可以将 &lt;code>QemuOpt&lt;/code>​ 视作 &lt;code>QemuOpts&lt;/code>​ 中的一个队列节点。其中所定义的 &lt;code>QTAILQ_ENTRY&lt;/code>​ 是和 &lt;code>TailQueue&lt;/code>​ 相关的数据结构，关于 &lt;code>TailQueue&lt;/code>​ 的详细信息可查看 &lt;a class="link" href="https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/" target="_blank" rel="noopener"
+>QEMU中的队列queue&lt;/a>。&lt;/p>
+&lt;p>　　​&lt;code>QemuOpts&lt;/code>​ 是大选项中各个子选项的动态集合。&lt;code>QemuOpts&lt;/code>​中保存的&lt;code>QTAILQ_HEAD(, QemuOpt) head;&lt;/code>​ 是 &lt;code>QemuOpt&lt;/code>​ 队列的头节点，能够访问所有的 &lt;code>QemuOpt&lt;/code>​。&lt;/p>
+&lt;p>　　以 &lt;code>-device&lt;/code>​ 大选项为例，QEMU 中 &lt;code>-device&lt;/code>​ 表示设备，设备有非常多种，每一种都是独立的，且可以重复添加。一个 &lt;code>QemuOpts&lt;/code>​ 只能保存一种设备的子选项集合。那么多个相同种类的设备，但是参数不同，如何保存？这就需要再引入一个数据结构 &lt;code>QemuOptsList&lt;/code>​，&lt;code>QemuOptsList&lt;/code>​ 也是一个 &lt;code>TailQueue&lt;/code>​，保存 &lt;code>QemuOpts&lt;/code>​ 的集合。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="n">QemuOptsList&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">implied_opt_name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">bool&lt;/span> &lt;span class="n">merge_lists&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="cm">/* Merge multiple uses of option into a single list? */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">QTAILQ_HEAD&lt;/span>&lt;span class="p">(,&lt;/span> &lt;span class="n">QemuOpts&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">head&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QemuOptDesc&lt;/span> &lt;span class="n">desc&lt;/span>&lt;span class="p">[];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　每一个 &lt;code>QemuOptsList&lt;/code>​ 代表了大选项，&lt;code>QemuOptsList&lt;/code>​ 中的每一个 &lt;code>QemuOpts&lt;/code>​ 代表一类设备，由大选项中的子选项集合组成。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/assets/QemuListsConcise-20241030154145-jnl8u0p.svg"
+loading="lazy"
+alt="QemuListsConcise"
+>​&lt;/p>
+&lt;p>　　下图给出完整体的数据结构的实例，将 &lt;code>QemuOptsList&lt;/code>​ 中的数据结构和 &lt;code>QemuOpts&lt;/code>​ 分开绘制，并在 &lt;code>QemuOpts&lt;/code>​ 给出了 &lt;code>TailQueue&lt;/code>​ 的细节，结合 &lt;a class="link" href="https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/" target="_blank" rel="noopener"
+>QEMU中的队列queue&lt;/a> 理解更佳。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/assets/QEMUParameterDataStruct-20241030152802-ppjltu4.svg"
+loading="lazy"
+alt="QEMUParameterDataStruct"
+>​&lt;/p>
+&lt;p>　　QEMU 在 &lt;code>util/qemu-config.c&lt;/code>​ 中定义了一个全局的 &lt;code>QemuOptsList&lt;/code>​ 数组 &lt;code>vm_config_groups&lt;/code>​ 来储存所有可用的参数（即上图中提到的数组 &lt;code>vm_config_groups&lt;/code>​）：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">static QemuOptsList *vm_config_groups[48];
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">static QemuOptsList *drive_config_groups[5];
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　这两行代码说明了 QEMU 最多支持 48 个参数，5 个驱动器参数。这两个全局数组由位于 &lt;code>softmmu/vl.c&lt;/code>​ 文件的 &lt;code>qemu_init&lt;/code>​ 函数负责初始化：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_drive_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_drive_opts(&amp;amp;qemu_legacy_drive_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_drive_opts(&amp;amp;qemu_common_drive_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_drive_opts(&amp;amp;qemu_drive_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_drive_opts(&amp;amp;bdrv_runtime_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_chardev_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_device_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_netdev_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_nic_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_net_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_rtc_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_global_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_mon_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_trace_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_plugin_add_opts();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_option_rom_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_accel_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_mem_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_smp_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_boot_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_add_fd_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_object_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_tpmdev_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_overcommit_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_msg_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_name_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_numa_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_icount_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_semihosting_config_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_fw_cfg_opts);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> qemu_add_opts(&amp;amp;qemu_action_opts);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中，&lt;code>qemu_add_opts&lt;/code>​ 和 &lt;code>qemu_add_drive_opts&lt;/code>​ 函数的实现位于 &lt;code>util/qemu-config.c&lt;/code>​ 文件中，主要负责将参数中传入的 &lt;code>OemuOptsList&lt;/code>​ 添加到全局数组中：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">void qemu_add_drive_opts(QemuOptsList *list)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> int entries, i;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> entries = ARRAY_SIZE(drive_config_groups);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> entries--; /* keep list NULL terminated */
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for (i = 0; i &amp;lt; entries; i++) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if (drive_config_groups[i] == NULL) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> drive_config_groups[i] = list;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> fprintf(stderr, &amp;#34;ran out of space in drive_config_groups&amp;#34;);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> abort();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">void qemu_add_opts(QemuOptsList *list)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> int entries, i;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> entries = ARRAY_SIZE(vm_config_groups);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> entries--; /* keep list NULL terminated */
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for (i = 0; i &amp;lt; entries; i++) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if (vm_config_groups[i] == NULL) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> vm_config_groups[i] = list;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> fprintf(stderr, &amp;#34;ran out of space in vm_config_groups&amp;#34;);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> abort();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="命令行参数的解析">命令行参数的解析
+&lt;/h2>&lt;p>　　在 qemu 中，参数解析在 &lt;code>vl.c&lt;/code>​ 中的 &lt;code>qemu_init&lt;/code>​ 函数中，参数的解析分为两部分：&lt;/p>
+&lt;ul>
+&lt;li>第一部分检查选项是否是 QEMU 中预定义的 &lt;code>QEMUOption&lt;/code>​，并初始化 &lt;code>machine_opts_dict&lt;/code>​ 数组，根据是否传入了 &lt;code>-no-user-config&lt;/code>​ 参数来加载用户配置。&lt;/li>
+&lt;li>真正解析具体参数并执行相应设置&lt;/li>
+&lt;/ul>
+&lt;h3 id="第一阶段">第一阶段
+&lt;/h3>&lt;p>　　首先按照下标顺序依次读取终端传入的参数数组，跳过子选项，只解析主选项。通过 &lt;code>lookup_opt&lt;/code>​ 函数查询主选项是否是预定义的 &lt;code>QEMUOption&lt;/code>​，如果没找到，退出程序，如果找到，则返回找到的 &lt;code>QEMUOption&lt;/code>​ 指针。虽然 &lt;code>lookup_opt&lt;/code>​ 函数也会保存主选项对应的子选项参数数组的指针到 &lt;code>optarg&lt;/code>​，但是第一阶段并不会使用。&lt;/p>
+&lt;p>　　如果在解析主选项过程中，检查到有主选项&lt;code>-no-user-config&lt;/code>​，后续就跳过加载用户配置，否则还会加载用户配置。然后会初始化 &lt;code>machine_opts_dict&lt;/code>​ 数组，这里的 &lt;code>machine_opts_dict&lt;/code>​ 是一个字典结构，主要用于存储终端传入的参数数组中的虚拟机选项和参数，包括 CPU 数量、内存大小、设备配置等。&lt;code>machine_opts_dict&lt;/code>​ 的存在使得参数解析机制能够以一种结构化的方式管理和访问虚拟机参数，而不是使用分散的单独变量或者凌乱的数据结构。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/* first pass of option parsing */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">optind&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">optind&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">argc&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">optind&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="sc">&amp;#39;-&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/* disk image */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">optind&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QEMUOption&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">popt&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">lookup_opt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">argc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">optarg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">optind&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">switch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="nl">QEMU_OPTION_nouserconfig&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">userconfig&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">machine_opts_dict&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">qdict_new&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">userconfig&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">qemu_read_default_config_file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">error_fatal&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>lookup_opt&lt;/code>​ 函数定义如下，由于&lt;code>qemu_options&lt;/code>​定义时，最后一个元素为&lt;code>{ }&lt;/code>​，在遍历时发现 &lt;code>popt-&amp;gt;name&lt;/code>​ 为空还没有匹配到主选项，就可以认为该主选项非法。&lt;code>lookup_opt&lt;/code>​ 函数若匹配到当前的主选项，且主选项有子选项，则将子选项数组的指针保存到 &lt;code>poptarg&lt;/code>​ 并返回给上层函数。&lt;code>lookup_opt&lt;/code>​ 同时还会将已经遍历的 &lt;code>optind&lt;/code>​ 的值也返回给上层函数，表示已经遍历过参数数组的这些参数。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">QEMUOption&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nf">lookup_opt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">argc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">**&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">**&lt;/span>&lt;span class="n">poptarg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">poptind&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QEMUOption&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">optind&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">poptind&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">optind&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">optarg&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">loc_set_cmdline&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">optind&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">optind&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/* Treat --foo the same as -foo. */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="sc">&amp;#39;-&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">r&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">popt&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">qemu_options&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">(;;)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">error_report&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;invalid option&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="nf">strcmp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">r&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">popt&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">flags&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">HAS_ARG&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">optind&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="n">argc&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">error_report&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;requires an argument&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">optarg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">optind&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">loc_set_cmdline&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">optind&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">optarg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">*&lt;/span>&lt;span class="n">poptarg&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">optarg&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">*&lt;/span>&lt;span class="n">poptind&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">optind&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">popt&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="第二阶段">第二阶段
+&lt;/h3>&lt;p>　　真正开始解析参数。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl"> &lt;span class="cm">/* second pass of option parsing */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">optind&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">(;;)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">optind&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="n">argc&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">optind&lt;/span>&lt;span class="p">][&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="sc">&amp;#39;-&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">loc_set_cmdline&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">optind&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">drive_add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">IF_DEFAULT&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">optind&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">HD_OPTS&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QEMUOption&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">popt&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">lookup_opt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">argc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">optarg&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">optind&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">arch_mask&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">arch_type&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">error_report&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Option not supported for this target&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">switch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">popt&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="nl">QEMU_OPTION_cpu&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">default&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　重新按照下标顺序依次遍历终端传入的参数数组，调用 &lt;code>lookup_opt&lt;/code>​ 函数找到对应的 &lt;code>QEMUOption&lt;/code>​，然后检查对应选项在当前架构下是否支持，最后使用 &lt;code>switch&lt;/code>​ 语句根据 &lt;code>QEMUOption&lt;/code>​ 的成员变量 &lt;code>index&lt;/code>​ 的不同来执行不同的分支完成具体的设置。需要注意，主选项和子选项是成对出现的，在 &lt;code>lookup_opt&lt;/code>​ 函数中也是成对解析，如果发现子选项进入了主循环，则默认为 &lt;code>driver&lt;/code>​。&lt;/p>
+&lt;p>　　‍&lt;/p>
+&lt;h2 id="参考资料">参考资料
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://blog.jjl9807.com/archives/7/" target="_blank" rel="noopener"
+>QEMU 参数解析机制简析&lt;/a>&lt;/li>
+&lt;li>《QEMU/KVM 源码解析与应用》李强，机械工业出版社&lt;/li>
+&lt;/ul>
+&lt;p>　　‍&lt;/p></description></item><item><title>QEMU中的队列queue</title><link>https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/</link><pubDate>Tue, 29 Oct 2024 09:29:20 +0800</pubDate><guid>https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/</guid><description>&lt;p>　　​&lt;code>include/qemu/queue.h&lt;/code>​中的注释如下。该文件通过宏定义的方式，定义了4种数据结构，以及相关的操作。&lt;br>
+四种数据结构分别是：&lt;code>singly-linked list&lt;/code>​单向链表、&lt;code>list&lt;/code>​双向链表、&lt;code>simple queue&lt;/code>​简单队列、&lt;code>tail queue&lt;/code>​尾队列。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * This file defines four types of data structures: singly-linked lists,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * lists, simple queues, and tail queues.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * A singly-linked list is headed by a single forward pointer. The
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * elements are singly linked for minimum space and pointer manipulation
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * overhead at the expense of O(n) removal for arbitrary elements. New
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * elements can be added to the list after an existing element or at the
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * head of the list. Elements being removed from the head of the list
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * should use the explicit macro for this purpose for optimum
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * efficiency. A singly-linked list may only be traversed in the forward
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * direction. Singly-linked lists are ideal for applications with large
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * datasets and few or no removals or for implementing a LIFO queue.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * A list is headed by a single forward pointer (or an array of forward
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * pointers for a hash table header). The elements are doubly linked
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * so that an arbitrary element can be removed without a need to
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * traverse the list. New elements can be added to the list before
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * or after an existing element or at the head of the list. A list
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * may only be traversed in the forward direction.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * A simple queue is headed by a pair of pointers, one the head of the
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * list and the other to the tail of the list. The elements are singly
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * linked to save space, so elements can only be removed from the
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * head of the list. New elements can be added to the list after
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * an existing element, at the head of the list, or at the end of the
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * list. A simple queue may only be traversed in the forward direction.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * A tail queue is headed by a pair of pointers, one to the head of the
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * list and the other to the tail of the list. The elements are doubly
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * linked so that an arbitrary element can be removed without a need to
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * traverse the list. New elements can be added to the list before or
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * after an existing element, at the head of the list, or at the end of
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * the list. A tail queue may be traversed in either direction.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * For details on the use of these macros, see the queue(3) manual page.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　本文主要描述&lt;code>tail queue&lt;/code>​，并简单介绍其他三种数据结构。&lt;/p>
+&lt;h2 id="singly-linked-list单向链表">​&lt;code>singly-linked list&lt;/code>​单向链表
+&lt;/h2>&lt;p>　　&lt;strong>特点&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>由元素组成，每个元素通过单个向前的指针连接。&lt;/li>
+&lt;li>在列表头部或某个元素之后添加元素效率较高。&lt;/li>
+&lt;li>移除元素通常需要O(n)时间，因为可能涉及遍历列表以找到元素。&lt;/li>
+&lt;li>在删除操作较少或数据以后进先出（LIFO）方式增长的场景中最为理想。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>适用场景&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>在数据集大且删除操作少的应用中非常有用。&lt;/li>
+&lt;li>适合堆栈实现，其中元素不断地被推入并从头部弹出。&lt;/li>
+&lt;/ul>
+&lt;h2 id="list双向链表">​&lt;code>list&lt;/code>​双向链表
+&lt;/h2>&lt;p>　　&lt;strong>特点&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>元素是双向链接的，允许轻松移除任何元素而无需完全遍历。&lt;/li>
+&lt;li>只能向前遍历。&lt;/li>
+&lt;li>新元素可以在列表的头部或现有元素之前或之后添加。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>适用场景&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>适合频繁插入和从列表任何部分删除的应用。&lt;/li>
+&lt;li>在需要快速访问和修改数据且不希望遍历列表带来性能损失的场景中常用。&lt;/li>
+&lt;/ul>
+&lt;h2 id="simple-queue简单队列">​&lt;code>simple queue&lt;/code>​简单队列
+&lt;/h2>&lt;p>　　&lt;strong>特点&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>由两个指针头部，一个指向列表的头部，另一个指向尾部。&lt;/li>
+&lt;li>元素单向链接，这意味着节省空间，但只允许从头部移除。&lt;/li>
+&lt;li>支持在列表的末尾或现有元素之后添加元素。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>适用场景&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>适合队列实现，其中元素在尾部入队，在头部出队（先进先出，FIFO）。&lt;/li>
+&lt;li>在主要是追加操作或元素按到达顺序处理的情况下非常有用。&lt;/li>
+&lt;/ul>
+&lt;h2 id="tail-queue尾队列">​&lt;code>tail queue&lt;/code>​尾队列
+&lt;/h2>&lt;p>　　&lt;strong>特点&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>类似于简单队列，但元素是双向链接的。&lt;/li>
+&lt;li>允许移除任何元素而无需遍历整个列表。&lt;/li>
+&lt;li>元素可以在列表的头部或尾部添加或移除，列表可以向任一方向遍历。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>适用场景&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>在需要频繁在列表两端插入和删除的情况下非常灵活。&lt;/li>
+&lt;li>理想用于实现双端队列（deque），在两端高效添加或删除数据。&lt;/li>
+&lt;/ul>
+&lt;p>　　在QEMU中&lt;code>tail queue&lt;/code>​被大量使用。&lt;/p>
+&lt;h3 id="tail-queue数据结构形式">&lt;code>tail queue&lt;/code>​数据结构形式
+&lt;/h3>&lt;h4 id="qtailqlink">QTailQLink
+&lt;/h4>&lt;p>　　文件&lt;code>include/qemu/queue.h&lt;/code>​中定义了&lt;code>tail queue&lt;/code>​最重要的数据结构&lt;code>QTailQLink&lt;/code>​，这是一个内部结构，被&lt;code>QTAILQ_HEAD&lt;/code>​和&lt;code>QTAILQ_ENTRY&lt;/code>​使用。主要目的在于尽可能不影响自定义数据结构的同时，将数据结构联系起来。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">QTailQLink&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tql_next&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">QTailQLink&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tql_prev&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="n">QTailQLink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>QTailQLink&lt;/code>​定义的&lt;code>tql_next&lt;/code>​类型为&lt;code>void *&lt;/code>​，其作用是指向当前节点后续的自定义数据结构节点，由于自定义数据结构类型不能确定，因此只能用&lt;code>void *&lt;/code>​定义。&lt;code>tql_prev&lt;/code>​则是指向当前节点的前一个&lt;code>QTailQLink&lt;/code>​节点。这两个变量的在后续&lt;code>QTAILQ_HEAD&lt;/code>​和&lt;code>QTAILQ_ENTRY&lt;/code>​中将体现出独特的作用。&lt;/p>
+&lt;h4 id="qtailq_head">QTAILQ_HEAD
+&lt;/h4>&lt;p>　　​&lt;code>QTAILQ_HEAD&lt;/code>​定义如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * Tail queue definitions. The union acts as a poor man template, as if
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * it were QTailQLink&amp;lt;type&amp;gt;.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_HEAD(name, type) \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">union name { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> struct type *tqh_first; &lt;/span>&lt;span class="cm">/* first element */&lt;/span>&lt;span class="cp"> \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> QTailQLink tqh_circ; &lt;/span>&lt;span class="cm">/* link for circular backwards list */&lt;/span>&lt;span class="cp"> \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">}
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * union使两个变量共享同一个空间：tqh_first为一个指针，QTailQLink包含两个指针。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 因此，tqh_first和tqh_circ.tql_next储存在同一个位置。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 即tqh_circ.tql_next就是tqh_first。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　需要注意，&lt;code>QTAILQ_HEAD&lt;/code>​被定义为&lt;code>union&lt;/code>​结构体，也就是&lt;code>union&lt;/code>​结构体中所有的变量共享同一块内存空间。当我们&lt;code>QTailQLink&lt;/code>​展开后，&lt;code>tqh_first&lt;/code>​和&lt;code>QTailQLink.tql_next&lt;/code>​共享同一块内存，也就是两者实际上的值是相同的，只不过名字不同。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/assets/QTAILQ_HEAD-20241029231909-i9pqqvc.svg"
+loading="lazy"
+alt="QTAILQ_HEAD"
+>​&lt;/p>
+&lt;h4 id="qtailq_entry">QTAILQ_ENTRY
+&lt;/h4>&lt;p>　　同理，&lt;code>QTAILQ_ENTRY&lt;/code>​也是如此：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_ENTRY(type) \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">union { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> struct type *tqe_next; &lt;/span>&lt;span class="cm">/* next element */&lt;/span>&lt;span class="cp"> \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> QTailQLink tqe_circ; &lt;/span>&lt;span class="cm">/* link for circular backwards list */&lt;/span>&lt;span class="cp"> \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">}
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/assets/QTAILQ_ENTRY-20241030081938-km080t3.svg"
+loading="lazy"
+alt="QTAILQ_ENTRY"
+>​&lt;/p>
+&lt;p>　　​&lt;code>QTAILQ_HEAD&lt;/code>​和&lt;code>QTAILQ_ENTRY&lt;/code>​区别在与，&lt;code>QTAILQ_HEAD.tqh_first&lt;/code>​指向第一个自定义数据结构体，&lt;code>QTAILQ_HEAD&lt;/code>​本身是一个单独节点，不会存在于自定义数据结构中。而&lt;code>QTAILQ_ENTRY&lt;/code>​是定义在自定义数据结构体中的，作为自定义数据结构体的一部分。&lt;/p>
+&lt;h4 id="moduleentry举例">​&lt;code>ModuleEntry&lt;/code>​举例
+&lt;/h4>&lt;p>　　为了直观的理解，以&lt;code>util/module.c&lt;/code>​中定义的&lt;code>ModuleEntry&lt;/code>​为例：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// A general element for tail queue, must contain QTAILQ_ENTRY, and the name for
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// QTAILQ_ENTRY is arbitrary
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Example
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">ModuleEntry&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="p">)(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// data only for this struct
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">QTAILQ_ENTRY&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ModuleEntry&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="c1">// use for queue
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">module_init_type&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// data only for this struct
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="n">ModuleEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="nf">QTAILQ_HEAD&lt;/span>&lt;span class="p">(,&lt;/span> &lt;span class="n">ModuleEntry&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">ModuleTypeList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>ModuleEntry&lt;/code>​就是自定义数据结构体，其中包含&lt;code>QTAILQ_ENTRY&lt;/code>​定义的同时，还包含有其他变量，将其展开后代码如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">ModuleEntry&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="p">)(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">union&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">ModuleEntry&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tqe_next&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">QTailQLink&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tql_next&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">QTailQLink&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tql_prev&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="n">tqe_circ&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">module_init_type&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="n">ModuleEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　根据在&lt;code>QTAILQ_ENTRY&lt;/code>​中的对&lt;code>union&lt;/code>​结构体的分析，我们可以得到&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">ModuleEntry&lt;/span> &lt;span class="n">entry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 下面两者等价，指向ModuleEntry类型 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">ModuleEntry&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">entry&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">node&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">tqe_next&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">ModuleEntry&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">entry&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">node&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tqe_circ&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tql_next&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 指向struct QTailQLink */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="k">struct&lt;/span> &lt;span class="n">QTailQLink&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">entry&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">node&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tqe_circ&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tql_prev&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　而&lt;code>QTAILQ_HEAD&lt;/code>​则是单独定义的：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="nf">QTAILQ_HEAD&lt;/span>&lt;span class="p">(,&lt;/span> &lt;span class="n">ModuleEntry&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">ModuleTypeList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="n">ModuleTypeList&lt;/span> &lt;span class="n">dso_init_list&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　同样将其展开，可以看到和&lt;code>ModuleEntry&lt;/code>​不同点在在于，其中不包含其他类型的数据。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">union&lt;/span> &lt;span class="n">ModuleTypeList&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">ModuleEntry&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tqh_first&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">QTailQLink&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tql_next&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">QTailQLink&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">tql_prev&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="n">tqh_circ&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="n">ModuleTypeList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在实际使用时，如下图组织数据：&lt;code>ModuleTypeList&lt;/code>​定义头节点，&lt;code>ModuleEntry&lt;/code>​定义中间节点，双向队列由头节点和 node 之间的指针来维护。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/assets/ModuleTypeList-20241030110600-83vxikp.svg"
+loading="lazy"
+alt="ModuleTypeList"
+>​&lt;/p>
+&lt;p>　　需要注意的是，所有next指针（&lt;code>tql_next&lt;/code>​、&lt;code>tqe_next&lt;/code>​）指向的都是自定义数据结构，而所有的prev指针（&lt;code>tql_prev&lt;/code>​）指向的都是&lt;code>struct QTailQLink&lt;/code>​（即&lt;code>tqh_circ&lt;/code>​，&lt;code>tqe_circ&lt;/code>​）。这意味着，如果我们想要访问cur节点的前一个节点，需要从&lt;code>tql_prev-&amp;gt;tql_prev-&amp;gt;tql_next&lt;/code>​来访问。&lt;/p>
+&lt;h3 id="其他api">其他API
+&lt;/h3>&lt;h4 id="head初始化">head初始化
+&lt;/h4>&lt;p>　　有两种方式实现：&lt;code>QTAILQ_HEAD_INITIALIZER&lt;/code>​和&lt;code>QTAILQ_INIT&lt;/code>​。&lt;/p>
+&lt;p>　　​&lt;code>QTAILQ_HEAD_INITIALIZER&lt;/code>​ 实际上是宏定义的结构体赋值文本，不算是函数接口（api）。&lt;br>
+​&lt;code>QTAILQ_INIT&lt;/code>​是宏定义的函数体，算是函数接口（api）。&lt;/p>
+&lt;p>　　因此，函数调用时使用&lt;code>QTAILQ_INIT&lt;/code>​，而定义struct时需要初始化head，则使用&lt;code>QTAILQ_HEAD_INITIALIZER&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_HEAD_INITIALIZER(head) \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> { .tqh_circ = { NULL, &amp;amp;(head).tqh_circ } }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * HEAD初始化时，头尾是同一个节点（本HEAD节点）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * 和后续的 QTAILQ_INIT(head)作用相同，但用途不同。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * QTAILQ_HEAD_INITIALIZER 是宏定义，用于自定义struct初始化head时使用。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * QTAILQ_INIT 是函数，在函数中调用实现head初始化。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* QTAILQ_HEAD_INITIALIZER */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="n">QemuOptsList&lt;/span> &lt;span class="n">qemu_source_opts&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;source&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="n">implied_opt_name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;file&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="n">head&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">QTAILQ_HEAD_INITIALIZER&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">qemu_source_opts&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">head&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">.&lt;/span>&lt;span class="n">desc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * Tail queue functions.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_INIT(head) do { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_first = NULL; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_circ.tql_prev = &amp;amp;(head)-&amp;gt;tqh_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">} while (&lt;/span>&lt;span class="cm">/*CONSTCOND*/&lt;/span>&lt;span class="cp">0)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="c1">// 初始化队列时，由于只有一个HEAD节点，因此HEAD的prev指向自身，next（即first元素）指向空
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 否则HEAD的prev指向的就是尾元素
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* QTAILQ_INIT */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="n">ModuleTypeList&lt;/span> &lt;span class="n">init_type_list&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">MODULE_INIT_MAX&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="n">ModuleTypeList&lt;/span> &lt;span class="n">dso_init_list&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">init_lists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">static&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">inited&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">inited&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">MODULE_INIT_MAX&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">QTAILQ_INIT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">init_type_list&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">QTAILQ_INIT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">dso_init_list&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">inited&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="头部和尾部插入">头部和尾部插入
+&lt;/h4>&lt;p>　　由于是宏定义实现的接口，我们预先不知道自定义的数据结构的名称，以及其中的&lt;code>strutc QTailQLink&lt;/code>​名称，因此需要传入这两个参数，&lt;code>elm&lt;/code>​和&lt;code>field&lt;/code>​。例如，&lt;code>ModuleEntry&lt;/code>​对应于&lt;code>elm&lt;/code>​，&lt;code>ModuleEntry&lt;/code>​中的&lt;code>node&lt;/code>​对应于&lt;code>field&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> * Tail queue functions.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm"> */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_INSERT_HEAD(head, elm, field) do { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> if (((elm)-&amp;gt;field.tqe_next = (head)-&amp;gt;tqh_first) != NULL) \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_first-&amp;gt;field.tqe_circ.tql_prev = \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> &amp;amp;(elm)-&amp;gt;field.tqe_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> else \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_circ.tql_prev = &amp;amp;(elm)-&amp;gt;field.tqe_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_first = (elm); \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_prev = &amp;amp;(head)-&amp;gt;tqh_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">} while (&lt;/span>&lt;span class="cm">/*CONSTCOND*/&lt;/span>&lt;span class="cp">0)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="c1">// 向头节点插入时，先判断HEAD后有没有其他元素，并将当前元素elm的next指针指向HEAD后的元素
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 如果有其他元素，则将HEAD的后续元素的prev指针指向当前元素elm
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 如果没有其他元素，则将HEAD的prev指针指向当前元素elm。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 然后将HEAD的first指向elm，因为first其实就是HEAD的next
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 最后将elm的prev指向head。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 需要注意：HEAD中的tqe_circ、elm中的field（即QTAILQ_ENTRY）的tqe_circ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 才是整个链条中的“节点”，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// elm中，field就是QTAILQ_ENTRY，用来标识节点，因此elm不仅有“节点”，还有其他的数据
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 而在HEAD中，HEAD就是QTAILQ_HEAD，和QTAILQ_ENTRY同属基本的queue数据结构，
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 因此，在整个链条中，QTAILQ_HEAD和QTAILQ_ENTRY作为队列中的节点，其中的指针
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// prev和next链接每个节点。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 在实现中很有意思的一点，next指针的类型是type *，而pre的指针类型是QTailQLink *
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 因此，在访问next中的“节点”时，需要访问next.field.tqe_circ，而pre直接就访问
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// pre.tqe_circ
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_INSERT_TAIL(head, elm, field) do { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_next = NULL; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_prev = (head)-&amp;gt;tqh_circ.tql_prev; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_circ.tql_prev-&amp;gt;tql_next = (elm); \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_circ.tql_prev = &amp;amp;(elm)-&amp;gt;field.tqe_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">} while (&lt;/span>&lt;span class="cm">/*CONSTCOND*/&lt;/span>&lt;span class="cp">0)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_INSERT_AFTER(head, listelm, elm, field) do { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> if (((elm)-&amp;gt;field.tqe_next = (listelm)-&amp;gt;field.tqe_next) != NULL)\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_next-&amp;gt;field.tqe_circ.tql_prev = \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> &amp;amp;(elm)-&amp;gt;field.tqe_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> else \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_circ.tql_prev = &amp;amp;(elm)-&amp;gt;field.tqe_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (listelm)-&amp;gt;field.tqe_next = (elm); \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_prev = &amp;amp;(listelm)-&amp;gt;field.tqe_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">} while (&lt;/span>&lt;span class="cm">/*CONSTCOND*/&lt;/span>&lt;span class="cp">0)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_INSERT_BEFORE(listelm, elm, field) do { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_prev = (listelm)-&amp;gt;field.tqe_circ.tql_prev; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_next = (listelm); \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (listelm)-&amp;gt;field.tqe_circ.tql_prev-&amp;gt;tql_next = (elm); \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (listelm)-&amp;gt;field.tqe_circ.tql_prev = &amp;amp;(elm)-&amp;gt;field.tqe_circ; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">} while (&lt;/span>&lt;span class="cm">/*CONSTCOND*/&lt;/span>&lt;span class="cp">0)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define QTAILQ_REMOVE(head, elm, field) do { \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> if (((elm)-&amp;gt;field.tqe_next) != NULL) \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_next-&amp;gt;field.tqe_circ.tql_prev = \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_prev; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> else \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (head)-&amp;gt;tqh_circ.tql_prev = (elm)-&amp;gt;field.tqe_circ.tql_prev; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_prev-&amp;gt;tql_next = (elm)-&amp;gt;field.tqe_next; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_prev = NULL; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_circ.tql_next = NULL; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"> (elm)-&amp;gt;field.tqe_next = NULL; \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">} while (&lt;/span>&lt;span class="cm">/*CONSTCOND*/&lt;/span>&lt;span class="cp">0)
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　除了上述&lt;code>Tail queue functions&lt;/code>​，文件中还定义了一些访问方法，不在此处展示，当明白数据组织后，再去看源码将很容易。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>Linux Perf工具</title><link>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</link><pubDate>Sat, 19 Oct 2024 10:27:24 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>，&lt;a class="link" href="https://perfwiki.github.io/main/" target="_blank" rel="noopener"
+>perfwiki&lt;/a>，&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　&lt;a class="link" href="https://perf.wiki.kernel.org/index.php/Main_Page" target="_blank" rel="noopener"
+>perf&lt;/a> 是由 Linux 官方提供的系统性能分析工具 。我们通常说的 perf 实际上包含两部分：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>perf&lt;/strong> 命令，用户空间的应用程序，是内核子系统 &lt;strong>perf_events&lt;/strong> 的前端工具。&lt;/li>
+&lt;li>&lt;strong>perf_events&lt;/strong> ，Linux 内核中的一个子系统。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>perf_events&lt;/strong>是Linux 2.6.31版本引入的内核子系统，可以提供多种来源的事件的性能计数器，供用户空间软件 &lt;strong>perf&lt;/strong> 使用，完成性能分析（Performance profiling）。perf 和 perf_events 最初支持硬件计数器（performance monitoring counters，&lt;strong>PMC&lt;/strong>），后来扩展到下列的多种事件源的支持。&lt;/p>
+&lt;p>　　&lt;strong>perf_events&lt;/strong> 4类事件源：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Hardware Events&lt;/strong>:：由CPU 性能计数器（performance counters）以及其内部的 Performance Monitoring Unit (PMU)获取，用来统计 Hardware event，例如 cpu-cycles、instructions executed 、cache-misses、branch mispredicted、周期数（the number of cycles）、退役指令（instructions retired）， 缓存未命中（L1 cache misses L1 ）等。这些 event 因每种处理器类型和型号而异。&lt;/p>
+&lt;p>注：Last Branch Record（LBR）是Intel CPU中最先引入的一个功能，记录最近执行过的分支指令，可以用来分析分支指令的执行情况，在perf list中，branch相关的功能也被划分到PMU分类，认为LBR的相关数据是通过PMU来获取的。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Software Events&lt;/strong>: 基于内核计数器的低优先级events， 例如, context-switches，CPU migrations(处理器迁移次数)， minor faults(soft page faults)，major faults(hard page faults)。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Tracepoints&lt;/strong>:：由内核的 ftrace 实现的跟踪点事件，是散落在内核源代码中的一些 hook，用来调用probe函数。开启后，它们便可以在特定的代码被运行到时被触发，这一特性可以被各种 trace/debug 工具所使用。Perf 就是该特性的用户之一。假如您想知道在应用程序运行期间，内核内存管理模块的行为，便可以利用潜伏在 slab 分配器中的 tracepoint。当内核运行到这些 tracepoint 时，便会通知 perf。仅仅适用于2.6.3以及之后的 linux 内核。除了内核中的tracepoint，还有用户态中的，USDT（User-level statically-defined tracing）。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Dynamic Tracing&lt;/strong>： probe函数（探针or探测函数），kprobe（kernel probe）内核态探针，用来创建和管理内核代码中的探测点。Uprobes，user-probe，用户态探针，用来对用户态应用程序进行探测点的创建和管理，关于&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/kprobetrace.html" target="_blank" rel="noopener"
+>kprobe&lt;/a>和&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/uprobetracer.html" target="_blank" rel="noopener"
+>uprobe&lt;/a>可参考对应的内核文档。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　下图显示了 perf 命令和 perf_events 的关系，以及 perf_events 支持的事件源。下面的分类和linux perf wiki上的perf_envent分类有些许不同，主要在与tracepoint的定义，下图包含了Static Tracing以及Dynamic Tracing。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019173251-5nhjlei.png"
+width="2616"
+height="1362"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="460px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>&lt;/p>
+&lt;p>　　我们可以通过命令&lt;code>perf list&lt;/code>​来查看perf支持的事件类型，但&lt;code>perf list&lt;/code>​不能完全显示所有支持的事件类型，需要&lt;code>sudo perf list&lt;/code>​。&lt;/p>
+&lt;p>　　同时还可以显示特定模块支持的perf事件：hw/cache/pmu都是硬件相关的；tracepoint基于内核的ftrace；sw（software）实际上是内核计数器。&lt;/p>
+&lt;p>　　下边列出一些&lt;code>sudo perf list&lt;/code>​的输出例子：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">branches&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">context&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">switches&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cs&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cpu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">clock&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">misses&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">loads&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cpu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span>&lt;span class="o">/&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Kernel&lt;/span> &lt;span class="n">PMU&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">block&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">block_bio_backmerge&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Tracepoint&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　下图是很有名的brendan gregg的博客中的分类，他写了很多关于性能分析的书籍和博客。&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019114014-vosgddz.png"
+width="1500"
+height="1050"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="342px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix.html" target="_blank" rel="noopener"
+>www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix&amp;hellip;.&lt;/a>、&lt;a class="link" href="https://www.brendangregg.com/perf.html" target="_blank" rel="noopener"
+>www.brendangregg.com/perf.html&lt;/a>&lt;/p>
+&lt;h2 id="原理">原理
+&lt;/h2>&lt;p>　　CPU 和其他硬件设备通常提供用于观测性能数据的 PMC。简单来说，&lt;strong>PMC&lt;/strong> 就是 CPU 上的&lt;strong>可编程寄存器&lt;/strong>，可通过编程对特定硬件事件进行计数。通过 PMC 可以监控和计算 CPU 内部各种事件，比如 CPU 指令的执行效率、CPU caches 的命中率、分支预测的成功率等微结构级别的性能信息。利用这些数据分析性能，可以实现各种性能优化。&lt;/p>
+&lt;p>　　perf 命令通过 &lt;a class="link" href="https://www.man7.org/linux/man-pages/man2/perf_event_open.2.html" target="_blank" rel="noopener"
+>perf_event_open(2)&lt;/a> 系统调用访问 PMC，配置想要捕获的硬件事件。PMC 可以在两种模式下使用：&lt;/p>
+&lt;ul>
+&lt;li>Counting（计数模式），只报告Hardware Event、Software Events、PMU计数等。相关命令perf stat。开销几乎为零。&lt;/li>
+&lt;li>Sampling（采样模式），当发生一定数量的事件后，会触发一个中断，以便捕获系统的状态信息。perf将事件数据缓存到一块buffer中，然后异步写入到perf.data文件中。使用perf report等工具进行离线分析。可用于采集代码路径。&lt;/li>
+&lt;li>bpf：Kernel 4.4+新增功能，可以提供更多有效filter和输出总结。&lt;/li>
+&lt;/ul>
+&lt;p>　　下面详细介绍一下 Sampling 模式：&lt;/p>
+&lt;p>　　Perf 通过系统调用 sys_perf_event_open 陷入到内核中，内核根据 perf 提供的信息在&lt;a class="link" href="https://so.csdn.net/so/search?q=PMU&amp;amp;spm=1001.2101.3001.7020" target="_blank" rel="noopener"
+>PMU&lt;/a>（Performance Monitoring Unit）上初始化一个硬件性能计数器（PMC: Performance Monitoring Counter）。PMC随着指定硬件事件的发生而自动累加。如果不触发溢出中断，则就是counting模式，例如 perf stat模式。&lt;/p>
+&lt;p>　　在PMC 溢出时，PMU触发一个PMI（Performance Monitoring Interrupt）中断。内核在PMI 中断的处理函数中保存PMC的计数值，触发中断时的指令地址，当前时间戳以及当前进程的PID、TID、comm 等信息。我们把这些信息统称为一个采样（sample）。内核会将收集到的sample放入用于跟用户空间通信的Ring Buffer。用户空间里的perf分析程序采用mmap机制从ring buffer中读入采样，并对其解析。&lt;/p>
+&lt;p>　　下图从系统调用和数据结构的层面展示了用户空间如何获取PMU信息的流程。还有一张类似的图，是来自阿里的pdf中的，被其他博客转载，或者重绘后使用，其大体内容和下图是一致的。pdf地址：&lt;a class="link" href="https://greenteajug.cn/images/%E5%BC%82%E6%9E%84%E4%BD%93%E7%B3%BB%E4%B8%8B%E7%9A%84Java%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90.pdf" target="_blank" rel="noopener"
+>类似图&lt;/a>&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019164150-xfko25z.png"
+width="2030"
+height="930"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="523px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%88%A9%E7%94%A8%E7%8E%87/" target="_blank" rel="noopener"
+>plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%8&amp;hellip;&lt;/a>&lt;/p>
+&lt;h2 id="使用">使用
+&lt;/h2>&lt;p>　　关于 perf 的详细使用，参考：&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>Gitignore</title><link>https://codetang-2417.github.io/p/gitignore/</link><pubDate>Thu, 22 Feb 2024 10:43:52 +0800</pubDate><guid>https://codetang-2417.github.io/p/gitignore/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://blog.csdn.net/songyu0120/article/details/77848910" target="_blank" rel="noopener"
+>git中的.gitignore 的忽略规则&lt;/a>、&lt;a class="link" href="https://blog.csdn.net/w8y56f/article/details/103263924" target="_blank" rel="noopener"
+>.gitignore文件语法和常见写法&lt;/a>、&lt;a class="link" href="https://git-scm.com/docs/gitignore" target="_blank" rel="noopener"
+>git-scm.com/docs/gitignore&lt;/a>&lt;/p>
+&lt;h2 id="忽略规则的优先级">忽略规则的优先级
+&lt;/h2>&lt;p>　　​&lt;code>gitignore&lt;/code>​文件中的每一行都指定一个模式。当决定是否忽略该路径的文件时，Git 通常会检查来自多个源的&lt;code>gitignore&lt;/code>​模式，按照以下优先级顺序，从最高到最低（在一个优先级内，最后匹配的模式决定结果）：&lt;/p>
+&lt;ol>
+&lt;li>从命令行中读取可用的忽略规则，从上往下依次读取&lt;/li>
+&lt;li>当前目录定义的规则（即：如果在父目录中定义了一些模式，但在子目录的 &lt;code>.gitignore&lt;/code>​ 中有冲突的模式，则&lt;strong>子目录的规则会优先&lt;/strong>。）&lt;/li>
+&lt;li>父级目录定义的规则，依次递推。&lt;/li>
+&lt;li>$GIT_DIR/info/exclude 文件中定义的规则&lt;/li>
+&lt;li>core.excludesfile中定义的全局规则&lt;/li>
+&lt;/ol>
+&lt;p>　　注：这些模式是&lt;strong>相对&lt;/strong>于 &lt;code>.gitignore&lt;/code>​ 文件所在位置进行匹配的。这意味着如果 &lt;code>.gitignore&lt;/code>​ 文件在某个子目录中，那么它定义的规则只适用于该子目录及其子目录中的文件。称&lt;code>.gitignore&lt;/code>​文件所处的目录为根目录。&lt;/p>
+&lt;h2 id="pattern的格式">PATTERN的格式
+&lt;/h2>&lt;p>　　Pattern可以理解为我们在&lt;code>gitignore&lt;/code>​文件中写下的每一行字符，可以理解为匹配的规则。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>所有空行或者以 #（hash） 开头的行都会被 Git 忽略。其中以 # 开头的行用作注释。&lt;/p>
+&lt;p># 的英文为 hash，对于以哈希开头的Pattern，需要在第一个哈希前面放置一个反斜杠（backslash）（“ &lt;code>\&lt;/code>​ ”）。&lt;code>\&lt;/code>​表示转义。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>末尾的空格也需要加&lt;code>\&lt;/code>​转义，否则空格被忽略。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>前缀“ &lt;code>!&lt;/code>​ ”，用于取消之前的排除规则。已经被前面的Pattern所排除的任何匹配文件（且符合当前Pattern的），将再次被包含在内。&lt;/p>
+&lt;p>如果文件的开头就是&lt;code>!&lt;/code>​那么需要在最开头添加&lt;code>\&lt;/code>​，例如：&lt;code>\~important!.txt&lt;/code>​&lt;/p>
+&lt;p>&lt;strong>注意：&lt;/strong> 如果某个文件的&lt;strong>上级目录已经被排除&lt;/strong>（例如上级目录在 &lt;code>.gitignore&lt;/code>​ 中被忽略了），则无法通过 &amp;ldquo;!&amp;rdquo; 将该文件重新包括进来。因为 Git 出于性能原因，不会保留已被排除的目录内容，因此即便你试图通过规则重新包括某个文件，这个操作也不会生效。&lt;/p>
+&lt;p>举例：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qrkernel/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">!qrkernel/filelist.mk
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;code>!qrkernel/filelist.mk&lt;/code>​操作是无效的，因为&lt;code>qrkernel/&lt;/code>​表示排除当前根目录以及子目录中所有的&lt;code>qrkernel&lt;/code>​目录。因此，文件&lt;code>filelist.mk&lt;/code>​的上级目录已经被排除，所以再次包含&lt;code>filelist.mk&lt;/code>​无效。&lt;/p>
+&lt;p>正确的写法：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qrkernel/**
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">!qrkernel/filelist.mk
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;code>qrkernel/**&lt;/code>​只排除&lt;code>qrkernel&lt;/code>​目录下的文件和子目录及其内容，不会排除&lt;code>qrkernel&lt;/code>​目录本身。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>“&lt;code>/&lt;/code>​“（slash）符号用作文件夹&lt;strong>分隔符&lt;/strong>，可以出现在pattern的开头，中间，结尾。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>“&lt;code>/&lt;/code>​“出现在pattern的开头或者中间，或者两者同时出现，则表示pattern是&lt;code>.gitignore&lt;/code>​所在的目录层级，否则，pattern表示的范围是&lt;code>.gitignore&lt;/code>​当前目录及其子目录层级。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>如果模式末尾有“&lt;code>/&lt;/code>​“，则该模式将仅匹配目录，否则该模式可以匹配文件和目录。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>例如，模式&lt;code>doc/frotz/&lt;/code>​匹配&lt;code>doc/frotz&lt;/code>​目录，但不匹配&lt;code>a/doc/frotz&lt;/code>​目录；然而&lt;code>frotz/&lt;/code>​匹配&lt;code>frotz&lt;/code>​和&lt;code>a/frotz&lt;/code>​目录（所有路径都以&lt;code>.gitignore&lt;/code>​文件所处的文件夹为根目录，相对于该根目录进行匹配）。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>星号（asterisk）“ &lt;code>*&lt;/code>​ ”匹配除“&lt;code>/&lt;/code>​”之外的任何内容。字符“ &lt;code>?&lt;/code>​ ”匹配除“ &lt;code>/&lt;/code>​ ”之外的&lt;strong>任意1个字符&lt;/strong>。范围表示法，例如&lt;code>[a-zA-Z]&lt;/code>​ ，可用于匹配范围中的字符之一。有关更详细的说明，请参阅 fnmatch(3) 和 FNM_PATHNAME 标志。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>两个连续的“&lt;code>*&lt;/code>​”，在全路径匹配pattern中有特殊的含义&lt;/p>
+&lt;ul>
+&lt;li>以&lt;code>**/&lt;/code>​开头的pattern，表示在所有的文件夹中进行匹配。例如：&amp;quot;&lt;code>**/foo&lt;/code>​&amp;quot;匹配&lt;strong>当前根目录及所有子目录下&lt;/strong>的所有的以foo命名的文件以及文件夹，和pattern&lt;code>foo&lt;/code>​等价。&amp;quot;&lt;code>**/foo/bar&lt;/code>​&amp;quot;则匹配&lt;strong>根目录及子目录下的foo目录&lt;/strong>下的所有&lt;code>bar&lt;/code>​命名的文件及目录。&lt;/li>
+&lt;li>以“ &lt;code>/**&lt;/code>​ ”结尾的pattern，表示匹配目录中的所有内容。例如，“ &lt;code>abc/**&lt;/code>​ ”匹配目录根目录下“ &lt;code>abc&lt;/code>​ ”目录内的所有文件。&lt;/li>
+&lt;li>​&lt;code>/**/&lt;/code>​匹配任意目录，例如，“ &lt;code>a/**/b&lt;/code>​ ”匹配“ &lt;code>a/b&lt;/code>​ ”、“ &lt;code>a/x/b&lt;/code>​ ”、“ &lt;code>a/x/y/b&lt;/code>​ ”等。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　​&lt;code>.gitignore&lt;/code>​只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改&lt;code>.gitignore&lt;/code>​是无效的。例如已经进行了提交，或者add的文件和目录，则需要&lt;code>git rm -r --cached .&lt;/code>​ 命令，将&lt;strong>当前目录下&lt;/strong>所有文件从 Git 的暂存区（Index）中移除，但是保留这些文件在工作目录中的状态。这意味着这些文件不再被 Git 跟踪，但仍然会保留在本地文件系统中，不会被删除。&lt;/p>
+&lt;p>　　然后再修改&lt;code>.gitignore&lt;/code>​文件，此时git就会按照新修正的&lt;code>.gitignore&lt;/code>​进行索引。&lt;/p>
+&lt;p>　　注意：建议只在需要移除的目录下使用该命令，如果在根目录下使用，会直接移除所有的文件索引。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">git rm -r --cached .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git add .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git commit -m &amp;#39;update .gitignore&amp;#39;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="匹配规则举例">匹配规则举例
+&lt;/h2>&lt;p>　　文件 &lt;code>.gitignore&lt;/code>​ 的格式规范如下：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>可以使用标准的 glob 模式匹配，它会递归地应用在整个工作区中。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>匹配是区分大小写的，如：/abc 和 /Abc 含义不同&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>*~ 忽略所有以~结尾的文件（这种文件通常被许多编辑器标记为临时文件）&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>空目录（包括隐藏目录）会被忽略，无法提交追踪&lt;br>
+如果不希望空目录被忽略，需要在里头建.gitkeep文件&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>所谓的 glob 模式是指 shell 所使用的简化了的正则表达式。&lt;/p>
+&lt;p>星号（*）匹配零个或多个任意字符；[abc] 匹配任何一个列在方括号中的字符 （这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）。&lt;/p>
+&lt;p>问号（?）只匹配一个任意字符；如果在方括号中使用短划线分隔两个字符， 表示所有在这两个字符范围内的都可以匹配（比如 [0-9] 表示匹配所有 0 到 9 的数字）。&lt;/p>
+&lt;p>使用两个星号（ ** ）表示匹配任意中间目录，比如 a/**/z 可以匹配 a/z 、 a/b/z 或 a/b/c/z 等。&lt;/p>&lt;/blockquote>
+&lt;h3 id="前提约定">前提约定
+&lt;/h3>&lt;ol>
+&lt;li>
+&lt;p>约定1&lt;br>
+“当前目录、子目录、子子目录…” 的表述包含的目录是：.gitignore文件所在的目录，以及该目录下的所有目录和它们的所有子目录及子子目录… 总之是这颗目录树的所有节点。&lt;/p>
+&lt;p>例如：
+.gitignore文件在 /Users/stonewang/git-ignore-test/.gitignore，即.gitignore文件所在的目录为/Users/stonewang/git-ignore-test/。
+该表述的含义是：以/Users/stonewang/git-ignore-test/作为起点的所有目录树节点&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># 该表述包含了dir1、dir2、dir1_sub、dir1_sub2、dir1_sub_sub、dir1_sub_sub2、dir1_sub2_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/Users/stonewang/git-ignore-test/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |-------.gitignore
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |-------dir1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |----dir1_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |-----dir1_sub_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |-----dir1_sub_sub2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |----dir1_sub2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |-----dir1_sub2_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |-------dir2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>‍&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>其他补充&lt;br>
+目录（即文件夹）的名字有各种表现形式，如显示的、隐藏的、带扩展名的和不带扩展名的。例如：dir、.dir、dir.ext、.dir.ext&lt;/p>
+&lt;p>文件名的形式也各种各样，如显示的，隐藏的，带扩展名的，不带扩展名的。如file、.file、file.ext、.file.ext&lt;/p>
+&lt;p>在.gitignore中，以 / 结尾的只会匹配目录，不带 / 结尾的匹配文件和目录，注意没有一种写法仅匹配文件的&lt;/p>
+&lt;p>在Mac和Windows中都不允许文件之间重名，目录之间重名，目录和文件之间重名。不区分大小写&lt;/p>
+&lt;p>在Mac和Windows中，目录名都是允许带点的，如dir.ext 可以作为目录名（看起来就像文件的扩展名）&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="详细例子">详细例子
+&lt;/h3>&lt;ul>
+&lt;li>
+&lt;p>为了表述准确，引入自创数学符号&lt;/p>
+&lt;ul>
+&lt;li>(.gitignore)N 表示.gitignore文件所在的目录+所有子目录包括直接或间接&lt;/li>
+&lt;li>(.gitignore)O 表示.gitignore文件所在的目录，不包括其任何子目录&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>写法&lt;/th>
+&lt;th>作用&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>dir/&lt;/td>
+&lt;td>忽略 (.gitignore)N 中的dir目录（不包含子目录）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/&lt;/td>
+&lt;td>忽略 (.gitignore)O 中的dir目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>file&lt;/td>
+&lt;td>忽略(.gitignore)N 中的file 文件&amp;amp;目录（名为file的目录也会被忽略）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/file&lt;/td>
+&lt;td>忽略(.gitignore)O 中的file文件&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>*.log&lt;/td>
+&lt;td>忽略(.gitignore)N 中的*.log 文件&amp;amp;目录（符合名字的目录也将被忽略）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/file&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下的file文件&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/Abc* 和 /dir/Abc &lt;em>.java 和/dir/&lt;/em> .java&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下符合Abc &lt;em>（或Abc&lt;/em>.java或*.java）规则的文件&amp;amp;目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/Abc*/&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下符合Abc*的目录（不忽略dir下的文件!）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/*/&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下的符合*的子目录（注意/sub/file的文件不会忽略）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/&lt;em>/&lt;/em> .txt&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下的符合&lt;em>的子目录下的，符合&lt;/em>.txt的文件&amp;amp;目录。注意是一个星，仅忽略一层，即/dir/sub/a.txt 和 /dir/sub/sub2/b.txt，仅仅忽略a.txt，不忽略b.txt，另外/dir/k.txt也不会被忽略&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/**/*.txt&lt;/td>
+&lt;td>忽略 (.gitignore)O 中的dir目录下的直接和间接子目录下的，符合*.txt的文件&amp;amp;目录。两个星号表示0-n层级的目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/sub/** 和 /sub/ 是等价的&lt;/td>
+&lt;td>亲测。前者表示忽略/sub/下的所有直接或间接的目录和文件（**表示文件和目录，因为没有/结尾），后者表示忽略/sub/下的东西&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/sub/**/ 和 /sub/ 是不等价的&lt;/td>
+&lt;td>亲测。前者明确表示忽略目录除掉了文件，所以对于/sub/file是不会被忽略的。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>sub/ 和 /sub/ 含义不同&lt;/td>
+&lt;td>前者忽略(.gitignore)N下的sub目录，后者忽略(.gitignore)O下的sub&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>sub/abc/ 和 /sub/abc/&lt;/td>
+&lt;td>&lt;strong>这两个的含义完全相同（有点奇怪，本以为前者是递归所有的目录）&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/src/main/java/ 和 src/main/java/&lt;/td>
+&lt;td>不等价。前者匹配(.gitignore)N下的src/main/java/ 目录，要满足这个目录的层级结构的。后者等价于/src/main/java/，仅仅忽略(.gitignore)O下的该目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/src/main/file.txt 和 src/main/file.txt&lt;/td>
+&lt;td>不等价。前者匹配(.gitignore)N下的src/main/file.txt，符合这个目录层级结构的将会被忽略，后者等价于/src/main/file.txt，仅仅忽略(.gitignore)O下所匹配的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/dir/ 和 dir/&lt;/td>
+&lt;td>是等价的。上面的例子等价这个不等价，就是因为目录的层级数的问题导致的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/file.txt 和 file.txt&lt;/td>
+&lt;td>是等价的。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>先后写!a.txt和*.txt&lt;/td>
+&lt;td>后面的配置覆盖前面的，导致所有*.txt文件都被忽略（有点奇怪，实际测试确实如此）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>先后写*.txt 和 !a.txt&lt;/td>
+&lt;td>正确。能够忽略除了a.txt外的文件。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>对于.gitignore文件不在git仓库根目录的情况：参考特殊情况&lt;/td>
+&lt;td>（参考特殊情况）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item></channel></rss>

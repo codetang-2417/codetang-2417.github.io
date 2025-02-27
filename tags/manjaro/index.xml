@@ -1,0 +1,1051 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Manjaro on LingLong</title><link>https://codetang-2417.github.io/tags/manjaro/</link><description>Recent content in Manjaro on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Fri, 06 Dec 2024 22:47:30 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/manjaro/index.xml" rel="self" type="application/rss+xml"/><item><title>sudo免密码</title><link>https://codetang-2417.github.io/p/sudo%E5%85%8D%E5%AF%86%E7%A0%81/</link><pubDate>Fri, 06 Dec 2024 22:17:28 +0800</pubDate><guid>https://codetang-2417.github.io/p/sudo%E5%85%8D%E5%AF%86%E7%A0%81/</guid><description>&lt;p>　　​&lt;code>sudo&lt;/code>​ 能通过精细化的授权配置（/etc/sudoers 文件）和密码验证，帮助管理员更安全、灵活地控制用户权限。一般都会设立一个超级管理员权限组，将有管理员用户加入到超级管理员用户组，就可以通过 &lt;code>sudo&lt;/code>​ 临时获取超级管理员权限执行命令。&lt;/p>
+&lt;h2 id="查看超级管理员组">查看超级管理员组
+&lt;/h2>&lt;p>　　不同的 Linux 发行版的管理权限的组名不同：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>Debian/Ubuntu 系列&lt;/strong>：&lt;br>
+通常有一个名为 &lt;code>sudo&lt;/code>​ 的组，用于授权用户获得管理员权限。&lt;/li>
+&lt;li>&lt;strong>Red Hat/CentOS/Fedora 系列&lt;/strong>：&lt;br>
+这些系统中一般使用 &lt;code>wheel&lt;/code>​ 组来授予 sudo 权限，而不是 &lt;code>sudo&lt;/code>​ 组。&lt;/li>
+&lt;li>&lt;strong>其他发行版或自定义系统&lt;/strong>：&lt;br>
+有的可能使用 &lt;code>admin&lt;/code>​ 等其他组名，或者管理员权限配置方式不同。&lt;/li>
+&lt;/ol>
+&lt;p>　　可以通过下列命令查看当前系统中是否有 &lt;code>sudo&lt;/code>​、&lt;code>wheel&lt;/code>​ 或 &lt;code>admin&lt;/code>​ 等相关组：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat /etc/group &lt;span class="p">|&lt;/span> grep -E &lt;span class="s2">&amp;#34;sudo|wheel|admin&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　Manjaro 就是使用 &lt;code>wheel&lt;/code>​ 组来授予 sudo 权限。&lt;/p>
+&lt;h2 id="配置文件-etcsudoers">配置文件 /etc/sudoers
+&lt;/h2>&lt;p>　　通过命令 &lt;code>visudo&lt;/code>​ 可以对配置 &lt;code>sudo&lt;/code>​ 的文件 &lt;code>/etc/sudoers&lt;/code>​ 进行编辑，来配置 sudo 的相关行为。&lt;/p>
+&lt;p>　　​&lt;code>/etc/sudoers&lt;/code>​ 文件只有只读权限，虽然可以通过 root 权限强行写入，但是不会检查语法，不保证每次修改的内容符合语法，有可能会引发系统异常。因此，通常使用 &lt;code>visudo&lt;/code>​ 来修改。&lt;/p>
+&lt;p>　　但 &lt;code>visudo&lt;/code>​ 默认的编辑器是 &lt;code>vi&lt;/code>​，不习惯使用的话，可以通过 &lt;code>export EDITOR=vim&lt;/code>​ 将 &lt;code>visudo&lt;/code>​ 编辑器临时换成 &lt;code>vim&lt;/code>​。&lt;/p>
+&lt;p>　　manjaro 中 &lt;code>/etc/sudoers&lt;/code>​ 文件一般如下&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">##&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## User privilege specification&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">##&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">root &lt;span class="nv">ALL&lt;/span>&lt;span class="o">=(&lt;/span>ALL:ALL&lt;span class="o">)&lt;/span> ALL
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## Uncomment to allow members of group wheel to execute any command&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># %wheel ALL=(ALL:ALL) ALL&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## Same thing without a password&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># %wheel ALL=(ALL:ALL) NOPASSWD: ALL&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## Uncomment to allow members of group sudo to execute any command&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># %sudo ALL=(ALL:ALL) ALL&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## Uncomment to allow any user to run sudo if they know the password&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## of the user they are running the command as (root by default).&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Defaults targetpw # Ask for the password of the target user&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ALL ALL=(ALL:ALL) ALL # WARNING: only use this together with &amp;#39;Defaults targetpw&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## Read drop-in files from /etc/sudoers.d&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">@includedir /etc/sudoers.d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　越往后的配置，优先级越高，也就是越往后的配置，会覆盖掉前面与之冲突的配置。下面介绍两个配置的含义。&lt;/p>
+&lt;p>　　​&lt;strong>​&lt;code>root ALL=(ALL:ALL) ALL&lt;/code>​&lt;/strong>​&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>作用对象：&lt;/strong> 只作用于用户 &lt;code>root&lt;/code>​。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>解释：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>第一个 &lt;code>ALL&lt;/code>​：&lt;code>root&lt;/code>​ 用户可以从任意主机执行 &lt;code>sudo&lt;/code>​。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>​&lt;code>ALL=(ALL:ALL)&lt;/code>​：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>第一个&lt;/strong> &lt;strong>​&lt;code>ALL&lt;/code>​&lt;/strong>​ &lt;strong>：&lt;/strong> 指定可以切换到的目标用户（这里表示任意用户）。&lt;/li>
+&lt;li>&lt;strong>第二个&lt;/strong> &lt;strong>​&lt;code>ALL&lt;/code>​&lt;/strong>​ &lt;strong>（冒号后的部分）：&lt;/strong> 指定可以切换到的目标组（这里表示任意组）。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>最后的 &lt;code>ALL&lt;/code>​：指示允许执行的命令（这里表示任意命令）。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>总结：&lt;/strong> &lt;code>root&lt;/code>​ 用户不需要提权，因为它本身就是超级用户，所以这个配置通常是冗余的，仅用作兼容性说明，明确 &lt;code>root&lt;/code>​ 用户没有任何限制。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　​ &lt;strong>​&lt;code>%wheel ALL=(ALL:ALL) ALL&lt;/code>​&lt;/strong>​&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>作用对象：&lt;/strong> 作用于用户组 &lt;code>wheel&lt;/code>​。&lt;/p>
+&lt;ul>
+&lt;li>​&lt;code>%&lt;/code>​ 表示后面跟的是一个用户组，而不是单个用户。&lt;/li>
+&lt;li>用户组 &lt;code>wheel&lt;/code>​ 通常是系统管理员用来标记具备提权能力的用户。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>解释：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>第一个 &lt;code>ALL&lt;/code>​：&lt;code>wheel&lt;/code>​ 组内的用户可以从任意主机执行 &lt;code>sudo&lt;/code>​。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>​&lt;code>ALL=(ALL:ALL)&lt;/code>​：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>第一个&lt;/strong> &lt;strong>​&lt;code>ALL&lt;/code>​&lt;/strong>​ &lt;strong>：&lt;/strong> 组内用户可以切换到任意用户。&lt;/li>
+&lt;li>&lt;strong>第二个&lt;/strong> &lt;strong>​&lt;code>ALL&lt;/code>​&lt;/strong>​ &lt;strong>（冒号后的部分）：&lt;/strong> 组内用户可以切换到任意组。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>最后的 &lt;code>ALL&lt;/code>​：组内用户可以执行任意命令。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>总结：&lt;/strong> 加入 &lt;code>wheel&lt;/code>​ 组的用户可以使用 &lt;code>sudo&lt;/code>​ 提权来执行任何命令。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="不使用密码提权">不使用密码提权
+&lt;/h3>&lt;p>　　取消掉 &lt;code># %wheel ALL=(ALL:ALL) NOPASSWD: ALL&lt;/code>​ 前面的注释即可。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">%wheel &lt;span class="nv">ALL&lt;/span>&lt;span class="o">=(&lt;/span>ALL:ALL&lt;span class="o">)&lt;/span> NOPASSWD: ALL
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　表示 &lt;code>wheel&lt;/code>​ 用户组中的任意用户都可以使用 sudo 提权到 root，且不需要密码。&lt;/p>
+&lt;h3 id="覆盖配置文件">覆盖配置文件
+&lt;/h3>&lt;p>‍&lt;/p>
+&lt;p>　　一般在 ubuntu、debian 系统中，取消注释就可以免密提权，因为这类系统中 &lt;code>/etc/sudoers.d&lt;/code>​ 文件夹下，没有额外的配置文件，那么 &lt;code>/etc/sudoers&lt;/code>​ 文件的最后一行 &lt;code>@includedir /etc/sudoers.d&lt;/code>​ 即便将 &lt;code>/etc/sudoers.d&lt;/code>​ 包含进去，也不会生效。但 manjaro 下默认有一个配置文件 &lt;code>/etc/sudoers.d/10-installer&lt;/code>​，其中的内容为：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ sudo cat /etc/sudoers.d/10-installer
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">%wheel &lt;span class="nv">ALL&lt;/span>&lt;span class="o">=(&lt;/span>ALL&lt;span class="o">)&lt;/span> ALL
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　根据前面提到的 &lt;code>/etc/sudoers&lt;/code>​ 中的规则，越往后的配置优先级越高，manjaro 发行版中，即便在 &lt;code>/etc/sudoers&lt;/code>​ 中取消了注释 &lt;code>%wheel ALL=(ALL:ALL) NOPASSWD: ALL&lt;/code>​，也会被 &lt;code>/etc/sudoers.d/10-installer&lt;/code>​ 中的配置覆盖。&lt;/p>
+&lt;p>　　所以，可以将 &lt;code>/etc/sudoers&lt;/code>​ 最后一行 &lt;code>@includedir /etc/sudoers.d&lt;/code>​ 注释掉；也可以在&lt;code>/etc/sudoers.d/10-installer&lt;/code>​ 中添加一条，将我们需要免密提权的用户添加进文件中，如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">%wheel &lt;span class="nv">ALL&lt;/span>&lt;span class="o">=(&lt;/span>ALL&lt;span class="o">)&lt;/span> ALL
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ling &lt;span class="nv">ALL&lt;/span>&lt;span class="o">=(&lt;/span>ALL&lt;span class="o">)&lt;/span> NOPASSWD: ALL
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p></description></item><item><title>qbittorrent 校验大文件导致Linux内核出问题</title><link>https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/</link><pubDate>Sun, 17 Nov 2024 01:25:27 +0800</pubDate><guid>https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/</guid><description>&lt;h2 id="问题">问题
+&lt;/h2>&lt;p>　　在 &lt;code>qbittorrent&lt;/code>​ 校验大文件时（大概100GB以上？），会出现无法启动新应用的情况。&lt;/p>
+&lt;p>　　KDE 还会在一段时间后，弹出下列通知&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-txt" data-lang="txt">&lt;span class="line">&lt;span class="cl">Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　而且在终端中无法运行系统内核相关的程序，例如：&lt;code>journalctl&lt;/code>​、&lt;code>systemdctl&lt;/code>​ 等。无法通过 &lt;code>reboot&lt;/code>​ 重启电脑，只能通过长按电源键硬重启电脑。&lt;/p>
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;h3 id="手动">手动
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">sudo renice +10 -p $(pgrep qbittorrent)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　再次校验大文件时，就不会出现上述问题。&lt;/p>
+&lt;h3 id="自动">自动
+&lt;/h3>&lt;p>　　更改开机自启动 &lt;code>desktop&lt;/code>​ 文件，在启动时就将 &lt;code>qbittorrent&lt;/code>​ 优先级降低。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">$ ls ~/.config/autostart&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">$ vim org.qbittorrent.qBittorrent.desktop&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">将 Exec=qbittorrent %U 改为&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">Exec=sh -c &amp;#34;nice -n 10 qbittorrent %U&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　更改通用启动 &lt;code>desktop&lt;/code>​ 文件，在启动时就将 &lt;code>qbittorrent&lt;/code>​ 优先级降低。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">$ vim ~/.local/share/applications/org.qbittorrent.qBittorrent.desktop&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">将 Exec=qbittorrent %U 改为&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">Exec=sh -c &amp;#34;nice -n 10 qbittorrent %U&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　或者通过图形化界面找到 &lt;code>desktop&lt;/code>​ 文件&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/assets/image-20241117013346-dz1m02x.png"
+width="740"
+height="560"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="132"
+data-flex-basis="317px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/assets/image-20241117013231-ihde2i5.png"
+width="365"
+height="529"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="68"
+data-flex-basis="165px"
+>​&lt;/p></description></item><item><title>Time 同步</title><link>https://codetang-2417.github.io/p/time-%E5%90%8C%E6%AD%A5/</link><pubDate>Tue, 05 Nov 2024 10:10:41 +0800</pubDate><guid>https://codetang-2417.github.io/p/time-%E5%90%8C%E6%AD%A5/</guid><description>&lt;p>　　使用 Manjaro，最近发现时间不同步。Manjaro 目前使用 systemd-timesyncd 服务同步时间。可通过下列命令查看服务状态：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ systemctl status systemd-timesyncd.service  ✔  9s 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">○ systemd-timesyncd.service - Network Time Synchronization
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Loaded: loaded &lt;span class="o">(&lt;/span>/usr/lib/systemd/system/systemd-timesyncd.service&lt;span class="p">;&lt;/span> enabled&lt;span class="p">;&lt;/span> preset: enabled&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Active: inactive &lt;span class="o">(&lt;/span>dead&lt;span class="o">)&lt;/span> since Tue 2024-11-05 09:49:12 CST&lt;span class="p">;&lt;/span> 21min ago
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Duration: 19min 50.593s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Invocation: ad67794ba19a43cfbb91ef6b058f40a8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Docs: man:systemd-timesyncd.service&lt;span class="o">(&lt;/span>8&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Main PID: &lt;span class="m">892&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="nv">code&lt;/span>&lt;span class="o">=&lt;/span>exited, &lt;span class="nv">status&lt;/span>&lt;span class="o">=&lt;/span>0/SUCCESS&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Status: &lt;span class="s2">&amp;#34;Idle.&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Mem peak: 5.3M
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CPU: 53ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:29:21 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Starting Network Time Synchronization...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:29:21 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Started Network Time Synchronization.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:32:09 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:32:51 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:34:06 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:36:24 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:40:51 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:49:12 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Stopping Network Time Synchronization...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:49:12 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: systemd-timesyncd.service: Deactivated successfully.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:49:12 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Stopped Network Time Synchronization.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　可知时间同步服务器访问出现问题。修改服务器为中国区的服务器:&lt;/p>
+&lt;p>　　​&lt;code>sudo vim /etc/systemd/timesyncd.conf&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Time&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">NTP&lt;/span>&lt;span class="o">=&lt;/span>ntp.aliyun.com ntp.ntsc.ac.cn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　重新运行服务，或者手动更新&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 手动更新&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo ntpd -q -g -p ntp.aliyun.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 重新运行服务&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ systemctl status systemd-timesyncd.service  ✔
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">● systemd-timesyncd.service - Network Time Synchronization
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Loaded: loaded &lt;span class="o">(&lt;/span>/usr/lib/systemd/system/systemd-timesyncd.service&lt;span class="p">;&lt;/span> enabled&lt;span class="p">;&lt;/span> preset: enabled&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Active: active &lt;span class="o">(&lt;/span>running&lt;span class="o">)&lt;/span> since Tue 2024-11-05 10:13:50 CST&lt;span class="p">;&lt;/span> 3min 8s ago
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Invocation: 50dde2f5504342deaf3543272c50b332
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Docs: man:systemd-timesyncd.service&lt;span class="o">(&lt;/span>8&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Main PID: &lt;span class="m">14567&lt;/span> &lt;span class="o">(&lt;/span>systemd-timesyn&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Status: &lt;span class="s2">&amp;#34;Contacted time server 203.107.6.88:123 (ntp.aliyun.com).&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Tasks: &lt;span class="m">2&lt;/span> &lt;span class="o">(&lt;/span>limit: 28019&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Memory: 3.3M &lt;span class="o">(&lt;/span>peak: 4.1M&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CPU: 42ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CGroup: /system.slice/systemd-timesyncd.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> └─14567 /usr/lib/systemd/systemd-timesyncd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:50 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Starting Network Time Synchronization...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:50 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Started Network Time Synchronization.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:52 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>14567&lt;span class="o">]&lt;/span>: Contacted &lt;span class="nb">time&lt;/span> server 203.107.6.88:123 &lt;span class="o">(&lt;/span>ntp.aliyun.com&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:52 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>14567&lt;span class="o">]&lt;/span>: Initial clock synchronization to Tue 2024-11-05 10:13:52.194984 CST.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　参考：&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Systemd-timesyncd" target="_blank" rel="noopener"
+>systemd-timesyncd&lt;/a>、&lt;a class="link" href="https://www.cnblogs.com/jarsing/articles/17503565.html" target="_blank" rel="noopener"
+>国内常用NTP服务器地址&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>个人Linux主机通过SSH隧道使服务器访问外网</title><link>https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/</link><pubDate>Sun, 20 Oct 2024 18:50:54 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/</guid><description>&lt;p>　　在学校的服务器使用过程中，需要服务器访问外网，但在服务器上可能没有权限创建代理网络，或者不方便使用。而且直接使用服务器访问外网也可能有风险，因此，本文通过ssh隧道，将服务器的网络代理到我们的终端主机，也就是我们自己的电脑上，再在自己的电脑上安装代理软件，实现服务器通过ssh隧道访问外网的功能。&lt;/p>
+&lt;h2 id="本机代理配置">本机代理配置
+&lt;/h2>&lt;p>　　本文中 “&lt;strong>本机”&lt;/strong> 一词代表个人电脑，&lt;strong>服务器&lt;/strong> 代表远程连接的服务器电脑。&lt;/p>
+&lt;p>　　本机系统如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ neofetch  ✔
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ ling@ling-20ym
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ --------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ OS: Manjaro Linux x86_64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ Host: 20YM Lenovo ThinkBook 16p Gen &lt;span class="m">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ Kernel: 6.1.112-1-MANJARO
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Uptime: &lt;span class="m">9&lt;/span> hours, &lt;span class="m">57&lt;/span> mins
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Packages: &lt;span class="m">1772&lt;/span> &lt;span class="o">(&lt;/span>pacman&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Shell: bash 5.2.37
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Resolution: 2560x1600, 2560x1440
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ DE: Plasma 6.1.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ WM: KWin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Theme: &lt;span class="o">[&lt;/span>Plasma&lt;span class="o">]&lt;/span>, Breeze &lt;span class="o">[&lt;/span>GTK2/3&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Icons: &lt;span class="o">[&lt;/span>Plasma&lt;span class="o">]&lt;/span>, McMojave-circle-dark &lt;span class="o">[&lt;/span>GTK2/3&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Terminal: konsole
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CPU: AMD Ryzen &lt;span class="m">7&lt;/span> 5800H with Radeon Graphics &lt;span class="o">(&lt;/span>16&lt;span class="o">)&lt;/span> @ 3.200GHz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> GPU: AMD ATI Radeon Vega Series / Radeon Vega Mobile Series
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> GPU: NVIDIA GeForce RTX &lt;span class="m">3060&lt;/span> Mobile / Max-Q
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Memory: 18054MiB / 23392MiB
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　采用clash verge作为代理软件，该软件能够开放本地端口作为代理访问路径，为ssh隧道提供了出口端口。&lt;/p>
+&lt;p>　　本人使用tun模式，尽可能的避免DNS泄漏。如果使用代理模式也可以。但 Linux上只有少数程序会走系统代理模式，除了在需要在clash verge中开启代理模式，还需要在对应的软件中手动设置代理。因此还是tun模式更适合linux上使用。参考：&lt;a class="link" href="https://github.com/clash-verge-rev/clash-verge-rev/issues/346" target="_blank" rel="noopener"
+>Ubuntu下系统代理只能作用于Firefox？&lt;/a>&lt;/p>
+&lt;p>　　注：开启代理模式后，即便本机其他程序不走clash，我们通过ssh建立隧道依然可行。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020185708-5yl00rv.png"
+width="740"
+height="836"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="88"
+data-flex-basis="212px"
+>​&lt;/p>
+&lt;p>　　这里开启tun模式后，并保证本机能够正常访问外网后，就可以开始ssh隧道搭建。需要注意，clash verge默认开放的代理端口为7897，可以自行修改。&lt;/p>
+&lt;h2 id="ssh隧道">SSH隧道
+&lt;/h2>&lt;p>　　参考：&lt;a class="link" href="https://www.entropy-tree.top/2024/04/18/ssh-tunneling-techniques/" target="_blank" rel="noopener"
+>SSH 隧道技术&lt;/a>、&lt;a class="link" href="https://cloud.tencent.com/developer/article/1901554" target="_blank" rel="noopener"
+>SSH隧道详解与使用AutoSSH实现稳定的内网穿透&lt;/a>、&lt;a class="link" href="https://www.lixueduan.com/posts/linux/07-ssh-tunnel/#%E6%89%A9%E5%B1%95-%E8%B7%A8%E6%9C%BA%E5%99%A8%E8%BD%AC%E5%8F%91" target="_blank" rel="noopener"
+>SSH 隧道简明教程&lt;/a>&lt;/p>
+&lt;p>　　SSH隧道提供三种模式：正向 SSH 隧道（本地转发）、反向 SSH 隧道（远程转发）、动态转发 SSH 隧道（Socket服务器）。&lt;/p>
+&lt;p>　　由于一台电脑上可能有多个网卡（意味着有多个 IP），因此在使用 SSH 隧道时，需要指定：1. 从哪一个 IP建立SSH连接。也就是SSH的登陆地址。2. SSH隧道应该连接到哪一个 IP上。也就是&lt;strong>隧道地址&lt;/strong>。&lt;/p>
+&lt;p>　　在下面的介绍中，destination 表示服务器的地址，也就是登陆服务器的标识符：&lt;strong>Username@Host_IP&lt;/strong>，host:hostport 表示服务器上的隧道地址。host可以和Host_IP不同，但都是服务器上的IP地址。&lt;/p>
+&lt;h3 id="正向-ssh-隧道">正向 SSH 隧道
+&lt;/h3>&lt;p>　　将本主机上的某网络端口上的所有流量，通过 SSH 隧道转发到远程服务器上的网络端口。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -L &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port:host:hostport destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 bind_address 可选（默认为 localhost），是本机上的一个网络ip。该命令会本地开启一个绑定在 [bind_address:]port 上的套接字，并监听。将该套接字上所有的流量都转发到 destination 服务器上的 host:hostport。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -L 9090:localhost:8080 root@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　例如，这个例子就是将本机 localhost:9090 上的流量转发到 10.0.0.2 服务器上的 localhost:8080。&lt;/p>
+&lt;h3 id="反向-ssh-隧道">反向 SSH 隧道
+&lt;/h3>&lt;p>　　将远程服务器上的网络端口上的所有流量，通过 SSH 隧道转发到本主机上的某网络端口。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port:host:hostport destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　和正向隧道的命令行格式相同，不同点在于此命令是在服务器上开启一个绑定在 host:hostport 上的套接字，并监听。将该套接字上所有的流量都转发到 &lt;strong>本机&lt;/strong> 上的 [bind_address:]port。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R 9090:localhost:8080 root@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　例如，这个例子就是将10.0.0.2 服务器上的 localhost:8080 上的流量转发到本机 localhost:9090。&lt;/p>
+&lt;h3 id="动态转发-ssh-隧道">动态转发 SSH 隧道
+&lt;/h3>&lt;p>　　动态转发 SSH 隧道实际上是将远程服务器作为一个 Socket 服务器，专门转发本地端口上的所有流量到&lt;strong>服务器所处的网络中&lt;/strong>。动态转发不像正向隧道与反向隧道一样转发端口与目标端口是一对一的，&lt;strong>动态转发中的转发端口对应的目标是目标主机所在的整个网络&lt;/strong>。不过使用动态转发访问目标主机所在网络时需要应用程序本身支持代理配置或者使用socket代理工具。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -D &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　-D [bind_address:]port 指定监听的端口，会在本地监听该端口，并将请求到该端口流量基于 SOCKS5 协议转发到远程主机上，其中 [bind_address:]可以不填，当不写或者为 * 时表示监听全部地址。示例:-D *:8081,-D 8081,-D 127.0.0.1:8081,-D 192.168.0.1:8081。&lt;/p>
+&lt;p>　　可以参考：&lt;a class="link" href="https://www.lixueduan.com/posts/linux/07-ssh-tunnel/#%E6%89%A9%E5%B1%95-%E8%B7%A8%E6%9C%BA%E5%99%A8%E8%BD%AC%E5%8F%91" target="_blank" rel="noopener"
+>SSH 隧道简明教程&lt;/a> 中&lt;code>扩展-跨机器转发&lt;/code>​章节，介绍的很清楚。&lt;/p>
+&lt;p>　　下面是从中截出的两张图片，主要应用是在A与B之间创建隧道，最终通过隧道访问到ServerC中的 http 服务。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020215213-kvxoreu.png"
+width="1244"
+height="598"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="208"
+data-flex-basis="499px"
+>​&lt;/p>
+&lt;p>　　最常用的就是绕过防火墙，在外网上通过一台可以访问内网的 Server A，访问内容。基于Socket协议的翻墙软件就是这个原理，用一台没被墙的、在国内可以通过SSH访问到的VPS，作为Socket服务器，也就是图中的 Server B。VPS在国外，可以访问国外网络资源，国内就将所有的外网网络请求发往 Server A的SSH 绑定端口，Server A会将其转发给国外网络，例如入中的 Server C。由于 Server A 到 Server B之间是SSH加密传输的，防火墙看不到其中具体访问的网络内容，就不会判断为翻墙。但由于这种方式应用太广泛，现在检测流量特征的手段很强，可以快速判断出并封掉。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020215222-0qvsdqk.png"
+width="946"
+height="676"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="335px"
+>​&lt;/p>
+&lt;h3 id="常用参数">常用参数
+&lt;/h3>&lt;ul>
+&lt;li>​&lt;code>-L&lt;/code>​：local，表示使用本地端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-R&lt;/code>​：remote，表示使用远程端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-D&lt;/code>​：dynamic，表示使用动态端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-N&lt;/code>​： 表示创建隧道以后不连接到 sshServer端，通常与”-f”选项连用&lt;/li>
+&lt;li>​&lt;code>-f&lt;/code>​：表示在后台运行ssh隧道，通常与”-N”选项连用&lt;/li>
+&lt;li>​&lt;code>-q&lt;/code>​ 参数用于启用 &lt;strong>静默模式&lt;/strong>（quiet mode）&lt;/li>
+&lt;li>​&lt;code>-g&lt;/code>​：表示 ssh 隧道对应的转发端口将监听在主机的所有IP中，不使用”-g选项”时，转发端口默认只监听在主机的本地回环地址中，”-g” 表示开启网关模式，远程端口转发中，无法开启网关功能&lt;/li>
+&lt;li>​&lt;code>-C&lt;/code>​：启用压缩，可以提高传输速度。&lt;/li>
+&lt;li>​&lt;code>-p port&lt;/code>​：指定 SSH 服务器监听的端口 (如果不是默认的22端口)。&lt;/li>
+&lt;li>​&lt;code>-i 私钥文件&lt;/code>​：使用指定的私钥文件进行身份验证。&lt;/li>
+&lt;li>​&lt;code>-T&lt;/code>​ ：用于禁用伪终端分配，使用 &lt;code>-N&lt;/code>​ 时，因为本身就没有需要交互的命令，SSH 默认不会分配伪终端，便不需要 &lt;code>-T&lt;/code>​&lt;/li>
+&lt;/ul>
+&lt;h2 id="应用">应用
+&lt;/h2>&lt;p>　　为了达到我们的目的：将服务器上的网络代理到本机上，我们有两种方案：&lt;/p>
+&lt;ol>
+&lt;li>建立反向隧道，将服务器端口上的流量转发到本机，服务器上所有的流量都走代理端口。优点是：比较简单，只需要ssh建立隧道即可，不需要安装其他软件，只要主机能访问外网，服务器就可以。缺点是：如果有其他服务器，需要在主机上为每一个服务器都单独创建SSH隧道。如果主机下线了，服务器就无法访问外网了。&lt;/li>
+&lt;li>建立 Socket服务器，让服务器的所有流量都走 Socket服务器。但这样的话和建立一个翻墙代理的区别就会很小了，不如直接就在服务器上安装代理软件。优点是：更安全，代理管理起来更方便。一般来说Socket服务器不会轻易下线，保证服务器一直有外网网络。缺点是：每一台服务器上都需要单独配置软件，且Socket服务器需要在外网。&lt;/li>
+&lt;/ol>
+&lt;p>　　对于普通的应用场景来说，在自己的电脑上，我们都会安装代理软件，在服务器管理员没有配置跳板机或者跳板机故障时，我们就可以采用第一种，快速 实现 or 恢复 服务器访问外部网络。&lt;/p>
+&lt;p>　　我们假设服务器的ip为10.0.0.2，服务器上有用户名为 server的用户。&lt;/p>
+&lt;h3 id="本机配置">本机配置
+&lt;/h3>&lt;p>　　本机上我们安装clash verge，正常启动后，就会clash verge就会监听 localhost:7897，并转发流量到代理服务器。本示例为方便起见，将主机和远程服务器的端口都设置为 7897，实际上远程服务器可以设置为其他没有被使用的端口，主机也可以在clash verge中将代理端口改为其他端口后，将SSH隧道的本地端口同步修改。&lt;/p>
+&lt;p>　　运行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R 7897:localhost:7897 -fqCN server@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　为远程服务器的 localhost:7897 和本机的 localhost:7897建立ssh隧道。转发方向为：远程服务器 SSH隧道 -&amp;gt; 本机 localhost:7897 -&amp;gt; clash verge。&lt;/p>
+&lt;p>　　​&lt;code>-fqCN&lt;/code>​：后台运行、静默模式、启动压缩模式，加快速度、只转发端口，不连接终端。&lt;/p>
+&lt;h3 id="远程服务器配置">远程服务器配置
+&lt;/h3>&lt;p>　　远程服务器上需要在终端中添加代理变量，也可以写到终端变量文件（~/.bashrc 或者 ~/.profile ）中，每次登陆自动生效。使得所有的流量走代理端口，也就是本地回环地址的7897端口。转发方向：服务器其他网络 -&amp;gt; 服务器 localhost的7897端口 -&amp;gt; 服务器SSH隧道&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;localhost:7897&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;localhost:7897&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="设置好后不能正常联网">设置好后不能正常联网
+&lt;/h2>&lt;p>　　在实践过程中，我遇到了按照上述配置后，主机网络正常访问外网，服务器和主机之间SSH隧道通信正常，但服务器无法访问外网。如下：&lt;/p>
+&lt;p>　　服务器：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl: &lt;span class="o">(&lt;/span>35&lt;span class="o">)&lt;/span> error:0A000126:SSL routines::unexpected eof &lt;span class="k">while&lt;/span> reading
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　添加参数 &lt;code>-v&lt;/code>​ 打印详细日志输出，可以看到使用了本地的DNS解析地址。但国内的DNS在没被代理的时候，会被CFW污染，因此这个地址实际上不是谷歌的服务器IP，但由于已经缓存下来了，所以在访问的时候会通过该IP来访问。于是，传递给代理的ip也是这个错误ip，就会导致访问出错。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -v -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Trying 127.0.0.1:7897...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 connect to IPv4 199.59.148.229:443 &lt;span class="o">(&lt;/span>locally resolved&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　解决办法：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>等几分钟中&amp;hellip;等DNS缓存过期。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>安装 proxychain，并在其中配置&lt;code>proxy_dns&lt;/code>​，使得DNS也通过代理查询。&lt;/p>
+&lt;p>配置 proxychain&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ vim /etc/proxychains.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Proxy DNS requests - no leak for DNS data&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">proxy_dns
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>ProxyList&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># add proxy here ...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># meanwile&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># defaults set to &amp;#34;tor&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">https 127.0.0.1 &lt;span class="m">7897&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">socks5 127.0.0.1 &lt;span class="m">7897&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过 proxychain 访问&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ proxychains curl -I https://www.youtube.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>在使用 systemd 管理服务的 Linux 上。可以通过重启系统解析服务来情况 DNS 缓存 &lt;code>sudo systemctl restart systemd-resolved&lt;/code>​。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>　　正常情况下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -v -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Trying 127.0.0.1:7897...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 connect to IPv4 31.13.94.41:443 &lt;span class="o">(&lt;/span>locally resolved&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 request granted.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Connected to &lt;span class="o">(&lt;/span>nil&lt;span class="o">)&lt;/span> &lt;span class="o">(&lt;/span>127.0.0.1&lt;span class="o">)&lt;/span> port &lt;span class="m">7897&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="c1">#0) &lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* ALPN, offering h2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* ALPN, offering http/1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* CAfile: /etc/ssl/certs/ca-certificates.crt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* CApath: /etc/ssl/certs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.0 &lt;span class="o">(&lt;/span>OUT&lt;span class="o">)&lt;/span>, TLS header, Certificate Status &lt;span class="o">(&lt;/span>22&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.3 &lt;span class="o">(&lt;/span>OUT&lt;span class="o">)&lt;/span>, TLS handshake, Client hello &lt;span class="o">(&lt;/span>1&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.2 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS header, Certificate Status &lt;span class="o">(&lt;/span>22&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.3 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS handshake, Server hello &lt;span class="o">(&lt;/span>2&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.2 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS header, Finished &lt;span class="o">(&lt;/span>20&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="重新建立ssh-隧道后服务器无法访问外网">重新建立SSH 隧道后服务器无法访问外网
+&lt;/h2>&lt;p>　　可能会出现 SSH 隧道已经被清空，但服务器端还没有退出对应的线程的情况，这时需要我们手动找出对应的线程，并kill掉。再重新建立 SSH 隧道。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ sudo lsof -i :7897
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sshd &lt;span class="m">2129065&lt;/span> tiancheng.tang 7u IPv6 &lt;span class="m">48338339&lt;/span> 0t0 TCP ip6-localhost:7897 &lt;span class="o">(&lt;/span>LISTEN&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sshd &lt;span class="m">2129065&lt;/span> tiancheng.tang 9u IPv4 &lt;span class="m">48338340&lt;/span> 0t0 TCP localhost:7897 &lt;span class="o">(&lt;/span>LISTEN&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ &lt;span class="nb">kill&lt;/span> &lt;span class="m">2129065&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　如果需要长时间稳定使用SSH 隧道，可以使用autossh。&lt;/p></description></item><item><title>Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网</title><link>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</link><pubDate>Thu, 12 Oct 2023 11:12:24 +0800</pubDate><guid>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</guid><description>&lt;p>　　参考链接：&lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a>、&lt;a class="link" href="https://blog.zenggyu.com/posts/zh/2022-05-04-%E5%9C%A8%E5%AE%BF%E4%B8%BB%E6%9C%BA%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84vpn%E8%BF%9E%E6%8E%A5/#%E4%B8%BA%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%B7%BB%E5%8A%A0%E7%94%A8%E4%BA%8E%E5%9F%BA%E6%9C%AC%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%BD%91%E5%8D%A1" target="_blank" rel="noopener"
+>在宿主机中使用虚拟机的VPN连接&lt;/a>&lt;/p>
+&lt;p>　　整体思想是：&lt;/p>
+&lt;p>　　建立一张单独的host-only网卡，使得虚拟机和宿主机之间可以通信，利用windows的网络分享功能，将VPN的网卡的网络分享到这张host-only网卡。那么访问这张host-only网卡，就可以访问到VPN的网络。而host-only网卡可以被主机访问到。因此，就是实现了主机通过虚拟机的VPN进行访问的功能。但虚拟机仍然需要一张可以直接上网的网卡。因为虚拟机需要正常和外界通信，因此主机需要为虚拟机创建两张独立的网卡。&lt;/p>
+&lt;p>　　注意：本文的应用场景是在非校园网环境，Linux系统通过虚拟机的VPN来访问校园网资源，在上述参考链接中，其中一个虚拟机使用的是桥接网卡上网，另一个使用的是网络地址转换NAT上网。&lt;/p>
+&lt;p>　　根据我的测试，校园网环境可能会阻止桥接模式下虚拟机获取 ipv4 地址，我们学校最开始允许宿舍有线网络上网，这时还可以通过桥接模式获取到ipv4的地址。后面禁止了有线网络，现在我的虚拟机桥接模式在校园网环境中就获取不到ipv4地址了。于是我在校园网中只能使用NAT模式上网。&lt;/p>
+&lt;p>　　但在公司时，虚拟机使用NAT上网并在开启VPN后，整个虚拟机将无法访问网络。这应该跟网络地址转换NAT有关，因为使用该方法，虚拟机获取的ip地址是10.0.2.16，可能跟VPN代理的10.0.0.0网段有冲突。导致最后虚拟机无法正常上网。&lt;/p>
+&lt;p>　　解决方案就是：在学校校园网用虚拟机NAT上网，在校园网以外的地方，用桥接网卡的方式上网。&lt;/p>
+&lt;p>　　为了方便，我创建了三张网卡：NAT、host-only、桥接。便于在NAT和host-only之间切换。&lt;/p>
+&lt;h2 id="虚拟机添加host-only网络">虚拟机添加host-only网络
+&lt;/h2>&lt;h3 id="virtaulbox建立host-only网卡">virtaulBox建立host-only网卡
+&lt;/h3>&lt;p>　　选中工具-&amp;gt;网络，然后建立一个host-only网络&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111516-d29y5m4.png"
+width="835"
+height="443"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="188"
+data-flex-basis="452px"
+>​&lt;/p>
+&lt;p>　　点击DHCP服务器，启动服务器，也可以不使用DHCP。区别在与在后续Linux宿主机添加路由节点时，DHCP分配到的网址可能不唯一，每次都需要重新查看。而使用默认地址，则固定为192.168.137.1。&lt;/p>
+&lt;p>　　这里需要注意，&lt;code>VirtualBox &amp;gt;= 6.1.28 &lt;/code>​的版本上，默认指定的网段是192.168.56.0/24，无法更改为其他网段。因此不能够像这篇文章 &lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a> 中提到的，修改VirtualBox的网段。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.2，因为windows11在网络共享时默认指定的网络地址192.168.137.1，需要两者在同一网段内。可以在后续少修改一次网络地址。&lt;/p>&lt;/blockquote>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111702-el6bvrq.png"
+width="879"
+height="1016"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111721-nfmelkb.png"
+width="836"
+height="973"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="85"
+data-flex-basis="206px"
+>​&lt;/p>
+&lt;p>　　添加完后，可以在Linux宿主机中查看&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ip addr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012154705-gpygtv4.png"
+width="842"
+height="326"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="258"
+data-flex-basis="619px"
+>​&lt;/p>
+&lt;h3 id="为虚拟机添加host-only的网卡并设置共享vpn网络">为虚拟机添加host-only的网卡并设置共享VPN网络
+&lt;/h3>&lt;p>　　在虚拟机对应的设置中，增加一个网卡，连接方式选择 &lt;code>仅主机（Host-Only）网络&lt;/code>​。但需要先关闭虚拟机，否则无法进行更改，就像我这里一样，没有关闭虚拟机，按钮是灰色的。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151700-y3wbm32.png"
+width="790"
+height="567"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+>​​&lt;/p>
+&lt;p>　　添加完成后，记住这里的MAC地址结尾E124，后续识别网卡的时候会用。打开虚拟机，进入设置-&amp;gt;网络和Internet-&amp;gt;高级网络设置-&amp;gt;更多网络适配器选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012150818-7du5bqc.png"
+width="1267"
+height="1126"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="112"
+data-flex-basis="270px"
+>​&lt;/p>
+&lt;p>　　这里的三个网卡，其中一个是深信服的Sanfor的网卡，也就是我这里的vpn软件使用的网卡。以太网是NAT网络的网卡，以太网2是host-only网卡。&lt;/p>
+&lt;p>　　可以在win11中的终端中输入命令&lt;code>Get-NetAdapter&lt;/code>​查看，前面添加网卡的时候提到，E124结尾的是Host-Only，所以这里就可以区分出哪一些是VPN的网卡，哪一些是virtualbox创建的网卡。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151602-ym2qt1z.png"
+width="1105"
+height="176"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="627"
+data-flex-basis="1506px"
+>​&lt;/p>
+&lt;p>　　然后开启VPN，转到网络适配器界面。右键VPN对应的网卡，选择 属性-&amp;gt;共享，然后选择Host-Only网卡。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152132-xydjf1p.png"
+width="1038"
+height="604"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="171"
+data-flex-basis="412px"
+>​&lt;/p>
+&lt;p>　　这里win10以前的系统可能弹出提示窗，说会前往设置以太网2的IP为192.168.137.1，我是安装的win11，没有弹窗，默认更改。因此，我们需要手动将Host-Only网卡的IP修改回原来的设定好的地址。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.2，因为windows11在网络共享时默认指定的网络地址是192.168.137.1，两者需要在同一网段内不能冲突。这里就不需要更改。&lt;/p>&lt;/blockquote>
+&lt;p>　　右键Host-Only网卡，选择属性，Internet 协议版本 4，然后双击，就会弹出修改IP的弹窗。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152540-j4c3j0u.png"
+width="1322"
+height="840"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>​​&lt;/p>
+&lt;p>　　如果前面开启了DHCP，则可以点自动获取IP，否则需要手动改动IP为Host-Only网络段中与前面设置不同的IP地址。比如前面已经使用了 192.168.56.1 和 192.168.56.2，则就现在就需要设置为192.168.56.3。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012160633-csbnpcr.png"
+width="412"
+height="560"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="73"
+data-flex-basis="176px"
+>​&lt;/p>
+&lt;p>　　设置完成后，回到host。&lt;/p>
+&lt;h3 id="连通性测试">连通性测试
+&lt;/h3>&lt;p>　　设置完成后，在host的终端中，应该可以ping通虚拟机中的host网卡的地址&lt;br>
+​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153053-5ij923e.png"
+width="510"
+height="213"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="239"
+data-flex-basis="574px"
+>​&lt;/p>
+&lt;p>　　如果ping不通，显示无法到达，很可能是win11的防火墙没有开启报文回复功能。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://www.zhihu.com/question/37301003?utm_id=0" target="_blank" rel="noopener"
+>知乎回答&lt;/a>，在设置中按照 隐私安全性 -&amp;gt; Windows安全中心 -&amp;gt; 防火墙和网络保护，打开防火墙设置&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153330-1j6cctx.png"
+width="1425"
+height="996"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+>​&lt;/p>
+&lt;p>　　然后打开高级设置，将入站和出站的&lt;code>ICMPv4回显请求&lt;/code>​功能打开。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153548-0dwqzv1.png"
+width="1474"
+height="928"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="381px"
+>​&lt;/p>
+&lt;h2 id="宿主机设置路由">宿主机设置路由
+&lt;/h2>&lt;h3 id="添加路由规则">添加路由规则
+&lt;/h3>&lt;p>　　我使用的manjaro，默认安装的是ip工具，先查看当前路由表&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153952-d3tfmfr.png"
+width="662"
+height="66"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1003"
+data-flex-basis="2407px"
+>​&lt;/p>
+&lt;p>　　可以看到192.168.56.0/24的网络段都会被路由到虚拟机win11的地址为192.168.56.1的网卡上去。但没有将VPN内网地址路由到虚拟机的表项。&lt;/p>
+&lt;p>　　因此需要添加路由规则，将VPN访问的网段路由到192.168.56.3，也就是之前在虚拟机中的host-only网卡中修改的地址。vboxnet0就是之前添加网卡时，系统中显示的网卡。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route add 10.0.0.0/8 via 192.168.56.3 dev vboxnet0 metric &lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　我要访问的VPN网段为10.0.0.0/8，如有需要可以更改为自己的内网网段。&lt;code>metric 100&lt;/code>​设置路由优先级，避免在Linux宿主机开启其他网络代理时，优先代理该网络段。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.1，因为这是windows11在网络共享时默认指定的网络地址。则这里路由添加表项就应当修改为&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ip route add 10.0.0.0/8 via 192.168.137.1 dev vboxnet0 metric &lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/blockquote>
+&lt;p>　　添加完成后再次查看&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153914-35e5clx.png"
+width="656"
+height="111"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="590"
+data-flex-basis="1418px"
+>​&lt;/p>
+&lt;p>　　此时 PING 自己的内网网段，就可以ping通。如果这里发现，ping不通，则需要在win11中重新将VPN的网卡分享到host-only网卡，然后修改host-only网卡（或者是VPN不会转发ICMP消息，可以直接打开对应VPN内网资源看看是否成功）。下一次开机时，需要先取消共享网络，再重新共享，否则也会出现没有回复的情况。（&lt;strong>即每次开虚拟机并开启VPN后，都需要重新共享网络&lt;/strong>）&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155146-grfnylf.png"
+width="583"
+height="169"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="344"
+data-flex-basis="827px"
+>​&lt;/p>
+&lt;p>　　设置完成后，如果重启虚拟机，需要重新分享网络，然后再更改ip。​​&lt;/p>
+&lt;p>　　目前还没有添加永久路由的方法，每次Linux宿主机重启后，都需要重新添加路由。&lt;/p>
+&lt;h2 id="在主机中访问对应网段">在主机中访问对应网段
+&lt;/h2>&lt;p>　　当可以ping通时，就能够在主机中正常访问了。实测ssh到内网网段服务器也是可以的。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155540-3e0311o.png"
+width="710"
+height="351"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="485px"
+>​&lt;/p>
+&lt;p>　　且不会和主机中的vpn冲突。我的主机使用的是v2ray进行科学上网，实测对本文中的行为没有影响，如果使用其他方式，不能保证。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：
+在 v2ray 不能很好的解决DNS泄漏，以及代理节点转向clash verge后，换用clash verge作为代理软件。在Linux上，Clash需要开启TUN模式，会接管DNS系统。我们学校的一些内网域名需要向VPN软件设立的DNS服务器（198.18.0.1）查询ip地址，而TUN模式的DNS查询不会自动转发到我们自己设立的虚拟机的网路中，因此导致这类网址只能在虚拟机中访问。&lt;/p>
+&lt;p>尝试过在clash中配置单独的域名解析地位，将这类域名DNS解析服务器指定为&lt;code>198.18.0.1&lt;/code>​，并将clash的fake ip域名范围修改为&lt;code>198.19.0.1/16&lt;/code>​（默认为&lt;code>198.18.0.1/16&lt;/code>​，和VPN的网段冲突）。但目前的clash verge版本中，配置&lt;code>nameserver-policy:&lt;/code>​不生效，因此，此方案还没有结果。&lt;/p>
+&lt;p>目前没有其他解决方式，但这种情况不需要在Linux宿主机上解决，直接在虚拟机上访问即可。本文的初衷是在Linux中的终端访问服务器，或者vscode连接服务器工作，因此只需要能够正常通过ip连接内网服务器即可。&lt;/p>
+&lt;p>&lt;strong>2024.11.4补充&lt;/strong>：
+本文只能代理 &lt;code>10.0.0.0/8&lt;/code>​ 的网段，如果希望通过访问内网域名的形式访问内网资源，则还应当配置 DNS 服务器。
+　　‍&lt;/p>&lt;/blockquote></description></item><item><title>Ryzen随机卡死问题</title><link>https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/</link><pubDate>Sun, 08 Oct 2023 22:49:25 +0800</pubDate><guid>https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/</guid><description>&lt;p>现象：浏览网页，编写文字等正常工作时，会突然卡死，屏幕显示内容不动，鼠标无法移动，键盘没有反应（按下大小写键，大写提示灯不会改变）。且完全随机 ，跟打开软件没有关系。经过一年多的使用，的确是AMD CPU的问题。因此尝试下面这个方案：&lt;a class="link" href="https://mrswolf.github.io/my-manjaro-log/#Ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98" target="_blank" rel="noopener"
+>Ryzen随机卡死问题&lt;/a>、&lt;a class="link" href="https://github.com/jfredrickson/disable-c6" target="_blank" rel="noopener"
+>解决方案原git仓库&lt;/a>&lt;/p>
+&lt;p>原博主内容截图：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231008162752-i4kjf46.png"
+width="1148"
+height="567"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="485px"
+>​&lt;/p>
+&lt;p>根据其中的描述&lt;/p>
+&lt;p>先安装守护进程服务软件&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -S disable-c6-systemd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo modprobe msr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>编辑/etc/modules-load.d/modules.conf，添加msr这一行，以便在启动时加载msr模块：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">msr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>最后，启动如下service，完成上述操作完成后，推荐重启电脑后才能启动。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo systemctl &lt;span class="nb">enable&lt;/span> disable-c6.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl start disable-c6.service
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果报错，就在重启后重新安装一下，再开service。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231008162943-651uf71.png"
+width="553"
+height="37"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1494"
+data-flex-basis="3587px"
+>​&lt;/p>
+&lt;p>另，根据在Manjaro中的讨论，有人在Archlinux的wiki中也找到了同样的问题描述，称之为 &lt;a class="link" href="https://wiki.archlinux.org/title/Ryzen" target="_blank" rel="noopener"
+>Soft lock freezing&lt;/a> 。根据其解决方案的描述，提供了四种方案：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>关闭rcu。考虑到需要编译内核，比较麻烦，大多数情况下不会尝试。&lt;/p>
+&lt;p>当&lt;code>Kernel &amp;gt;= 4.10.0&lt;/code>​，编译内核时，追加参数&lt;code>CONFIG_RCU_NOCB_CPU&lt;/code>​进行编译。将&lt;code>echo rcu_nocbs=0-$(($(nproc)-1))&lt;/code>​的结果，添加到grub的&lt;code>GRUB_CMDLINE_LINUX&lt;/code>​中。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>关闭c6 state&lt;/p>
+&lt;p>kernel参数追加&lt;code>processor.max_cstate=5&lt;/code>​：在grub的&lt;code>GRUB_CMDLINE_LINUX&lt;/code>​中添加&lt;code>processor.max_cstate=5processor.max_cstate=5&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo nano /etc/default/grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231009094631-98vuju1.png"
+width="533"
+height="170"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="313"
+data-flex-basis="752px"
+>​&lt;/p>
+&lt;p>保存后，还要运行&lt;code>sudo update-grub&lt;/code>​以更新grub。&lt;/p>
+&lt;p>但这个方法有可能不能正确关闭c6状态，此时就需要本文提到的方法，使用&lt;code>disable-c6-systemd&lt;/code>​进行关闭。该方法在我的电脑上不可行的，因此我通过&lt;code>disable-c6-systemd&lt;/code>​进行关闭。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>某一些笔记本中（例如HP Envy x360 15-bq100na），可能存在CPU软件锁定的问题，通过在kernel中追加参数&lt;code>idle=nomwait&lt;/code>​，可以避免。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>kernel参数追加&lt;code>pci=nomsi&lt;/code>​，这个办法我尝试过，但不起作用，仍然会冻结。尝试：&lt;code>acpi_osi=Linux&lt;/code>​加入的到kernel参数或许有用(我增加这个参数后，仍然会死机，但相较于之前概率小很多)。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>补充：这个问题所有的AMD的Ryzen处理器都会遇到！根据 &lt;a class="link" href="https://bugzilla.kernel.org/show_bug.cgi?id=196683" target="_blank" rel="noopener"
+>Bug 196683 - Random Soft Lockup on new Ryzen build&lt;/a> 这个帖子中的讨论，从2017年就开始存在，一直到现在都没有修复，我使用的是 R7 5800H，甚至在windows下，都有一定概率发生。因此，AMD真的不能yes，下一台笔记本还是intel算了。AMD虽然整体性能已经追上来了，但仍然有一些小问题，虽然不致命，但很让人心烦。&lt;/p>
+&lt;p>2023/10/13 更新&lt;br>
+最近的卡死概率降低了很多，但是在半夜仍然会卡死，看来通过软件在开机启动的时候关闭C6不能完全解决这个问题。&lt;/p>
+&lt;p>又通过一些搜索，找到了下面的文章：&lt;a class="link" href="https://cloud-atlas.readthedocs.io/zh_CN/latest/kernel/cpu/amd/amd_cpu_c-state.html" target="_blank" rel="noopener"
+>ADM Ryzon处理器随机”冻结”问题&lt;/a>、&lt;a class="link" href="https://gist.github.com/dlqqq/876d74d030f80dc899fc58a244b72df0" target="_blank" rel="noopener"
+>AMD Ryzen CPU 随机“冻结”&lt;/a>、&lt;a class="link" href="https://blog.udn.com/wldtw2008/118678592" target="_blank" rel="noopener"
+>AMD Ryzen 2700X + CentOS7 隨機鎖死問題&lt;/a>&lt;/p>
+&lt;p>根据其中的各种描述，解决方法如下：&lt;/p>
+&lt;ol>
+&lt;li>如果你的BIOS支持关闭CPU电源管理，则需要在BIOS中关闭。&lt;/li>
+&lt;li>在内核参数中增加​&lt;code>idle=nomwait&lt;/code>​&lt;/li>
+&lt;li>在内核参数中增加​&lt;code>processor.max_cstate=1 intel_idle.max_cstate=0&lt;/code>​&lt;/li>
+&lt;li>内核参数更新后，需要手动执行&lt;code>sudo update-grub&lt;/code>​以更新配置&lt;/li>
+&lt;/ol>
+&lt;p>通过下列命令查看&lt;code>max_cstate&lt;/code>​，没有更改之前其值为9。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat /sys/module/intel_idle/parameters/max_cstate
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过&lt;code>cat /proc/cmdline&lt;/code>​可以查看内核启动参数。&lt;/p>
+&lt;p>最后，我有一个不算办法的办法：启动 linux 后启动 virtualbox 虚拟机，运行 windows。这样的话，virtualbox 一直运行，能够保证不处于低功耗状态，且因为 Linux 现在并不支持微信，日常使用还是需要安装 windows 的虚拟机，因此这也算是一个卡死问题的解决方案。&lt;/p>
+&lt;p>2024/9/16 更新&lt;br>&lt;/p>
+&lt;p>Linux现在是6.1内核，更新几次内核以后现在已经不存在卡死的问题了，即便是低功耗运行。&lt;/p>
+&lt;p>但是，windows 11更新以后却开始了。。。也是低功耗运行时卡死，或者重启。为了玩黑神话我重装了系统，坏消息是重装系统没用；好消息是，高负载下不会卡死，不会重启。&lt;/p></description></item></channel></rss>

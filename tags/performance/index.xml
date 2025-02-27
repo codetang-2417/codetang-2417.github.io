@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Performance on LingLong</title><link>https://codetang-2417.github.io/tags/performance/</link><description>Recent content in Performance on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Sun, 20 Oct 2024 09:33:43 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/performance/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux Perf工具</title><link>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</link><pubDate>Sat, 19 Oct 2024 10:27:24 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>，&lt;a class="link" href="https://perfwiki.github.io/main/" target="_blank" rel="noopener"
+>perfwiki&lt;/a>，&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　&lt;a class="link" href="https://perf.wiki.kernel.org/index.php/Main_Page" target="_blank" rel="noopener"
+>perf&lt;/a> 是由 Linux 官方提供的系统性能分析工具 。我们通常说的 perf 实际上包含两部分：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>perf&lt;/strong> 命令，用户空间的应用程序，是内核子系统 &lt;strong>perf_events&lt;/strong> 的前端工具。&lt;/li>
+&lt;li>&lt;strong>perf_events&lt;/strong> ，Linux 内核中的一个子系统。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>perf_events&lt;/strong>是Linux 2.6.31版本引入的内核子系统，可以提供多种来源的事件的性能计数器，供用户空间软件 &lt;strong>perf&lt;/strong> 使用，完成性能分析（Performance profiling）。perf 和 perf_events 最初支持硬件计数器（performance monitoring counters，&lt;strong>PMC&lt;/strong>），后来扩展到下列的多种事件源的支持。&lt;/p>
+&lt;p>　　&lt;strong>perf_events&lt;/strong> 4类事件源：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Hardware Events&lt;/strong>:：由CPU 性能计数器（performance counters）以及其内部的 Performance Monitoring Unit (PMU)获取，用来统计 Hardware event，例如 cpu-cycles、instructions executed 、cache-misses、branch mispredicted、周期数（the number of cycles）、退役指令（instructions retired）， 缓存未命中（L1 cache misses L1 ）等。这些 event 因每种处理器类型和型号而异。&lt;/p>
+&lt;p>注：Last Branch Record（LBR）是Intel CPU中最先引入的一个功能，记录最近执行过的分支指令，可以用来分析分支指令的执行情况，在perf list中，branch相关的功能也被划分到PMU分类，认为LBR的相关数据是通过PMU来获取的。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Software Events&lt;/strong>: 基于内核计数器的低优先级events， 例如, context-switches，CPU migrations(处理器迁移次数)， minor faults(soft page faults)，major faults(hard page faults)。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Tracepoints&lt;/strong>:：由内核的 ftrace 实现的跟踪点事件，是散落在内核源代码中的一些 hook，用来调用probe函数。开启后，它们便可以在特定的代码被运行到时被触发，这一特性可以被各种 trace/debug 工具所使用。Perf 就是该特性的用户之一。假如您想知道在应用程序运行期间，内核内存管理模块的行为，便可以利用潜伏在 slab 分配器中的 tracepoint。当内核运行到这些 tracepoint 时，便会通知 perf。仅仅适用于2.6.3以及之后的 linux 内核。除了内核中的tracepoint，还有用户态中的，USDT（User-level statically-defined tracing）。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Dynamic Tracing&lt;/strong>： probe函数（探针or探测函数），kprobe（kernel probe）内核态探针，用来创建和管理内核代码中的探测点。Uprobes，user-probe，用户态探针，用来对用户态应用程序进行探测点的创建和管理，关于&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/kprobetrace.html" target="_blank" rel="noopener"
+>kprobe&lt;/a>和&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/uprobetracer.html" target="_blank" rel="noopener"
+>uprobe&lt;/a>可参考对应的内核文档。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　下图显示了 perf 命令和 perf_events 的关系，以及 perf_events 支持的事件源。下面的分类和linux perf wiki上的perf_envent分类有些许不同，主要在与tracepoint的定义，下图包含了Static Tracing以及Dynamic Tracing。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019173251-5nhjlei.png"
+width="2616"
+height="1362"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="460px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>&lt;/p>
+&lt;p>　　我们可以通过命令&lt;code>perf list&lt;/code>​来查看perf支持的事件类型，但&lt;code>perf list&lt;/code>​不能完全显示所有支持的事件类型，需要&lt;code>sudo perf list&lt;/code>​。&lt;/p>
+&lt;p>　　同时还可以显示特定模块支持的perf事件：hw/cache/pmu都是硬件相关的；tracepoint基于内核的ftrace；sw（software）实际上是内核计数器。&lt;/p>
+&lt;p>　　下边列出一些&lt;code>sudo perf list&lt;/code>​的输出例子：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">branches&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">context&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">switches&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cs&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cpu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">clock&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">misses&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">loads&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cpu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span>&lt;span class="o">/&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Kernel&lt;/span> &lt;span class="n">PMU&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">block&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">block_bio_backmerge&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Tracepoint&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　下图是很有名的brendan gregg的博客中的分类，他写了很多关于性能分析的书籍和博客。&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019114014-vosgddz.png"
+width="1500"
+height="1050"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="342px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix.html" target="_blank" rel="noopener"
+>www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix&amp;hellip;.&lt;/a>、&lt;a class="link" href="https://www.brendangregg.com/perf.html" target="_blank" rel="noopener"
+>www.brendangregg.com/perf.html&lt;/a>&lt;/p>
+&lt;h2 id="原理">原理
+&lt;/h2>&lt;p>　　CPU 和其他硬件设备通常提供用于观测性能数据的 PMC。简单来说，&lt;strong>PMC&lt;/strong> 就是 CPU 上的&lt;strong>可编程寄存器&lt;/strong>，可通过编程对特定硬件事件进行计数。通过 PMC 可以监控和计算 CPU 内部各种事件，比如 CPU 指令的执行效率、CPU caches 的命中率、分支预测的成功率等微结构级别的性能信息。利用这些数据分析性能，可以实现各种性能优化。&lt;/p>
+&lt;p>　　perf 命令通过 &lt;a class="link" href="https://www.man7.org/linux/man-pages/man2/perf_event_open.2.html" target="_blank" rel="noopener"
+>perf_event_open(2)&lt;/a> 系统调用访问 PMC，配置想要捕获的硬件事件。PMC 可以在两种模式下使用：&lt;/p>
+&lt;ul>
+&lt;li>Counting（计数模式），只报告Hardware Event、Software Events、PMU计数等。相关命令perf stat。开销几乎为零。&lt;/li>
+&lt;li>Sampling（采样模式），当发生一定数量的事件后，会触发一个中断，以便捕获系统的状态信息。perf将事件数据缓存到一块buffer中，然后异步写入到perf.data文件中。使用perf report等工具进行离线分析。可用于采集代码路径。&lt;/li>
+&lt;li>bpf：Kernel 4.4+新增功能，可以提供更多有效filter和输出总结。&lt;/li>
+&lt;/ul>
+&lt;p>　　下面详细介绍一下 Sampling 模式：&lt;/p>
+&lt;p>　　Perf 通过系统调用 sys_perf_event_open 陷入到内核中，内核根据 perf 提供的信息在&lt;a class="link" href="https://so.csdn.net/so/search?q=PMU&amp;amp;spm=1001.2101.3001.7020" target="_blank" rel="noopener"
+>PMU&lt;/a>（Performance Monitoring Unit）上初始化一个硬件性能计数器（PMC: Performance Monitoring Counter）。PMC随着指定硬件事件的发生而自动累加。如果不触发溢出中断，则就是counting模式，例如 perf stat模式。&lt;/p>
+&lt;p>　　在PMC 溢出时，PMU触发一个PMI（Performance Monitoring Interrupt）中断。内核在PMI 中断的处理函数中保存PMC的计数值，触发中断时的指令地址，当前时间戳以及当前进程的PID、TID、comm 等信息。我们把这些信息统称为一个采样（sample）。内核会将收集到的sample放入用于跟用户空间通信的Ring Buffer。用户空间里的perf分析程序采用mmap机制从ring buffer中读入采样，并对其解析。&lt;/p>
+&lt;p>　　下图从系统调用和数据结构的层面展示了用户空间如何获取PMU信息的流程。还有一张类似的图，是来自阿里的pdf中的，被其他博客转载，或者重绘后使用，其大体内容和下图是一致的。pdf地址：&lt;a class="link" href="https://greenteajug.cn/images/%E5%BC%82%E6%9E%84%E4%BD%93%E7%B3%BB%E4%B8%8B%E7%9A%84Java%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90.pdf" target="_blank" rel="noopener"
+>类似图&lt;/a>&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019164150-xfko25z.png"
+width="2030"
+height="930"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="523px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%88%A9%E7%94%A8%E7%8E%87/" target="_blank" rel="noopener"
+>plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%8&amp;hellip;&lt;/a>&lt;/p>
+&lt;h2 id="使用">使用
+&lt;/h2>&lt;p>　　关于 perf 的详细使用，参考：&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p></description></item></channel></rss>

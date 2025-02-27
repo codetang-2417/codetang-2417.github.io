@@ -1,0 +1,1378 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>专业知识 on LingLong</title><link>https://codetang-2417.github.io/categories/%E4%B8%93%E4%B8%9A%E7%9F%A5%E8%AF%86/</link><description>Recent content in 专业知识 on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Sun, 20 Oct 2024 09:33:43 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/categories/%E4%B8%93%E4%B8%9A%E7%9F%A5%E8%AF%86/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux Perf工具</title><link>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</link><pubDate>Sat, 19 Oct 2024 10:27:24 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>，&lt;a class="link" href="https://perfwiki.github.io/main/" target="_blank" rel="noopener"
+>perfwiki&lt;/a>，&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　&lt;a class="link" href="https://perf.wiki.kernel.org/index.php/Main_Page" target="_blank" rel="noopener"
+>perf&lt;/a> 是由 Linux 官方提供的系统性能分析工具 。我们通常说的 perf 实际上包含两部分：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>perf&lt;/strong> 命令，用户空间的应用程序，是内核子系统 &lt;strong>perf_events&lt;/strong> 的前端工具。&lt;/li>
+&lt;li>&lt;strong>perf_events&lt;/strong> ，Linux 内核中的一个子系统。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>perf_events&lt;/strong>是Linux 2.6.31版本引入的内核子系统，可以提供多种来源的事件的性能计数器，供用户空间软件 &lt;strong>perf&lt;/strong> 使用，完成性能分析（Performance profiling）。perf 和 perf_events 最初支持硬件计数器（performance monitoring counters，&lt;strong>PMC&lt;/strong>），后来扩展到下列的多种事件源的支持。&lt;/p>
+&lt;p>　　&lt;strong>perf_events&lt;/strong> 4类事件源：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Hardware Events&lt;/strong>:：由CPU 性能计数器（performance counters）以及其内部的 Performance Monitoring Unit (PMU)获取，用来统计 Hardware event，例如 cpu-cycles、instructions executed 、cache-misses、branch mispredicted、周期数（the number of cycles）、退役指令（instructions retired）， 缓存未命中（L1 cache misses L1 ）等。这些 event 因每种处理器类型和型号而异。&lt;/p>
+&lt;p>注：Last Branch Record（LBR）是Intel CPU中最先引入的一个功能，记录最近执行过的分支指令，可以用来分析分支指令的执行情况，在perf list中，branch相关的功能也被划分到PMU分类，认为LBR的相关数据是通过PMU来获取的。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Software Events&lt;/strong>: 基于内核计数器的低优先级events， 例如, context-switches，CPU migrations(处理器迁移次数)， minor faults(soft page faults)，major faults(hard page faults)。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Tracepoints&lt;/strong>:：由内核的 ftrace 实现的跟踪点事件，是散落在内核源代码中的一些 hook，用来调用probe函数。开启后，它们便可以在特定的代码被运行到时被触发，这一特性可以被各种 trace/debug 工具所使用。Perf 就是该特性的用户之一。假如您想知道在应用程序运行期间，内核内存管理模块的行为，便可以利用潜伏在 slab 分配器中的 tracepoint。当内核运行到这些 tracepoint 时，便会通知 perf。仅仅适用于2.6.3以及之后的 linux 内核。除了内核中的tracepoint，还有用户态中的，USDT（User-level statically-defined tracing）。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Dynamic Tracing&lt;/strong>： probe函数（探针or探测函数），kprobe（kernel probe）内核态探针，用来创建和管理内核代码中的探测点。Uprobes，user-probe，用户态探针，用来对用户态应用程序进行探测点的创建和管理，关于&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/kprobetrace.html" target="_blank" rel="noopener"
+>kprobe&lt;/a>和&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/uprobetracer.html" target="_blank" rel="noopener"
+>uprobe&lt;/a>可参考对应的内核文档。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　下图显示了 perf 命令和 perf_events 的关系，以及 perf_events 支持的事件源。下面的分类和linux perf wiki上的perf_envent分类有些许不同，主要在与tracepoint的定义，下图包含了Static Tracing以及Dynamic Tracing。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019173251-5nhjlei.png"
+width="2616"
+height="1362"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="460px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>&lt;/p>
+&lt;p>　　我们可以通过命令&lt;code>perf list&lt;/code>​来查看perf支持的事件类型，但&lt;code>perf list&lt;/code>​不能完全显示所有支持的事件类型，需要&lt;code>sudo perf list&lt;/code>​。&lt;/p>
+&lt;p>　　同时还可以显示特定模块支持的perf事件：hw/cache/pmu都是硬件相关的；tracepoint基于内核的ftrace；sw（software）实际上是内核计数器。&lt;/p>
+&lt;p>　　下边列出一些&lt;code>sudo perf list&lt;/code>​的输出例子：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">branches&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">context&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">switches&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cs&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cpu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">clock&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">misses&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">loads&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cpu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span>&lt;span class="o">/&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Kernel&lt;/span> &lt;span class="n">PMU&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">block&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">block_bio_backmerge&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Tracepoint&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　下图是很有名的brendan gregg的博客中的分类，他写了很多关于性能分析的书籍和博客。&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019114014-vosgddz.png"
+width="1500"
+height="1050"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="342px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix.html" target="_blank" rel="noopener"
+>www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix&amp;hellip;.&lt;/a>、&lt;a class="link" href="https://www.brendangregg.com/perf.html" target="_blank" rel="noopener"
+>www.brendangregg.com/perf.html&lt;/a>&lt;/p>
+&lt;h2 id="原理">原理
+&lt;/h2>&lt;p>　　CPU 和其他硬件设备通常提供用于观测性能数据的 PMC。简单来说，&lt;strong>PMC&lt;/strong> 就是 CPU 上的&lt;strong>可编程寄存器&lt;/strong>，可通过编程对特定硬件事件进行计数。通过 PMC 可以监控和计算 CPU 内部各种事件，比如 CPU 指令的执行效率、CPU caches 的命中率、分支预测的成功率等微结构级别的性能信息。利用这些数据分析性能，可以实现各种性能优化。&lt;/p>
+&lt;p>　　perf 命令通过 &lt;a class="link" href="https://www.man7.org/linux/man-pages/man2/perf_event_open.2.html" target="_blank" rel="noopener"
+>perf_event_open(2)&lt;/a> 系统调用访问 PMC，配置想要捕获的硬件事件。PMC 可以在两种模式下使用：&lt;/p>
+&lt;ul>
+&lt;li>Counting（计数模式），只报告Hardware Event、Software Events、PMU计数等。相关命令perf stat。开销几乎为零。&lt;/li>
+&lt;li>Sampling（采样模式），当发生一定数量的事件后，会触发一个中断，以便捕获系统的状态信息。perf将事件数据缓存到一块buffer中，然后异步写入到perf.data文件中。使用perf report等工具进行离线分析。可用于采集代码路径。&lt;/li>
+&lt;li>bpf：Kernel 4.4+新增功能，可以提供更多有效filter和输出总结。&lt;/li>
+&lt;/ul>
+&lt;p>　　下面详细介绍一下 Sampling 模式：&lt;/p>
+&lt;p>　　Perf 通过系统调用 sys_perf_event_open 陷入到内核中，内核根据 perf 提供的信息在&lt;a class="link" href="https://so.csdn.net/so/search?q=PMU&amp;amp;spm=1001.2101.3001.7020" target="_blank" rel="noopener"
+>PMU&lt;/a>（Performance Monitoring Unit）上初始化一个硬件性能计数器（PMC: Performance Monitoring Counter）。PMC随着指定硬件事件的发生而自动累加。如果不触发溢出中断，则就是counting模式，例如 perf stat模式。&lt;/p>
+&lt;p>　　在PMC 溢出时，PMU触发一个PMI（Performance Monitoring Interrupt）中断。内核在PMI 中断的处理函数中保存PMC的计数值，触发中断时的指令地址，当前时间戳以及当前进程的PID、TID、comm 等信息。我们把这些信息统称为一个采样（sample）。内核会将收集到的sample放入用于跟用户空间通信的Ring Buffer。用户空间里的perf分析程序采用mmap机制从ring buffer中读入采样，并对其解析。&lt;/p>
+&lt;p>　　下图从系统调用和数据结构的层面展示了用户空间如何获取PMU信息的流程。还有一张类似的图，是来自阿里的pdf中的，被其他博客转载，或者重绘后使用，其大体内容和下图是一致的。pdf地址：&lt;a class="link" href="https://greenteajug.cn/images/%E5%BC%82%E6%9E%84%E4%BD%93%E7%B3%BB%E4%B8%8B%E7%9A%84Java%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90.pdf" target="_blank" rel="noopener"
+>类似图&lt;/a>&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019164150-xfko25z.png"
+width="2030"
+height="930"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="523px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%88%A9%E7%94%A8%E7%8E%87/" target="_blank" rel="noopener"
+>plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%8&amp;hellip;&lt;/a>&lt;/p>
+&lt;h2 id="使用">使用
+&lt;/h2>&lt;p>　　关于 perf 的详细使用，参考：&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>数据结构知识点集合</title><link>https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/</link><pubDate>Sun, 29 Sep 2024 09:45:17 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/</guid><description>&lt;h2 id="循环队列">循环队列
+&lt;/h2>&lt;p>　　队列：先进先出的数据结构，有多种实现方式，比较简单的是通过数组模拟。还可以用链表。&lt;/p>
+&lt;p>　　循环队列则是为了解决顺序队列的”假溢出“问题而提出。&lt;/p>
+&lt;p>　　假溢出：顺序队列的数组空间没有真正被填满，但因为队列的头指针已经向后移动了一定距离，导致在继续入队时，队列判定为溢出。如果不使用循环队列，动态的修改队列的头尾指针的指向，则需要不断的将队列中的元素移动到数组的头部，保证不溢出。&lt;/p>
+&lt;p>　　循环队列需要考虑队空和队满的判别条件。&lt;/p>
+&lt;p>　　有两种方法区分队空和队满：&lt;/p>
+&lt;ol>
+&lt;li>创建变量 size，记录循环队列大小。&lt;code>size = 0&lt;/code>​为队空。&lt;code>size = array.length&lt;/code>​为队满。&lt;/li>
+&lt;li>数组只使用&lt;code>array.length-1&lt;/code>​的空间，留出1个元素作为缓冲。front指向队列中首元素，而rear指向队列尾元素的下一个元素。因此&lt;code>front == rear&lt;/code>​为队空，&lt;code>front == (rear + 1) % capacity&lt;/code>​为队满。&lt;/li>
+&lt;/ol>
+&lt;p>　　例题：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">假设以数组A[70]存放循环队列的元素, 其头指针是front=47, 当前队列有50个元素, 则队列的尾指针值为（ ）。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">A.70 B.27 C.37 D.20
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　front到数组末尾共有 70 - 47 = 23个元素，则数组头部开始应再存 50 - 23 = 27个元素，默认情况下，采用第2种循环队列判空和判满的方式，则rear指向的应该是27，也就是第28个元素。&lt;/p>
+&lt;h2 id="图">图
+&lt;/h2>&lt;p>　　参考：&lt;a class="link" href="https://www.hello-algo.com/chapter_graph/graph/" target="_blank" rel="noopener"
+>Hello 算法：图&lt;/a>&lt;/p>
+&lt;h3 id="图的分类">图的分类
+&lt;/h3>&lt;p>　　图是非线性数据结构，由顶点和边组成。根据边的特性，分为有向图和无向图。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929143933-imuuq16.png"
+width="1064"
+height="794"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="134"
+data-flex-basis="321px"
+>​&lt;/p>
+&lt;p>　　而根据顶点是否连通，又可以分为连通图和非连通图。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929144027-nmiayku.png"
+width="1049"
+height="756"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="138"
+data-flex-basis="333px"
+>​&lt;/p>
+&lt;p>　　 还可以为每一条边添加权重，从而转变为有权图&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929144337-utj2xta.png"
+width="1068"
+height="782"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="136"
+data-flex-basis="327px"
+>​&lt;/p>
+&lt;h3 id="图的术语">图的术语
+&lt;/h3>&lt;p>　　参考：&lt;a class="link" href="http://t.csdnimg.cn/b4sNJ" target="_blank" rel="noopener"
+>图（Graph）详解 - 数据结构 - CSDN App&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>邻接（adjacency）：当两顶点之间存在边相连时，称这两顶点“邻接”。在图 9-4 中，顶点 1 的邻接顶点为顶点 2、3、5。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>路径（path）：从顶点 A 到顶点 B 经过的边构成的序列被称为从 A 到 B 的“路径”。在图 9-4 中，边序列 1-5-2-4 是顶点 1 到顶点 4 的一条路径。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>度（degree）：一个顶点拥有的边数。对于有向图，入度（in-degree）表示有多少条边指向该顶点，出度（out-degree）表示有多少条边从该顶点指出。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>完全图&lt;/strong>： 在有 n 个顶点的无向图中，若有 n*(n-1)/2 条边，即任意两个顶点之间有且仅有一条边，则称此图为无向&lt;a class="link" href="https://so.csdn.net/so/search?q=%E5%AE%8C%E5%85%A8%E5%9B%BE&amp;amp;spm=1001.2101.3001.7020" target="_blank" rel="noopener"
+>完全图&lt;/a>；在 n 个顶点的有向图中，若有 n*(n-1) 条边，即任意两个顶点之间有且仅有方向相反的边，此图称为有向完全图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>路径： 在图 G = (V， E) 中，若从顶点 vi 出发有一组边使其可到达顶点 vj，则称顶点 vi 到顶点 vj 的顶点序列为从顶点 vi 到顶点 vj 的路径。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>路径长度&lt;/strong>： 对于不带权的图，一条路径的路径长度是指该路径上的边的条数；对于带权的图，一&lt;br>
+条路径的路径长度是指该路径上各个边权值的总和。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>连通图&lt;/strong>： 在&lt;strong>无向图&lt;/strong>中，若从顶点 v1 到顶点 v2 有路径，则称顶点 v1 与顶点 v2 是连通的。&lt;strong>若图中任意一对顶点都是连通的&lt;/strong>，则称此图为连通图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>强连通图&lt;/strong>： 在&lt;strong>有向图&lt;/strong>中，若在每一对顶点 vi 和 vj 之间都存在一条从 vi 到 vj 的路径，也存在一条从 vj 到 vi 的路径，则称此图是强连通图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>弱连通图&lt;/strong>：在&lt;strong>有向图&lt;/strong>中，如果将图中的所有有向边转换为无向边后，图是连通的，则称为弱连通图。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>生成树&lt;/strong>： 在&lt;strong>无向图&lt;/strong>中，一个&lt;strong>连通图&lt;/strong>的最小连通无环子图称作该图的生成树。生成树有且只有 n 个顶点和 n-1 条边。&lt;/p>
+&lt;p>注：最小连通无环子图中的”最小“应当从连通图上来理解，“最小连通子图”，指一个连通图中，边数最小的子图，但要求顶点数不变。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>无向图的连通分量：是在图中具有连通性的一部分，是图中能够相互连通的&lt;strong>极大顶点集合&lt;/strong>。因为一个图并不总是连通图、强连通图、弱连通图。往往是其中存在一些连通子图，为了描述这类图，提出的连通分量的概念，需要注意，连通分量一定是极大连通子图，如果一个顶点存在于某一个连通子图，那么这个顶点在的连通分量一定就是包含了所有和其连通的顶点的子图。&lt;/p>
+&lt;p>例题：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">对于一个具有n个顶点的无向连通图，其连通分量的个数为：
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">A.n B.n+1 C.1 D.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>连通分量是极大连通子图，对于连通图来说，其本身就是连通图，则极大连通子图就是其自身。因此，连通分量个数为1。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>强连通分量：&lt;strong>有向图&lt;/strong>中的一个子图，其中任意两个顶点之间都有&lt;strong>双向可达的路径&lt;/strong>。即对于任意顶点 $u$ 和 $v$，存在从 $u$ 到 $v$ 的路径，且也存在从 $v$ 到 $u$ 的路径。或者简单的说，图的某个子图是一个强连通图，则称这个子图为强连通分量。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>弱连通分量：有向图中，如果我们忽略边的方向，把所有边都当作无向边，那么能够连通的极大子图就是弱连通分量。或者简单的说，图的某个子图是一个弱连通图，则称这个子图为弱连通分量。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="图的表示">图的表示
+&lt;/h2>&lt;h3 id="邻接矩阵">邻接矩阵
+&lt;/h3>&lt;p>　　设图的顶点数量为 n ，邻接矩阵（adjacency matrix）使用一个 n×n 大小的矩阵来表示图，每一行（列）代表一个顶点，矩阵元素代表边，用 1 或 0 表示两个顶点之间是否存在边。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929173911-jdgnp3a.png"
+width="1062"
+height="738"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="345px"
+>​&lt;/p>
+&lt;p>　　邻接矩阵具有以下特性。&lt;/p>
+&lt;ul>
+&lt;li>顶点不能与自身相连，因此邻接矩阵主对角线元素没有意义。&lt;/li>
+&lt;li>对于无向图，两个方向的边等价，此时邻接矩阵关于主对角线对称。&lt;/li>
+&lt;li>将邻接矩阵的元素从 1 和 0 替换为权重，则可表示有权图。&lt;/li>
+&lt;/ul>
+&lt;p>　　使用邻接矩阵表示图时，我们可以直接访问矩阵元素以获取边，因此增删查改操作的效率很高，时间复杂度均为 $O(1)$ 。然而，矩阵的空间复杂度为 $O(n^2)$ ，内存占用较多。&lt;/p>
+&lt;h3 id="邻接表">邻接表
+&lt;/h3>&lt;p>　　邻接表（adjacency list）使用 n 个链表来表示图，链表节点表示顶点。第 i 个链表对应顶点 i ，其中存储了该顶点的所有邻接顶点（与该顶点相连的顶点）。图 9-6 展示了一个使用邻接表存储的图的示例。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/assets/image-20240929174243-jnhg32b.png"
+width="1056"
+height="663"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="159"
+data-flex-basis="382px"
+>​&lt;/p>
+&lt;p>　　邻接表仅存储实际存在的边，而边的总数通常远小于 $n^2$ ，因此它更加节省空间。然而，在邻接表中需要通过遍历链表来查找边，因此其时间效率不如邻接矩阵。&lt;/p>
+&lt;p>　　观察图 9-6 ，&lt;strong>邻接表结构与哈希表中的“链式地址”非常相似，因此我们也可以采用类似的方法来优化效率&lt;/strong>。比如当链表较长时，可以将链表转化为 AVL 树或红黑树，从而将时间效率从 $O(n)$ 优化至 $O(log⁡\ n)$ ；还可以把&lt;strong>链表转换为哈希表&lt;/strong>，从而将时间复杂度降至 $O(1)$ 。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>时间复杂度</title><link>https://codetang-2417.github.io/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/</link><pubDate>Sat, 21 Sep 2024 15:14:34 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://www.hello-algo.com/chapter_computational_complexity/time_complexity/" target="_blank" rel="noopener"
+>时间复杂度&lt;/a>&lt;/p>
+&lt;p>　　时间复杂度分析统计的不是算法运行时间，&lt;strong>而是算法运行时间随着数据量变大时的增长趋势&lt;/strong>。&lt;/p>
+&lt;p>　　在数学上，时间复杂度被定义为 函数渐进上界，可以简单理解为能够反应函数的增长趋势的函数。&lt;/p>
+&lt;p>　　通常用大O符号表示：$O(f(n))$。其中 $f(n)$ 就是我们计算时间复杂度时的结果。&lt;/p>
+&lt;p>　　计算 $ f(n) $ 的实质是计算操作的数量。&lt;/p>
+&lt;h2 id="计算操作数量">计算操作数量
+&lt;/h2>&lt;p>　　计算技巧：&lt;/p>
+&lt;ol>
+&lt;li>忽略常数项&lt;/li>
+&lt;li>省略系数&lt;/li>
+&lt;li>循环嵌套时，使用乘法&lt;/li>
+&lt;li>只取高阶项&lt;/li>
+&lt;/ol>
+&lt;h2 id="常见类型">常见类型
+&lt;/h2>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/assets/image-20240921162601-gdamc1b.png"
+width="1087"
+height="807"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="134"
+data-flex-basis="323px"
+>​&lt;/p>
+&lt;h3 id="常数阶o1">常数阶$O(1)$
+&lt;/h3>&lt;p>　　常数阶的操作数量与输入数据大小 n 无关，即不随着 n 的变化而变化。&lt;/p>
+&lt;p>　　在以下函数中，尽管操作数量 &lt;code>size&lt;/code>​ 可能很大，但由于其与输入数据大小 n 无关，因此时间复杂度仍为 $O(1)$：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 常数阶 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">constant&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">size&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">100000&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="线性阶on">线性阶$O(n)$
+&lt;/h3>&lt;p>　　线性阶的操作数量相对于输入数据大小 n 以线性级别增长。线性阶通常出现在&lt;strong>单层循环&lt;/strong>中：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 线性阶 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">linear&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　实际上就是操作的数量以数据规模 n 的线性级别增长。&lt;/p>
+&lt;p>　　遍历数组和遍历链表等操作的时间复杂度均为 $O(n)$ ，其中 n 为数组或链表的长度：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 线性阶（遍历数组） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">arrayTraversal&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 循环次数与数组长度成正比
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="nl">num&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="平方阶-on2">平方阶 $O(n^2)$
+&lt;/h3>&lt;p>　　平方阶的操作数量相对于输入数据大小 n 以平方级别增长。平方阶通常出现在嵌套循环中，外层循环和内层循环的时间复杂度都为 $O(n)$，因此总体的时间复杂度为 $O(n^2)$ ：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 平方阶 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">quadratic&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 循环次数与数据大小 n 成平方关系
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　以冒泡排序为例，外层循环执行 n−1 次，内层循环执行 n−1、n−2、…、2、1 次，因此时间复杂度为 $O((n−1)*n/2)=O(n^2)$（求和公式）：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 平方阶（冒泡排序） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">bubbleSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 计数器
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 外循环：未排序区间为 [0, i]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 交换 nums[j] 与 nums[j + 1]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">tmp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">tmp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 元素交换包含 3 个单元操作
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="指数阶-o2n">指数阶 $O(2^n)$
+&lt;/h3>&lt;p>　　生物学的“细胞分裂”是指数阶增长的典型例子：初始状态为 1 个细胞，分裂一轮后变为 2 个，分裂两轮后变为 4 个，以此类推，分裂 n 轮后有 $2^n$ 个细胞。&lt;/p>
+&lt;p>　　图 2-11 和以下代码模拟了细胞分裂的过程，时间复杂度为 $O(2^n)$ ：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 指数阶（循环实现） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">exponential&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">base&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 细胞每轮一分为二，形成数列 1, 2, 4, 8, ..., 2^(n-1)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">base&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">base&lt;/span> &lt;span class="o">*=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// count = 1 + 2 + 4 + 8 + .. + 2^(n-1) = 2^n - 1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在实际算法中，指数阶常出现于&lt;strong>递归函数&lt;/strong>中。例如在以下代码中，其递归地一分为二，经过 n 次分裂后停止：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 指数阶（递归实现） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">expRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">expRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">expRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/assets/image-20240921171331-ckvh8nb.png"
+width="1280"
+height="720"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>​&lt;/p>
+&lt;p>　　指数阶增长非常迅速，在穷举法（暴力搜索、回溯等）中比较常见。对于数据规模较大的问题，指数阶是不可接受的，通常需要使用动态规划或贪心算法等来解决。&lt;/p>
+&lt;h3 id="对数阶-olog-n">对数阶 $O(log⁡\ n)$
+&lt;/h3>&lt;p>　　与指数阶相反，对数阶反映了“每次操作缩减到一半”的情况。设输入数据大小为 n ，由于每次操作都缩减数据规模到一半，数据规模将迅速较少，循环次数是 $log_2\ ⁡n$，即 $2^n$ 的反函数。&lt;/p>
+&lt;p>　　图 2-12 和以下代码模拟了“每轮缩减到一半”的过程，时间复杂度为 $O(log2 ⁡n﻿)$，简记为 $O(log\ ⁡n)$ ：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 对数阶（循环实现） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">logarithmic&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">n&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">n&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　每一次操作都使 $n=n/2$​，这就会快速减少操作的次数。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/assets/image-20240928105855-xm64vsa.png"
+width="1058"
+height="653"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="388px"
+>​&lt;/p>
+&lt;p>　　和指数阶一样，对数阶也经常出现在递归函数中，两者的区别在递归返回时调用递归函数时的参数以及调用次数。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 对数阶（递归实现） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">logRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">logRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="线性对数阶onlogn">线性对数阶$O(n log n﻿)$
+&lt;/h3>&lt;p>　　线性对数阶常出现于嵌套循环中，两层循环的时间复杂度分别为 O(log⁡n) 和 O(n) 。相关代码如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 线性对数阶 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">linearLogRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">linearLogRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">linearLogRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/assets/image-20240928131924-y551g45.png"
+width="1069"
+height="762"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="140"
+data-flex-basis="336px"
+>​&lt;/p>
+&lt;h3 id="阶乘阶on">阶乘阶$O(n!)$
+&lt;/h3>&lt;p>　　阶乘阶对应数学上的“全排列”问题。给定 n 个互不重复的元素，求其所有可能的排列方案，方案数量为：&lt;/p>
+&lt;p>　　$n!=n\times(n-1)\times(n-2)\times&amp;hellip;\times2\times1$&lt;/p>
+&lt;p>　　阶乘通常使用递归实现。如图 2-14 和以下代码所示，第一层分裂出 n 个，第二层分裂出 n−1 个，以此类推，直至第 n 层时停止分裂：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 阶乘阶（递归实现） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">factorialRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 从 1 个分裂出 n 个
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">n&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">count&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">factorialRecur&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　像回溯算法就属于这一类，由于必须要遍历所有的情况，只能通过递归来实现。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/assets/image-20240928133736-63153li.png"
+width="1061"
+height="660"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="385px"
+>​&lt;/p>
+&lt;p>　　请注意，因为当 n≥4 时恒有 n!&amp;gt;2n ，所以阶乘阶比指数阶增长得更快，在 n 较大时也是不可接受的。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>常见排序算法</title><link>https://codetang-2417.github.io/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 20 Mar 2024 09:44:18 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://www.hello-algo.com/chapter_sorting/" target="_blank" rel="noopener"
+>第 11 章 排序&lt;/a>&lt;/p>
+&lt;h2 id="排序算法的评价维度">排序算法的评价维度
+&lt;/h2>&lt;p>　　&lt;strong>运行效率&lt;/strong> ：我们期望排序算法的时间复杂度尽量低，且总体操作数量较少（时间复杂度中的常数项变小）。对于大数据量的情况，运行效率显得尤为重要。&lt;/p>
+&lt;p>　　&lt;strong>就地性&lt;/strong>：顾名思义，原地排序通过在原数组上直接操作实现排序，无须借助额外的辅助数组，从而节省内存。通常情况下，原地排序的数据搬运操作较少，运行速度也更快。&lt;/p>
+&lt;p>　　&lt;strong>稳定性&lt;/strong>：稳定排序在完成排序后，&lt;strong>相等元素在数组中的相对顺序&lt;/strong>不发生改变。&lt;/p>
+&lt;p>　　稳定排序是多级排序场景的必要条件。假设我们有一个存储学生信息的表格，第 1 列和第 2 列分别是姓名和年龄。在这种情况下，非稳定排序可能导致输入数据的有序性丧失：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># 输入数据是按照姓名排序好的
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># (name, age)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;A&amp;#39;, 19)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;B&amp;#39;, 18)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;C&amp;#39;, 21)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;D&amp;#39;, 19)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;E&amp;#39;, 23)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 假设使用非稳定排序算法按年龄排序列表，
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 结果中 (&amp;#39;D&amp;#39;, 19) 和 (&amp;#39;A&amp;#39;, 19) 的相对位置改变，
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 输入数据按姓名排序的性质丢失
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;B&amp;#39;, 18)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;D&amp;#39;, 19)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;A&amp;#39;, 19)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;C&amp;#39;, 21)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> (&amp;#39;E&amp;#39;, 23)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　&lt;strong>自适应性&lt;/strong>：自适应排序能够利用输入数据已有的顺序信息来减少计算量，达到更优的时间效率。自适应排序算法的最佳时间复杂度通常优于平均时间复杂度。&lt;/p>
+&lt;p>　　&lt;strong>是否基于比较&lt;/strong>：基于比较的排序&lt;strong>依赖比较运算符&lt;/strong>（&amp;lt;、=、&amp;gt;）来判断元素的相对顺序，从而排序整个数组，理论最优时间复杂度为 O(nlog⁡n) 。而非比较排序不使用比较运算符，时间复杂度可达 O(n) ，但其通用性相对较差。&lt;/p>
+&lt;p>　　‍&lt;/p>
+&lt;p>　　复杂度为$O(n^2)$的简单排序方式，为：冒泡、选择、插入&lt;/p>
+&lt;p>　　线性对数阶 $O(nlog_2n)$ 排序：快速排序、堆排序和归并排序&lt;/p>
+&lt;p>　　‍&lt;/p>
+&lt;h2 id="选择排序">选择排序
+&lt;/h2>&lt;p>　　选择排序（selection sort）：开启一个循环，每轮从未排序区间选择最小的元素，将其放到已排序区间的末尾。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">/* 选择排序 */
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">void selectionSort(vector&amp;lt;int&amp;gt; &amp;amp;nums) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> int n = nums.size();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> // 外循环：[i, n-1)，n-1不需要遍历，一定是最大
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> // 最后一个元素不需要遍历，因为最后一个元素一定是最大的。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for (int i = 0; i &amp;lt; n - 1; i++) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> // 内循环：找到未排序区间内的最小元素，k只是作为记录。实际遍历的还是[i,n]未排序区间
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> int k = i;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> for (int j = i + 1; j &amp;lt; n; j++) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> if (nums[j] &amp;lt; nums[k])
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> k = j; // 记录最小元素的索引
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> // 将该最小元素与未排序区间的首个元素交换
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> swap(nums[i], nums[k]);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="算法特性">算法特性
+&lt;/h3>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>时间复杂度为&lt;/strong> **$O(n^2)$**​ &lt;strong>、非自适应排序&lt;/strong>：外循环共 n−1 轮，第一轮的未排序区间长度为 n ，最后一轮的未排序区间长度为 2 ，即各轮外循环分别包含 n、n−1、…、3、2 轮内循环，求和为 $(n−1)(n+2)/2$。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>空间复杂度为&lt;/strong> **$O(1)$**​ &lt;strong>、原地排序&lt;/strong>：指针 i 和 j 使用常数大小的额外空间。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>非稳定排序&lt;/strong>：在交换元素时，因此可能出现元素相同时被交换到不同的位置，如图&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/assets/image-20241001171418-ygtz7im.png"
+width="1056"
+height="684"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>​&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　‍&lt;/p>
+&lt;h2 id="冒泡排序">冒泡排序
+&lt;/h2>&lt;p>　　「冒泡排序 bubble sort」通过连续地比较与交换相邻元素实现排序。这个过程就像气泡从底部升到顶部一样,&lt;br>
+因此得名冒泡排序。实际上，冒泡排序和选择排序原理类似，但冒泡排序的效率更低，因为每一次都需要交换，而选择排序只有在确定是 最小/最大 的时候才会交换。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 冒泡排序 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">bubbleSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 外循环：未排序区间为 [0, i]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">size&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 交换 nums[j] 与 nums[j + 1]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 这里使用了 std::swap() 函数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="算法特性-1">算法特性
+&lt;/h3>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>时间复杂度为&lt;/strong> **$O(n^2)$**​ &lt;strong>、非自适应排序&lt;/strong>：外循环共 n−1 轮，第一轮的未排序区间长度为 n-1 ，最后一轮的未排序区间长度为 1 ，即各轮外循环分别包含 n−1、…、3、2 、1轮内循环，求和为 $(n−1)n/2$。而如果引入优化一，则最佳情况下，时间复杂度可达到 O(n) ，即数据全部有序的情况下，只遍历一次就可以得出结果。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>空间复杂度为&lt;/strong> **$O(1)$**​ &lt;strong>、原地排序&lt;/strong>：指针 i 和 j 使用常数大小的额外空间。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>稳定排序&lt;/strong>：在交换元素时，遇到相同的元素不会交换。&lt;/p>
+&lt;p>‍&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="效率优化">效率优化
+&lt;/h3>&lt;h4 id="优化一设置标志位">优化一：设置标志位
+&lt;/h4>&lt;p>　　我们发现，如果某轮“冒泡”中没有执行任何交换操作，说明数组已经完成排序，可直接返回结果。因此，可以增加一个标志位 &lt;code>flag&lt;/code>​ 来监测这种情况，一旦出现就立即返回。&lt;/p>
+&lt;p>　　经过优化，冒泡排序的最差时间复杂度和平均时间复杂度仍为 $O(n^2)$ ；但当输入数组完全有序时，可达到最佳时间复杂度 $O(n)$。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 冒泡排序（标志优化）*/&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">bubbleSortWithFlag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 外循环：未排序区间为 [0, i]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nf">size&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">bool&lt;/span> &lt;span class="n">flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 初始化标志位
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 交换 nums[j] 与 nums[j + 1]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 这里使用了 std::swap() 函数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 记录交换元素
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 此轮“冒泡”未交换任何元素，直接跳出
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="优化二设置结束边界">优化二：设置结束边界
+&lt;/h4>&lt;p>　　参考：&lt;a class="link" href="https://mrfzh.github.io/2019/11/17/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E5%8F%8A%E5%85%B6%E4%BC%98%E5%8C%96%EF%BC%88%E4%B8%89%E7%A7%8D%E4%BC%98%E5%8C%96%EF%BC%89/" target="_blank" rel="noopener"
+>冒泡排序及其优化（三种优化）&lt;/a>&lt;/p>
+&lt;p>　　除了检测是否有交换外，还可以记录上一次交换的位置。最后一次交换的位置之后的数据都是有序的，可以记录上一次最后交换的位置，作为下一次循环的结束边界。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 冒泡排序（边界）*/&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">bubbleSortWithFlag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">lastSwap&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 外循环：未排序区间为 [0, i]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">thisTurnLastSwap&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">lastSwap&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">thisTurnLastSwap&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 交换 nums[j] 与 nums[j + 1]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 这里使用了 std::swap() 函数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">lastSwap&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">thisTurnLastSwap&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">lastSwap&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 此轮“冒泡”未交换任何元素，直接跳出
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　这里将 优化一 的思想融入了。&lt;/p>
+&lt;h4 id="优化三双向冒泡排序">优化三：双向冒泡排序
+&lt;/h4>&lt;p>　　参考：&lt;a class="link" href="https://juejin.cn/post/6844903815716536333" target="_blank" rel="noopener"
+>最简单的冒泡排序还能怎么优化?&lt;/a>&lt;/p>
+&lt;p>　　双向冒泡排序，又叫鸡尾酒排序（Cocktail Sort）。&lt;/p>
+&lt;p>　　它的过程是：先从左往右比较一次，再从右往左比较一次，然后又从左往右比较一次，以此类推。&lt;/p>
+&lt;p>　　适用于大部分数据已经排序好的情况，可以减少已排序好数据的比较轮数。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 冒泡排序（双向冒泡）*/&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">function&lt;/span> &lt;span class="nf">bubbleSortOpt3&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// &amp;lt;== 设置每一轮循环的开始与结束位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">start&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">end&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">start&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">end&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">start&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">end&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">){&lt;/span> &lt;span class="c1">// 从start位置end位置过一遍安排最大值的位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">end&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// &amp;lt;== 由于当前最大的数已经放到了 end 位置, 故 end 位置向前移动
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">end&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">start&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">){&lt;/span> &lt;span class="c1">// 从end向start位置过一遍, 安排最小值的位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">start&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// &amp;lt;== 由于当前最小的数已经放到了 start 位置, 故 start 位置向后移动
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="插入排序">插入排序
+&lt;/h2>&lt;p>　　插入排序（insertion sort）是一种简单的排序算法，它的工作原理与手动整理一副牌的过程非常相似。&lt;/p>
+&lt;p>　　具体来说，我们在未排序区间选择一个基准元素，将该元素与其左侧已排序区间的元素逐一比较大小，并将该元素插入到正确的位置。&lt;/p>
+&lt;p>　　设基准元素为 &lt;code>base&lt;/code>​ ，我们需要将从目标索引到 &lt;code>base&lt;/code>​ 之间的所有元素向右移动一位，然后将 &lt;code>base&lt;/code>​ 赋值给目标索引。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/assets/image-20241010112126-vbbexr4.png"
+width="1280"
+height="720"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="177"
+data-flex-basis="426px"
+>​&lt;/p>
+&lt;p>　　插入排序的整体流程如图 11-7 所示。&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>初始状态下，数组的第 1 个元素已完成排序。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>选取数组的第 2 个元素作为 &lt;code>base&lt;/code>​ ，将其插入到正确位置后，&lt;strong>数组的前 2 个元素已排序&lt;/strong>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>选取第 3 个元素作为 &lt;code>base&lt;/code>​ ，将其插入到正确位置后，&lt;strong>数组的前 3 个元素已排序&lt;/strong>。&lt;/p>
+&lt;p>以此类推，在最后一轮中，选取最后一个元素作为 &lt;code>base&lt;/code>​ ，将其插入到正确位置后，&lt;strong>所有元素均已排序&lt;/strong>。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/assets/image-20241010112235-amwdlub.png"
+width="1067"
+height="662"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="161"
+data-flex-basis="386px"
+>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 插入排序 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">insertionSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 外循环：已排序区间为 [0, i-1]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">base&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 内循环：将 base 插入到已排序区间 [0, i-1] 中的正确位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">base&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">];&lt;/span> &lt;span class="c1">// 将 nums[j] 向右移动一位
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">base&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 将 base 赋值到正确位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="算法特性-2">算法特性
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>时间复杂度为&lt;/strong> **$O(n^2)$**​ &lt;strong>、自适应排序&lt;/strong>：在最差情况下，每次插入操作分别需要循环 n−1、n−2、…、2、1 次，求和得到 (n−1)n/2 ，因此时间复杂度为 $O(n^2)$ 。在遇到有序数据时，插入操作会提前终止。当输入数组完全有序时，插入排序达到最佳时间复杂度 $O(n)$ 。&lt;/li>
+&lt;li>&lt;strong>空间复杂度为&lt;/strong> **$O(1)$**​ &lt;strong>、原地排序&lt;/strong>：指针 i 和 j 使用常数大小的额外空间。&lt;/li>
+&lt;li>&lt;strong>稳定排序&lt;/strong>：在插入操作过程中，我们会将元素插入到相等元素的右侧，不会改变它们的顺序。&lt;/li>
+&lt;/ul>
+&lt;h3 id="插入排序的优势">插入排序的优势
+&lt;/h3>&lt;p>　　插入排序的时间复杂度为 $O(n^2)$ ，而我们即将学习的快速排序的时间复杂度为 $O(n\ log\ ⁡n)$ 。尽管插入排序的时间复杂度更高，&lt;strong>但在数据量较小的情况下，插入排序通常更快&lt;/strong>。&lt;/p>
+&lt;p>　　这个结论与线性查找和二分查找的适用情况的结论类似。快速排序这类 $O(n\ log⁡\ n)$ 的算法属于基于分治策略的排序算法，往往包含更多单元计算操作。而在数据量较小时，$n^2$ 和 $n\ log\ ⁡n$ 的数值比较接近，复杂度不占主导地位，每轮中的&lt;strong>单元操作数量起到决定性作用&lt;/strong>。&lt;/p>
+&lt;p>　　实际上，许多编程语言（例如 Java）的内置排序函数采用了插入排序，大致思路为：对于长数组，采用基于分治策略的排序算法，例如快速排序；对于短数组，直接使用插入排序。&lt;/p>
+&lt;p>　　虽然冒泡排序、选择排序和插入排序的时间复杂度都为 $O(n^2)$ ，但在实际情况中，&lt;strong>插入排序的使用频率显著高于冒泡排序和选择排序&lt;/strong>，主要有以下原因。&lt;/p>
+&lt;ul>
+&lt;li>冒泡排序基于元素交换实现，需要借助一个临时变量，共涉及 3 个单元操作；插入排序基于元素赋值实现，仅需 1 个单元操作。因此，&lt;strong>冒泡排序的计算开销通常比插入排序更高&lt;/strong>。&lt;/li>
+&lt;li>选择排序在任何情况下的时间复杂度都为 $O(n^2)$ 。&lt;strong>如果给定一组部分有序的数据，插入排序通常比选择排序效率更高&lt;/strong>。&lt;/li>
+&lt;li>选择排序不稳定，无法应用于多级排序。&lt;/li>
+&lt;/ul>
+&lt;h2 id="快速排序">快速排序
+&lt;/h2>&lt;p>　　快速排序（quick sort）是一种基于分治策略的排序算法，运行高效，应用广泛。和归并排序相同点都是使用分治策略，不同点在与快速排序是根据基准数划分，先划分，再排序，归并排序是先分组，再排序，再合并。&lt;/p>
+&lt;p>　　快速排序的核心操作是“哨兵划分”，其目标是：选择数组中的某个元素作为“基准数”，&lt;strong>将所有小于基准数的元素移到其左侧，而大于基准数的元素移到其右侧&lt;/strong>。具体来说，哨兵划分的流程如图 11-8 所示。&lt;/p>
+&lt;ol>
+&lt;li>选取数组最左端元素作为基准数，初始化两个指针 &lt;code>i&lt;/code>​ 和 &lt;code>j&lt;/code>​ 分别指向数组的两端。&lt;/li>
+&lt;li>设置一个循环，在每轮中使用 &lt;code>i&lt;/code>​（&lt;code>j&lt;/code>​）分别寻找第一个比基准数大（小）的元素，然后交换这两个元素。&lt;/li>
+&lt;li>循环执行步骤 &lt;code>2.&lt;/code>​ ，直到 &lt;code>i&lt;/code>​ 和 &lt;code>j&lt;/code>​ 相遇时停止，最后将基准数交换至两个子数组的分界线。&lt;/li>
+&lt;li>对左右两个子数组继续快速排序。&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 哨兵划分 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">partition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 以 nums[left] 为基准数
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">j&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 从右向左找首个小于基准数的元素
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 从左向右找首个大于基准数的元素
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]);&lt;/span> &lt;span class="c1">// 交换这两个元素
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">]);&lt;/span> &lt;span class="c1">// 将基准数交换至两子数组的分界线
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 返回基准数的索引
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 快速排序 */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 子数组长度为 1 时终止递归
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">left&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 哨兵划分
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">partition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 递归左子数组、右子数组
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="算法特性-3">算法特性
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>时间复杂度为&lt;/strong> **$O(n\ log\ n)$**​ &lt;strong>、非自适应排序&lt;/strong>：在平均情况下，哨兵划分的递归层数为 log⁡n ，每层中的总循环数为 n ，总体使用 $O(n\ log⁡\ n)$时间。在最差情况下，每轮哨兵划分操作都将长度为 n 的数组划分为长度为 0 和 n−1 的两个子数组，此时递归层数达到 n ，每层中的循环数为 n ，总体使用 $O(n^2)$时间。&lt;/li>
+&lt;li>&lt;strong>空间复杂度为&lt;/strong> **$O(1)$**​ &lt;strong>、原地排序&lt;/strong>：指针 i 和 j 使用常数大小的额外空间。&lt;/li>
+&lt;li>&lt;strong>非稳定排序&lt;/strong>：在交换基准元素时，有可能会使基准元素被交换到相等元素的后边。&lt;/li>
+&lt;/ul>
+&lt;h3 id="效率优化-1">效率优化
+&lt;/h3>&lt;h4 id="优化一基准数优化">优化一：基准数优化
+&lt;/h4>&lt;p>　　&lt;strong>快速排序在某些输入下的时间效率可能降低&lt;/strong>。举一个极端例子，假设输入数组是完全倒序的，由于我们选择最左端元素作为基准数，那么在哨兵划分完成后，基准数被交换至数组最右端，导致左子数组长度为 n−1、右子数组长度为 0 。如此递归下去，每轮哨兵划分后都有一个子数组的长度为 0 ，分治策略失效，快速排序退化为“冒泡排序”的近似形式。&lt;/p>
+&lt;p>　　为了尽量避免这种情况发生，&lt;strong>我们可以优化哨兵划分中的基准数的选取策略&lt;/strong>。例如，我们可以随机选取一个元素作为基准数。然而，如果运气不佳，每次都选到不理想的基准数，效率仍然不尽如人意。&lt;/p>
+&lt;p>　　需要注意的是，编程语言通常生成的是“伪随机数”。如果我们针对伪随机数序列构建一个特定的测试样例，那么快速排序的效率仍然可能劣化。&lt;/p>
+&lt;p>　　为了进一步改进，我们可以在数组中选取三个候选元素（通常为数组的首、尾、中点元素），&lt;strong>并将这三个候选元素的中位数作为基准数&lt;/strong>。这样一来，基准数“既不太小也不太大”的概率将大幅提升。当然，我们还可以选取更多候选元素，以进一步提高算法的稳健性。采用这种方法后，时间复杂度劣化至$O(n^2)$的概率大大降低。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">medianThree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">mid&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">l&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">r&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">right&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">m&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">mid&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">l&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">m&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">m&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">r&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">m&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">m&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">l&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">mid&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">m&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">l&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">l&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">r&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">l&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">l&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">m&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="nf">partition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">mid&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">left&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">right&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mid&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">medianThree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mid&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">mid&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">j&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">left&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　c++的库函数&lt;code>std::sort&lt;/code>​函数（基于快速排序、堆排序和插入排序的混合算法）中快排部分，也采用了基准数优化。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl"> &lt;span class="k">template&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="k">typename&lt;/span> &lt;span class="n">_Iterator&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">typename&lt;/span> &lt;span class="n">_Compare&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_GLIBCXX20_CONSTEXPR&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">__move_median_to_first&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">_Iterator&lt;/span> &lt;span class="n">__result&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">_Iterator&lt;/span> &lt;span class="n">__a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">_Iterator&lt;/span> &lt;span class="n">__b&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_Iterator&lt;/span> &lt;span class="n">__c&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">_Compare&lt;/span> &lt;span class="n">__comp&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">__comp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__b&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">__comp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__b&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__c&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">iter_swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__result&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__b&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="nf">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">__comp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__c&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">iter_swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__result&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__c&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">iter_swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__result&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__a&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="nf">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">__comp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__c&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">iter_swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__result&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__a&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span> &lt;span class="nf">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">__comp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__b&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__c&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">iter_swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__result&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__c&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">iter_swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__result&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__b&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">template&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="k">typename&lt;/span> &lt;span class="n">_RandomAccessIterator&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">typename&lt;/span> &lt;span class="n">_Compare&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_GLIBCXX20_CONSTEXPR&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">inline&lt;/span> &lt;span class="n">_RandomAccessIterator&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">__unguarded_partition_pivot&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">_RandomAccessIterator&lt;/span> &lt;span class="n">__first&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_RandomAccessIterator&lt;/span> &lt;span class="n">__last&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">_Compare&lt;/span> &lt;span class="n">__comp&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_RandomAccessIterator&lt;/span> &lt;span class="n">__mid&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">__first&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">__last&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">__first&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">__move_median_to_first&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__first&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__first&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__mid&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__last&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">__comp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">__unguarded_partition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">__first&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__last&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__first&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__comp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="优化二尾递归优化-空间优化">优化二：尾递归优化-空间优化
+&lt;/h4>&lt;p>　　&lt;strong>在某些输入下，快速排序可能占用空间较多&lt;/strong>。以完全有序的输入数组为例，设递归中的子数组长度为 m ，每轮哨兵划分操作都将产生长度为 0 的左子数组和长度为 m−1 的右子数组，这意味着每一层递归调用减少的问题规模非常小（只减少一个元素），递归树的高度会达到 n−1 ，此时需要占用 O(n) 大小的栈帧空间。&lt;/p>
+&lt;p>　　为了防止栈帧空间的累积，我们可以在每轮哨兵排序完成后，比较两个子数组的长度，&lt;strong>仅对较短的子数组进行递归&lt;/strong>。由于较短子数组的长度不会超过 n/2 ，因此这种方法能确保递归深度不超过 $log⁡\ n$，从而将最差空间复杂度优化至 $O(log\ ⁡n)$ 。代码如下所示：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/* 快速排序（尾递归优化） */&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vector&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 子数组长度为 1 时终止
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">left&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 哨兵划分操作
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">partition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 对两个子数组中较短的那个执行快速排序
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pivot&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">left&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">right&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">pivot&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">left&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 递归排序左子数组
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">left&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 剩余未排序区间为 [pivot + 1, right]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">quickSort&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">right&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 递归排序右子数组
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">right&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pivot&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 剩余未排序区间为 [left, pivot - 1]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="注意">注意
+&lt;/h3>&lt;p>　　在快速排序的分区算法中，&lt;strong>​&lt;code>while&lt;/code>​&lt;/strong>​ &lt;strong>循环的顺序&lt;/strong> 与 &lt;strong>基准元素的位置&lt;/strong> 密切相关，不能随意颠倒。原因主要有以下两个关键点，并且根据基准位置的不同，处理方式也不同：&lt;/p>
+&lt;h4 id="1-确保每个元素都能正确与基准比较">1. 确保每个元素都能正确与基准比较：
+&lt;/h4>&lt;p>　　因为程序是顺序执行的，在 i 和 j 相差1时，先执行的 while循环，会多一次比较机会，这决定了最后一次比较中的两个数据能够被正确的划分。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>右侧基准时&lt;/strong>：&lt;code>i&lt;/code>​ 指针从左向右寻找第一个 &lt;strong>大于基准的元素&lt;/strong>，&lt;code>j&lt;/code>​ 指针从右向左寻找 &lt;strong>小于基准的元素&lt;/strong>。如果 &lt;strong>​&lt;code>i&lt;/code>​&lt;/strong> &lt;strong>指针先行&lt;/strong>，它能确保左侧所有元素与基准进行比较，确保小于基准的元素正确地放置在左区间。&lt;/p>
+&lt;ul>
+&lt;li>如果颠倒顺序让 &lt;code>j&lt;/code>​ 指针先行，可能导致某些靠近基准的元素（特别是小于基准的）无法与基准比较，破坏分区的完整性。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>左侧基准时&lt;/strong>：则相反，应该让 &lt;strong>​&lt;code>j&lt;/code>​&lt;/strong>​ &lt;strong>指针先行&lt;/strong>，这样可以确保右侧的元素都能正确地与基准比较，找到第一个小于基准的元素。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="2-确保最后交换时基准与大于等于基准的元素交换">2. 确保最后交换时基准与大于等于基准的元素交换：
+&lt;/h4>&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>右侧基准时&lt;/strong>：如果 &lt;strong>​&lt;code>i&lt;/code>​&lt;/strong>​ &lt;strong>指针先行&lt;/strong>，最后一次交换时，&lt;code>i&lt;/code>​ 会停在 &lt;strong>大于等于基准的元素&lt;/strong> 上，这样交换后能确保分区结构正确，即 &lt;strong>左区间 &amp;lt; 基准 &amp;lt; 右区间&lt;/strong>。&lt;/p>
+&lt;ul>
+&lt;li>如果 &lt;code>j&lt;/code>​ 指针先行，则可能导致 &lt;code>i&lt;/code>​ 停在一个 &lt;strong>小于等于基准的元素&lt;/strong> 上，导致错误分区，破坏了左小右大的结构。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>左侧基准时&lt;/strong>：同理，应让 &lt;strong>​&lt;code>j&lt;/code>​&lt;/strong>​ &lt;strong>指针先行&lt;/strong>，这样确保最后交换时基准能够与 &lt;strong>小于等于基准的元素&lt;/strong> 交换，保证 &lt;strong>左区间 &amp;lt; 基准 &amp;lt; 右区间&lt;/strong>。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="实例说明">实例说明
+&lt;/h4>&lt;p>　　例如当 i = 0, j = 1，且 nums[0] &amp;lt;= nums[right] 时，上面的代码，会先执行 i++的循环，则 nums[i]就能够和基准 nums[right] 比较，i = j = 1。而若 j&amp;ndash; 的循环在最前面，则先执行 j&amp;ndash;的循环，这之后 i &amp;lt; j就不成立了，nums[i]就无法和基准比较，那么 i = j =0，此时大循环结束，需要交换nums[right] 和 nums[i]（i=0），而 nums[0] &amp;lt;= nums[right]，如果交换，则出现了 &lt;strong>​&lt;code>基准 &amp;lt; 右区间 &amp;gt; 左区间&lt;/code>​&lt;/strong>​ 的错误分区。正确的交换应该是 nums[right] 和 nums[1]，保证 &lt;strong>​&lt;code>左区间 &amp;lt; 基准 &amp;lt; 右区间&lt;/code>​&lt;/strong>​。&lt;/p>
+&lt;p>　　下面给出上述阐述的数组：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="err">原数组：&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">id&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">nums&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">right&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">right&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">])&lt;/span>&lt;span class="err">后：&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">id&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">nums&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="mi">5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">right&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">right&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">])&lt;/span>&lt;span class="err">后：&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">id&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">nums&lt;/span> &lt;span class="mi">2&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　所以如果我们把基准指针从 left 替换为 right，相应地，while循环的顺序就需要改变为：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">right&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="c1">// 从左侧开始找第一个大于基准的位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">j&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">right&lt;/span>&lt;span class="p">])&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="c1">// 从右侧开始找第一个小于基准的位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">j&lt;/span>&lt;span class="o">--&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">j&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">swap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">right&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">nums&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="插曲">插曲
+&lt;/h3>&lt;p>　　在 C++ 标准库中，&lt;code>std::sort&lt;/code>​ 函数是一种用于对容器或数组中的元素进行排序的函数。它是基于快速排序（Quicksort）、堆排序（Heapsort）和插入排序（Insertion Sort）的混合算法，称为 &lt;strong>Introsort&lt;/strong>。&lt;/p>
+&lt;h4 id="关键算法步骤">关键算法步骤
+&lt;/h4>&lt;ol>
+&lt;li>&lt;strong>Introsort&lt;/strong> 是基于快速排序的，但会在递归深度达到一定程度时切换到堆排序，以防止最坏情况下快速排序退化为 $O(n^2)$ 的时间复杂度。&lt;/li>
+&lt;li>在排序过程中，对小规模区间使用插入排序，以利用其在小数据集上的高效性。&lt;/li>
+&lt;/ol>
+&lt;p>　　leetcode上的排序题目：&lt;a class="link" href="https://leetcode.cn/problems/sort-an-array/" target="_blank" rel="noopener"
+>912. 排序数组&lt;/a> 中的测试数据增加了有序大数组，对快速排序不友好，会退化为类似冒泡排序的 $O(n^2)$算法，因此，使用快排需要经过基准数优化才能通过，另外，堆排序在这个题目中表现很好，因此C++中的sort函数也会快很多。&lt;/p>
+&lt;h2 id="归并排序">归并排序
+&lt;/h2>&lt;p>　　待续。&lt;/p>
+&lt;h2 id="堆排序">堆排序
+&lt;/h2>&lt;p>　　待续。&lt;/p></description></item></channel></rss>

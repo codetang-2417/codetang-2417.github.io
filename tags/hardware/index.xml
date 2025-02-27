@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hardware on LingLong</title><link>https://codetang-2417.github.io/tags/hardware/</link><description>Recent content in Hardware on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Fri, 06 Sep 2024 18:09:00 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/hardware/index.xml" rel="self" type="application/rss+xml"/><item><title>Ryzen随机卡死问题</title><link>https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/</link><pubDate>Sun, 08 Oct 2023 22:49:25 +0800</pubDate><guid>https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/</guid><description>&lt;p>现象：浏览网页，编写文字等正常工作时，会突然卡死，屏幕显示内容不动，鼠标无法移动，键盘没有反应（按下大小写键，大写提示灯不会改变）。且完全随机 ，跟打开软件没有关系。经过一年多的使用，的确是AMD CPU的问题。因此尝试下面这个方案：&lt;a class="link" href="https://mrswolf.github.io/my-manjaro-log/#Ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98" target="_blank" rel="noopener"
+>Ryzen随机卡死问题&lt;/a>、&lt;a class="link" href="https://github.com/jfredrickson/disable-c6" target="_blank" rel="noopener"
+>解决方案原git仓库&lt;/a>&lt;/p>
+&lt;p>原博主内容截图：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231008162752-i4kjf46.png"
+width="1148"
+height="567"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="485px"
+>​&lt;/p>
+&lt;p>根据其中的描述&lt;/p>
+&lt;p>先安装守护进程服务软件&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -S disable-c6-systemd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo modprobe msr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>编辑/etc/modules-load.d/modules.conf，添加msr这一行，以便在启动时加载msr模块：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">msr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>最后，启动如下service，完成上述操作完成后，推荐重启电脑后才能启动。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo systemctl &lt;span class="nb">enable&lt;/span> disable-c6.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl start disable-c6.service
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果报错，就在重启后重新安装一下，再开service。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231008162943-651uf71.png"
+width="553"
+height="37"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1494"
+data-flex-basis="3587px"
+>​&lt;/p>
+&lt;p>另，根据在Manjaro中的讨论，有人在Archlinux的wiki中也找到了同样的问题描述，称之为 &lt;a class="link" href="https://wiki.archlinux.org/title/Ryzen" target="_blank" rel="noopener"
+>Soft lock freezing&lt;/a> 。根据其解决方案的描述，提供了四种方案：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>关闭rcu。考虑到需要编译内核，比较麻烦，大多数情况下不会尝试。&lt;/p>
+&lt;p>当&lt;code>Kernel &amp;gt;= 4.10.0&lt;/code>​，编译内核时，追加参数&lt;code>CONFIG_RCU_NOCB_CPU&lt;/code>​进行编译。将&lt;code>echo rcu_nocbs=0-$(($(nproc)-1))&lt;/code>​的结果，添加到grub的&lt;code>GRUB_CMDLINE_LINUX&lt;/code>​中。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>关闭c6 state&lt;/p>
+&lt;p>kernel参数追加&lt;code>processor.max_cstate=5&lt;/code>​：在grub的&lt;code>GRUB_CMDLINE_LINUX&lt;/code>​中添加&lt;code>processor.max_cstate=5processor.max_cstate=5&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo nano /etc/default/grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231009094631-98vuju1.png"
+width="533"
+height="170"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="313"
+data-flex-basis="752px"
+>​&lt;/p>
+&lt;p>保存后，还要运行&lt;code>sudo update-grub&lt;/code>​以更新grub。&lt;/p>
+&lt;p>但这个方法有可能不能正确关闭c6状态，此时就需要本文提到的方法，使用&lt;code>disable-c6-systemd&lt;/code>​进行关闭。该方法在我的电脑上不可行的，因此我通过&lt;code>disable-c6-systemd&lt;/code>​进行关闭。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>某一些笔记本中（例如HP Envy x360 15-bq100na），可能存在CPU软件锁定的问题，通过在kernel中追加参数&lt;code>idle=nomwait&lt;/code>​，可以避免。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>kernel参数追加&lt;code>pci=nomsi&lt;/code>​，这个办法我尝试过，但不起作用，仍然会冻结。尝试：&lt;code>acpi_osi=Linux&lt;/code>​加入的到kernel参数或许有用(我增加这个参数后，仍然会死机，但相较于之前概率小很多)。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>补充：这个问题所有的AMD的Ryzen处理器都会遇到！根据 &lt;a class="link" href="https://bugzilla.kernel.org/show_bug.cgi?id=196683" target="_blank" rel="noopener"
+>Bug 196683 - Random Soft Lockup on new Ryzen build&lt;/a> 这个帖子中的讨论，从2017年就开始存在，一直到现在都没有修复，我使用的是 R7 5800H，甚至在windows下，都有一定概率发生。因此，AMD真的不能yes，下一台笔记本还是intel算了。AMD虽然整体性能已经追上来了，但仍然有一些小问题，虽然不致命，但很让人心烦。&lt;/p>
+&lt;p>2023/10/13 更新&lt;br>
+最近的卡死概率降低了很多，但是在半夜仍然会卡死，看来通过软件在开机启动的时候关闭C6不能完全解决这个问题。&lt;/p>
+&lt;p>又通过一些搜索，找到了下面的文章：&lt;a class="link" href="https://cloud-atlas.readthedocs.io/zh_CN/latest/kernel/cpu/amd/amd_cpu_c-state.html" target="_blank" rel="noopener"
+>ADM Ryzon处理器随机”冻结”问题&lt;/a>、&lt;a class="link" href="https://gist.github.com/dlqqq/876d74d030f80dc899fc58a244b72df0" target="_blank" rel="noopener"
+>AMD Ryzen CPU 随机“冻结”&lt;/a>、&lt;a class="link" href="https://blog.udn.com/wldtw2008/118678592" target="_blank" rel="noopener"
+>AMD Ryzen 2700X + CentOS7 隨機鎖死問題&lt;/a>&lt;/p>
+&lt;p>根据其中的各种描述，解决方法如下：&lt;/p>
+&lt;ol>
+&lt;li>如果你的BIOS支持关闭CPU电源管理，则需要在BIOS中关闭。&lt;/li>
+&lt;li>在内核参数中增加​&lt;code>idle=nomwait&lt;/code>​&lt;/li>
+&lt;li>在内核参数中增加​&lt;code>processor.max_cstate=1 intel_idle.max_cstate=0&lt;/code>​&lt;/li>
+&lt;li>内核参数更新后，需要手动执行&lt;code>sudo update-grub&lt;/code>​以更新配置&lt;/li>
+&lt;/ol>
+&lt;p>通过下列命令查看&lt;code>max_cstate&lt;/code>​，没有更改之前其值为9。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat /sys/module/intel_idle/parameters/max_cstate
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过&lt;code>cat /proc/cmdline&lt;/code>​可以查看内核启动参数。&lt;/p>
+&lt;p>最后，我有一个不算办法的办法：启动 linux 后启动 virtualbox 虚拟机，运行 windows。这样的话，virtualbox 一直运行，能够保证不处于低功耗状态，且因为 Linux 现在并不支持微信，日常使用还是需要安装 windows 的虚拟机，因此这也算是一个卡死问题的解决方案。&lt;/p>
+&lt;p>2024/9/16 更新&lt;br>&lt;/p>
+&lt;p>Linux现在是6.1内核，更新几次内核以后现在已经不存在卡死的问题了，即便是低功耗运行。&lt;/p>
+&lt;p>但是，windows 11更新以后却开始了。。。也是低功耗运行时卡死，或者重启。为了玩黑神话我重装了系统，坏消息是重装系统没用；好消息是，高负载下不会卡死，不会重启。&lt;/p></description></item></channel></rss>

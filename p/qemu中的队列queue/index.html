@@ -1,0 +1,449 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="\u3000\u200binclude/qemu/queue.h\u200b中的注释如下。该文件通过宏定义的方式，定义了4种数据结构，以及相关的操作。\n四种数据结构分别是：singly-linked list\u200b单向链表、list\u200b双向链表、simple queue\u200b简单队列、tail queue\u200b尾队列。\n"><meta name=keywords content="TAIL QUEUE,QEMU"><title>QEMU中的队列queue</title>
+<link rel=canonical href=https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="QEMU中的队列queue"><meta property='og:description' content="\u3000\u200binclude/qemu/queue.h\u200b中的注释如下。该文件通过宏定义的方式，定义了4种数据结构，以及相关的操作。\n四种数据结构分别是：singly-linked list\u200b单向链表、list\u200b双向链表、simple queue\u200b简单队列、tail queue\u200b尾队列。\n"><meta property='og:url' content='https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/'><meta property='og:site_name' content='LingLong'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='QEMU'><meta property='article:published_time' content='2024-10-29T09:29:20+08:00'><meta property='article:modified_time' content='2024-10-30T08:20:26+08:00'><meta name=twitter:title content="QEMU中的队列queue"><meta name=twitter:description content="\u3000\u200binclude/qemu/queue.h\u200b中的注释如下。该文件通过宏定义的方式，定义了4种数据结构，以及相关的操作。\n四种数据结构分别是：singly-linked list\u200b单向链表、list\u200b双向链表、simple queue\u200b简单队列、tail queue\u200b尾队列。\n"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_7866f48be1497b78.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>LingLong</a></h1><h2 class=site-description></h2></div></header><ol class=menu-social><li><a href=https://github.com/codetang-2417/ target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#singly-linked-list单向链表>​<code>singly-linked list</code>​单向链表</a></li><li><a href=#list双向链表>​<code>list</code>​双向链表</a></li><li><a href=#simple-queue简单队列>​<code>simple queue</code>​简单队列</a></li><li><a href=#tail-queue尾队列>​<code>tail queue</code>​尾队列</a><ol><li><a href=#tail-queue数据结构形式><code>tail queue</code>​数据结构形式</a><ol><li><a href=#qtailqlink>QTailQLink</a></li><li><a href=#qtailq_head>QTAILQ_HEAD</a></li><li><a href=#qtailq_entry>QTAILQ_ENTRY</a></li><li><a href=#moduleentry举例>​<code>ModuleEntry</code>​举例</a></li></ol></li><li><a href=#其他api>其他API</a><ol><li><a href=#head初始化>head初始化</a></li><li><a href=#头部和尾部插入>头部和尾部插入</a></li></ol></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/ style=background-color:#2a9d8f;color:#fff>编程开发</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/>QEMU中的队列queue</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Oct 29, 2024</time></div></footer></div></header><section class=article-content><p>　　​<code>include/qemu/queue.h</code>​中的注释如下。该文件通过宏定义的方式，定义了4种数据结构，以及相关的操作。<br>四种数据结构分别是：<code>singly-linked list</code>​单向链表、<code>list</code>​双向链表、<code>simple queue</code>​简单队列、<code>tail queue</code>​尾队列。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm> * This file defines four types of data structures: singly-linked lists,
+</span></span></span><span class=line><span class=cl><span class=cm> * lists, simple queues, and tail queues.
+</span></span></span><span class=line><span class=cl><span class=cm> *
+</span></span></span><span class=line><span class=cl><span class=cm> * A singly-linked list is headed by a single forward pointer. The
+</span></span></span><span class=line><span class=cl><span class=cm> * elements are singly linked for minimum space and pointer manipulation
+</span></span></span><span class=line><span class=cl><span class=cm> * overhead at the expense of O(n) removal for arbitrary elements. New
+</span></span></span><span class=line><span class=cl><span class=cm> * elements can be added to the list after an existing element or at the
+</span></span></span><span class=line><span class=cl><span class=cm> * head of the list.  Elements being removed from the head of the list
+</span></span></span><span class=line><span class=cl><span class=cm> * should use the explicit macro for this purpose for optimum
+</span></span></span><span class=line><span class=cl><span class=cm> * efficiency. A singly-linked list may only be traversed in the forward
+</span></span></span><span class=line><span class=cl><span class=cm> * direction.  Singly-linked lists are ideal for applications with large
+</span></span></span><span class=line><span class=cl><span class=cm> * datasets and few or no removals or for implementing a LIFO queue.
+</span></span></span><span class=line><span class=cl><span class=cm> *
+</span></span></span><span class=line><span class=cl><span class=cm> * A list is headed by a single forward pointer (or an array of forward
+</span></span></span><span class=line><span class=cl><span class=cm> * pointers for a hash table header). The elements are doubly linked
+</span></span></span><span class=line><span class=cl><span class=cm> * so that an arbitrary element can be removed without a need to
+</span></span></span><span class=line><span class=cl><span class=cm> * traverse the list. New elements can be added to the list before
+</span></span></span><span class=line><span class=cl><span class=cm> * or after an existing element or at the head of the list. A list
+</span></span></span><span class=line><span class=cl><span class=cm> * may only be traversed in the forward direction.
+</span></span></span><span class=line><span class=cl><span class=cm> *
+</span></span></span><span class=line><span class=cl><span class=cm> * A simple queue is headed by a pair of pointers, one the head of the
+</span></span></span><span class=line><span class=cl><span class=cm> * list and the other to the tail of the list. The elements are singly
+</span></span></span><span class=line><span class=cl><span class=cm> * linked to save space, so elements can only be removed from the
+</span></span></span><span class=line><span class=cl><span class=cm> * head of the list. New elements can be added to the list after
+</span></span></span><span class=line><span class=cl><span class=cm> * an existing element, at the head of the list, or at the end of the
+</span></span></span><span class=line><span class=cl><span class=cm> * list. A simple queue may only be traversed in the forward direction.
+</span></span></span><span class=line><span class=cl><span class=cm> *
+</span></span></span><span class=line><span class=cl><span class=cm> * A tail queue is headed by a pair of pointers, one to the head of the
+</span></span></span><span class=line><span class=cl><span class=cm> * list and the other to the tail of the list. The elements are doubly
+</span></span></span><span class=line><span class=cl><span class=cm> * linked so that an arbitrary element can be removed without a need to
+</span></span></span><span class=line><span class=cl><span class=cm> * traverse the list. New elements can be added to the list before or
+</span></span></span><span class=line><span class=cl><span class=cm> * after an existing element, at the head of the list, or at the end of
+</span></span></span><span class=line><span class=cl><span class=cm> * the list. A tail queue may be traversed in either direction.
+</span></span></span><span class=line><span class=cl><span class=cm> *
+</span></span></span><span class=line><span class=cl><span class=cm> * For details on the use of these macros, see the queue(3) manual page.
+</span></span></span><span class=line><span class=cl><span class=cm> */</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　本文主要描述<code>tail queue</code>​，并简单介绍其他三种数据结构。</p><h2 id=singly-linked-list单向链表>​<code>singly-linked list</code>​单向链表</h2><p>　　<strong>特点</strong>：</p><ul><li>由元素组成，每个元素通过单个向前的指针连接。</li><li>在列表头部或某个元素之后添加元素效率较高。</li><li>移除元素通常需要O(n)时间，因为可能涉及遍历列表以找到元素。</li><li>在删除操作较少或数据以后进先出（LIFO）方式增长的场景中最为理想。</li></ul><p>　　<strong>适用场景</strong>：</p><ul><li>在数据集大且删除操作少的应用中非常有用。</li><li>适合堆栈实现，其中元素不断地被推入并从头部弹出。</li></ul><h2 id=list双向链表>​<code>list</code>​双向链表</h2><p>　　<strong>特点</strong>：</p><ul><li>元素是双向链接的，允许轻松移除任何元素而无需完全遍历。</li><li>只能向前遍历。</li><li>新元素可以在列表的头部或现有元素之前或之后添加。</li></ul><p>　　<strong>适用场景</strong>：</p><ul><li>适合频繁插入和从列表任何部分删除的应用。</li><li>在需要快速访问和修改数据且不希望遍历列表带来性能损失的场景中常用。</li></ul><h2 id=simple-queue简单队列>​<code>simple queue</code>​简单队列</h2><p>　　<strong>特点</strong>：</p><ul><li>由两个指针头部，一个指向列表的头部，另一个指向尾部。</li><li>元素单向链接，这意味着节省空间，但只允许从头部移除。</li><li>支持在列表的末尾或现有元素之后添加元素。</li></ul><p>　　<strong>适用场景</strong>：</p><ul><li>适合队列实现，其中元素在尾部入队，在头部出队（先进先出，FIFO）。</li><li>在主要是追加操作或元素按到达顺序处理的情况下非常有用。</li></ul><h2 id=tail-queue尾队列>​<code>tail queue</code>​尾队列</h2><p>　　<strong>特点</strong>：</p><ul><li>类似于简单队列，但元素是双向链接的。</li><li>允许移除任何元素而无需遍历整个列表。</li><li>元素可以在列表的头部或尾部添加或移除，列表可以向任一方向遍历。</li></ul><p>　　<strong>适用场景</strong>：</p><ul><li>在需要频繁在列表两端插入和删除的情况下非常灵活。</li><li>理想用于实现双端队列（deque），在两端高效添加或删除数据。</li></ul><p>　　在QEMU中<code>tail queue</code>​被大量使用。</p><h3 id=tail-queue数据结构形式><code>tail queue</code>​数据结构形式</h3><h4 id=qtailqlink>QTailQLink</h4><p>　　文件<code>include/qemu/queue.h</code>​中定义了<code>tail queue</code>​最重要的数据结构<code>QTailQLink</code>​，这是一个内部结构，被<code>QTAILQ_HEAD</code>​和<code>QTAILQ_ENTRY</code>​使用。主要目的在于尽可能不影响自定义数据结构的同时，将数据结构联系起来。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>typedef</span> <span class=k>struct</span> <span class=n>QTailQLink</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span> <span class=o>*</span><span class=n>tql_next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=n>QTailQLink</span> <span class=o>*</span><span class=n>tql_prev</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>QTailQLink</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　​<code>QTailQLink</code>​定义的<code>tql_next</code>​类型为<code>void *</code>​，其作用是指向当前节点后续的自定义数据结构节点，由于自定义数据结构类型不能确定，因此只能用<code>void *</code>​定义。<code>tql_prev</code>​则是指向当前节点的前一个<code>QTailQLink</code>​节点。这两个变量的在后续<code>QTAILQ_HEAD</code>​和<code>QTAILQ_ENTRY</code>​中将体现出独特的作用。</p><h4 id=qtailq_head>QTAILQ_HEAD</h4><p>　　​<code>QTAILQ_HEAD</code>​定义如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm> * Tail queue definitions.  The union acts as a poor man template, as if
+</span></span></span><span class=line><span class=cl><span class=cm> * it were QTailQLink&lt;type&gt;.
+</span></span></span><span class=line><span class=cl><span class=cm> */</span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_HEAD(name, type)                                         \
+</span></span></span><span class=line><span class=cl><span class=cp>union name {                                                            \
+</span></span></span><span class=line><span class=cl><span class=cp>        struct type *tqh_first;       </span><span class=cm>/* first element */</span><span class=cp>               \
+</span></span></span><span class=line><span class=cl><span class=cp>        QTailQLink tqh_circ;          </span><span class=cm>/* link for circular backwards list */</span><span class=cp> \
+</span></span></span><span class=line><span class=cl><span class=cp>}
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm> * union使两个变量共享同一个空间：tqh_first为一个指针，QTailQLink包含两个指针。
+</span></span></span><span class=line><span class=cl><span class=cm> * 因此，tqh_first和tqh_circ.tql_next储存在同一个位置。
+</span></span></span><span class=line><span class=cl><span class=cm> * 即tqh_circ.tql_next就是tqh_first。
+</span></span></span><span class=line><span class=cl><span class=cm> */</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　需要注意，<code>QTAILQ_HEAD</code>​被定义为<code>union</code>​结构体，也就是<code>union</code>​结构体中所有的变量共享同一块内存空间。当我们<code>QTailQLink</code>​展开后，<code>tqh_first</code>​和<code>QTailQLink.tql_next</code>​共享同一块内存，也就是两者实际上的值是相同的，只不过名字不同。</p><p>​<img src=/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/assets/QTAILQ_HEAD-20241029231909-i9pqqvc.svg loading=lazy alt=QTAILQ_HEAD>​</p><h4 id=qtailq_entry>QTAILQ_ENTRY</h4><p>　　同理，<code>QTAILQ_ENTRY</code>​也是如此：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#define QTAILQ_ENTRY(type)                                              \
+</span></span></span><span class=line><span class=cl><span class=cp>union {                                                                 \
+</span></span></span><span class=line><span class=cl><span class=cp>        struct type *tqe_next;        </span><span class=cm>/* next element */</span><span class=cp>                \
+</span></span></span><span class=line><span class=cl><span class=cp>        QTailQLink tqe_circ;          </span><span class=cm>/* link for circular backwards list */</span><span class=cp> \
+</span></span></span><span class=line><span class=cl><span class=cp>}
+</span></span></span></code></pre></td></tr></table></div></div><p>​<img src=/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/assets/QTAILQ_ENTRY-20241030081938-km080t3.svg loading=lazy alt=QTAILQ_ENTRY>​</p><p>　　​<code>QTAILQ_HEAD</code>​和<code>QTAILQ_ENTRY</code>​区别在与，<code>QTAILQ_HEAD.tqh_first</code>​指向第一个自定义数据结构体，<code>QTAILQ_HEAD</code>​本身是一个单独节点，不会存在于自定义数据结构中。而<code>QTAILQ_ENTRY</code>​是定义在自定义数据结构体中的，作为自定义数据结构体的一部分。</p><h4 id=moduleentry举例>​<code>ModuleEntry</code>​举例</h4><p>　　为了直观的理解，以<code>util/module.c</code>​中定义的<code>ModuleEntry</code>​为例：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// A general element for tail queue, must contain QTAILQ_ENTRY, and the name for
+</span></span></span><span class=line><span class=cl><span class=c1>// QTAILQ_ENTRY is arbitrary
+</span></span></span><span class=line><span class=cl><span class=c1>// Example
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>typedef</span> <span class=k>struct</span> <span class=n>ModuleEntry</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span> <span class=p>(</span><span class=o>*</span><span class=n>init</span><span class=p>)(</span><span class=kt>void</span><span class=p>);</span>            <span class=c1>// data only for this struct
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nf>QTAILQ_ENTRY</span><span class=p>(</span><span class=n>ModuleEntry</span><span class=p>)</span> <span class=n>node</span><span class=p>;</span><span class=c1>// use for queue
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>module_init_type</span> <span class=n>type</span><span class=p>;</span>         <span class=c1>// data only for this struct
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span> <span class=n>ModuleEntry</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>typedef</span> <span class=nf>QTAILQ_HEAD</span><span class=p>(,</span> <span class=n>ModuleEntry</span><span class=p>)</span> <span class=n>ModuleTypeList</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　​<code>ModuleEntry</code>​就是自定义数据结构体，其中包含<code>QTAILQ_ENTRY</code>​定义的同时，还包含有其他变量，将其展开后代码如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>typedef</span> <span class=k>struct</span> <span class=n>ModuleEntry</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span> <span class=p>(</span><span class=o>*</span><span class=n>init</span><span class=p>)(</span><span class=kt>void</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>union</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>struct</span> <span class=n>ModuleEntry</span> <span class=o>*</span><span class=n>tqe_next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>struct</span> <span class=n>QTailQLink</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kt>void</span> <span class=o>*</span><span class=n>tql_next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=k>struct</span> <span class=n>QTailQLink</span> <span class=o>*</span><span class=n>tql_prev</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=n>tqe_circ</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=n>node</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>module_init_type</span> <span class=n>type</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>ModuleEntry</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　根据在<code>QTAILQ_ENTRY</code>​中的对<code>union</code>​结构体的分析，我们可以得到</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>ModuleEntry</span> <span class=n>entry</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=cm>/* 下面两者等价，指向ModuleEntry类型 */</span>
+</span></span><span class=line><span class=cl><span class=p>(</span><span class=n>ModuleEntry</span> <span class=o>*</span><span class=p>)</span> <span class=n>entry</span><span class=p>.</span><span class=n>node</span><span class=p>.</span><span class=nf>tqe_next</span>
+</span></span><span class=line><span class=cl><span class=p>(</span><span class=n>ModuleEntry</span> <span class=o>*</span><span class=p>)</span> <span class=n>entry</span><span class=p>.</span><span class=n>node</span><span class=p>.</span><span class=n>tqe_circ</span><span class=p>.</span><span class=n>tql_next</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/* 指向struct QTailQLink */</span>
+</span></span><span class=line><span class=cl><span class=p>(</span><span class=k>struct</span> <span class=n>QTailQLink</span> <span class=o>*</span><span class=p>)</span> <span class=n>entry</span><span class=p>.</span><span class=n>node</span><span class=p>.</span><span class=n>tqe_circ</span><span class=p>.</span><span class=n>tql_prev</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　而<code>QTAILQ_HEAD</code>​则是单独定义的：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>typedef</span> <span class=nf>QTAILQ_HEAD</span><span class=p>(,</span> <span class=n>ModuleEntry</span><span class=p>)</span> <span class=n>ModuleTypeList</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=n>ModuleTypeList</span> <span class=n>dso_init_list</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　同样将其展开，可以看到和<code>ModuleEntry</code>​不同点在在于，其中不包含其他类型的数据。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>typedef</span> <span class=k>union</span> <span class=n>ModuleTypeList</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=n>ModuleEntry</span> <span class=o>*</span><span class=n>tqh_first</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=n>QTailQLink</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>void</span> <span class=o>*</span><span class=n>tql_next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>struct</span> <span class=n>QTailQLink</span> <span class=o>*</span><span class=n>tql_prev</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=n>tqh_circ</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>ModuleTypeList</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　在实际使用时，如下图组织数据：<code>ModuleTypeList</code>​定义头节点，<code>ModuleEntry</code>​定义中间节点，双向队列由头节点和 node 之间的指针来维护。</p><p>​<img src=/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/assets/ModuleTypeList-20241030110600-83vxikp.svg loading=lazy alt=ModuleTypeList>​</p><p>　　需要注意的是，所有next指针（<code>tql_next</code>​、<code>tqe_next</code>​）指向的都是自定义数据结构，而所有的prev指针（<code>tql_prev</code>​）指向的都是<code>struct QTailQLink</code>​（即<code>tqh_circ</code>​，<code>tqe_circ</code>​）。这意味着，如果我们想要访问cur节点的前一个节点，需要从<code>tql_prev->tql_prev->tql_next</code>​来访问。</p><h3 id=其他api>其他API</h3><h4 id=head初始化>head初始化</h4><p>　　有两种方式实现：<code>QTAILQ_HEAD_INITIALIZER</code>​和<code>QTAILQ_INIT</code>​。</p><p>　　​<code>QTAILQ_HEAD_INITIALIZER</code>​ 实际上是宏定义的结构体赋值文本，不算是函数接口（api）。<br>​<code>QTAILQ_INIT</code>​是宏定义的函数体，算是函数接口（api）。</p><p>　　因此，函数调用时使用<code>QTAILQ_INIT</code>​，而定义struct时需要初始化head，则使用<code>QTAILQ_HEAD_INITIALIZER</code>​。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cm>/* */</span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_HEAD_INITIALIZER(head)                                   \
+</span></span></span><span class=line><span class=cl><span class=cp>        { .tqh_circ = { NULL, &amp;(head).tqh_circ } }
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=cm>/* 
+</span></span></span><span class=line><span class=cl><span class=cm> * HEAD初始化时，头尾是同一个节点（本HEAD节点）
+</span></span></span><span class=line><span class=cl><span class=cm> * 和后续的 QTAILQ_INIT(head)作用相同，但用途不同。
+</span></span></span><span class=line><span class=cl><span class=cm> * QTAILQ_HEAD_INITIALIZER 是宏定义，用于自定义struct初始化head时使用。
+</span></span></span><span class=line><span class=cl><span class=cm> * QTAILQ_INIT 是函数，在函数中调用实现head初始化。
+</span></span></span><span class=line><span class=cl><span class=cm> */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/* QTAILQ_HEAD_INITIALIZER */</span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=n>QemuOptsList</span> <span class=n>qemu_source_opts</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>name</span> <span class=o>=</span> <span class=s>&#34;source&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>implied_opt_name</span> <span class=o>=</span> <span class=s>&#34;file&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>head</span> <span class=o>=</span> <span class=nf>QTAILQ_HEAD_INITIALIZER</span><span class=p>(</span><span class=n>qemu_source_opts</span><span class=p>.</span><span class=n>head</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=p>.</span><span class=n>desc</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm> * Tail queue functions.
+</span></span></span><span class=line><span class=cl><span class=cm> */</span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_INIT(head) do {                                          \
+</span></span></span><span class=line><span class=cl><span class=cp>        (head)-&gt;tqh_first = NULL;                                       \
+</span></span></span><span class=line><span class=cl><span class=cp>        (head)-&gt;tqh_circ.tql_prev = &amp;(head)-&gt;tqh_circ;                  \
+</span></span></span><span class=line><span class=cl><span class=cp>} while (</span><span class=cm>/*CONSTCOND*/</span><span class=cp>0)
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=c1>// 初始化队列时，由于只有一个HEAD节点，因此HEAD的prev指向自身，next（即first元素）指向空
+</span></span></span><span class=line><span class=cl><span class=c1>// 否则HEAD的prev指向的就是尾元素
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=cm>/* QTAILQ_INIT */</span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=n>ModuleTypeList</span> <span class=n>init_type_list</span><span class=p>[</span><span class=n>MODULE_INIT_MAX</span><span class=p>];</span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=n>ModuleTypeList</span> <span class=n>dso_init_list</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=kt>void</span> <span class=nf>init_lists</span><span class=p>(</span><span class=kt>void</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>static</span> <span class=kt>int</span> <span class=n>inited</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>inited</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>(</span><span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>MODULE_INIT_MAX</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>QTAILQ_INIT</span><span class=p>(</span><span class=o>&amp;</span><span class=n>init_type_list</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nf>QTAILQ_INIT</span><span class=p>(</span><span class=o>&amp;</span><span class=n>dso_init_list</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>inited</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=头部和尾部插入>头部和尾部插入</h4><p>　　由于是宏定义实现的接口，我们预先不知道自定义的数据结构的名称，以及其中的<code>strutc QTailQLink</code>​名称，因此需要传入这两个参数，<code>elm</code>​和<code>field</code>​。例如，<code>ModuleEntry</code>​对应于<code>elm</code>​，<code>ModuleEntry</code>​中的<code>node</code>​对应于<code>field</code>​。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cm>/*
+</span></span></span><span class=line><span class=cl><span class=cm> * Tail queue functions.
+</span></span></span><span class=line><span class=cl><span class=cm> */</span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_INSERT_HEAD(head, elm, field) do {                       \
+</span></span></span><span class=line><span class=cl><span class=cp>        if (((elm)-&gt;field.tqe_next = (head)-&gt;tqh_first) != NULL)        \
+</span></span></span><span class=line><span class=cl><span class=cp>            (head)-&gt;tqh_first-&gt;field.tqe_circ.tql_prev =                \
+</span></span></span><span class=line><span class=cl><span class=cp>                &amp;(elm)-&gt;field.tqe_circ;                                 \
+</span></span></span><span class=line><span class=cl><span class=cp>        else                                                            \
+</span></span></span><span class=line><span class=cl><span class=cp>            (head)-&gt;tqh_circ.tql_prev = &amp;(elm)-&gt;field.tqe_circ;         \
+</span></span></span><span class=line><span class=cl><span class=cp>        (head)-&gt;tqh_first = (elm);                                      \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_circ.tql_prev = &amp;(head)-&gt;tqh_circ;             \
+</span></span></span><span class=line><span class=cl><span class=cp>} while (</span><span class=cm>/*CONSTCOND*/</span><span class=cp>0)
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=c1>// 向头节点插入时，先判断HEAD后有没有其他元素，并将当前元素elm的next指针指向HEAD后的元素
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果有其他元素，则将HEAD的后续元素的prev指针指向当前元素elm
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果没有其他元素，则将HEAD的prev指针指向当前元素elm。
+</span></span></span><span class=line><span class=cl><span class=c1>// 然后将HEAD的first指向elm，因为first其实就是HEAD的next
+</span></span></span><span class=line><span class=cl><span class=c1>// 最后将elm的prev指向head。
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=c1>// 需要注意：HEAD中的tqe_circ、elm中的field（即QTAILQ_ENTRY）的tqe_circ
+</span></span></span><span class=line><span class=cl><span class=c1>// 才是整个链条中的“节点”，
+</span></span></span><span class=line><span class=cl><span class=c1>// elm中，field就是QTAILQ_ENTRY，用来标识节点，因此elm不仅有“节点”，还有其他的数据
+</span></span></span><span class=line><span class=cl><span class=c1>// 而在HEAD中，HEAD就是QTAILQ_HEAD，和QTAILQ_ENTRY同属基本的queue数据结构，
+</span></span></span><span class=line><span class=cl><span class=c1>// 因此，在整个链条中，QTAILQ_HEAD和QTAILQ_ENTRY作为队列中的节点，其中的指针
+</span></span></span><span class=line><span class=cl><span class=c1>// prev和next链接每个节点。
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=c1>// 在实现中很有意思的一点，next指针的类型是type *，而pre的指针类型是QTailQLink *
+</span></span></span><span class=line><span class=cl><span class=c1>// 因此，在访问next中的“节点”时，需要访问next.field.tqe_circ，而pre直接就访问
+</span></span></span><span class=line><span class=cl><span class=c1>// pre.tqe_circ
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_INSERT_TAIL(head, elm, field) do {                       \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_next = NULL;                                   \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_circ.tql_prev = (head)-&gt;tqh_circ.tql_prev;     \
+</span></span></span><span class=line><span class=cl><span class=cp>        (head)-&gt;tqh_circ.tql_prev-&gt;tql_next = (elm);                    \
+</span></span></span><span class=line><span class=cl><span class=cp>        (head)-&gt;tqh_circ.tql_prev = &amp;(elm)-&gt;field.tqe_circ;             \
+</span></span></span><span class=line><span class=cl><span class=cp>} while (</span><span class=cm>/*CONSTCOND*/</span><span class=cp>0)
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_INSERT_AFTER(head, listelm, elm, field) do {             \
+</span></span></span><span class=line><span class=cl><span class=cp>        if (((elm)-&gt;field.tqe_next = (listelm)-&gt;field.tqe_next) != NULL)\
+</span></span></span><span class=line><span class=cl><span class=cp>            (elm)-&gt;field.tqe_next-&gt;field.tqe_circ.tql_prev =            \
+</span></span></span><span class=line><span class=cl><span class=cp>                &amp;(elm)-&gt;field.tqe_circ;                                 \
+</span></span></span><span class=line><span class=cl><span class=cp>        else                                                            \
+</span></span></span><span class=line><span class=cl><span class=cp>            (head)-&gt;tqh_circ.tql_prev = &amp;(elm)-&gt;field.tqe_circ;         \
+</span></span></span><span class=line><span class=cl><span class=cp>        (listelm)-&gt;field.tqe_next = (elm);                              \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_circ.tql_prev = &amp;(listelm)-&gt;field.tqe_circ;    \
+</span></span></span><span class=line><span class=cl><span class=cp>} while (</span><span class=cm>/*CONSTCOND*/</span><span class=cp>0)
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_INSERT_BEFORE(listelm, elm, field) do {                       \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_circ.tql_prev = (listelm)-&gt;field.tqe_circ.tql_prev; \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_next = (listelm);                                   \
+</span></span></span><span class=line><span class=cl><span class=cp>        (listelm)-&gt;field.tqe_circ.tql_prev-&gt;tql_next = (elm);                \
+</span></span></span><span class=line><span class=cl><span class=cp>        (listelm)-&gt;field.tqe_circ.tql_prev = &amp;(elm)-&gt;field.tqe_circ;         \
+</span></span></span><span class=line><span class=cl><span class=cp>} while (</span><span class=cm>/*CONSTCOND*/</span><span class=cp>0)
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=cp>#define QTAILQ_REMOVE(head, elm, field) do {                            \
+</span></span></span><span class=line><span class=cl><span class=cp>        if (((elm)-&gt;field.tqe_next) != NULL)                            \
+</span></span></span><span class=line><span class=cl><span class=cp>            (elm)-&gt;field.tqe_next-&gt;field.tqe_circ.tql_prev =            \
+</span></span></span><span class=line><span class=cl><span class=cp>                (elm)-&gt;field.tqe_circ.tql_prev;                         \
+</span></span></span><span class=line><span class=cl><span class=cp>        else                                                            \
+</span></span></span><span class=line><span class=cl><span class=cp>            (head)-&gt;tqh_circ.tql_prev = (elm)-&gt;field.tqe_circ.tql_prev; \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_circ.tql_prev-&gt;tql_next = (elm)-&gt;field.tqe_next; \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_circ.tql_prev = NULL;                          \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_circ.tql_next = NULL;                          \
+</span></span></span><span class=line><span class=cl><span class=cp>        (elm)-&gt;field.tqe_next = NULL;                                   \
+</span></span></span><span class=line><span class=cl><span class=cp>} while (</span><span class=cm>/*CONSTCOND*/</span><span class=cp>0)
+</span></span></span></code></pre></td></tr></table></div></div><p>　　除了上述<code>Tail queue functions</code>​，文件中还定义了一些访问方法，不在此处展示，当明白数据组织后，再去看源码将很容易。</p><p>　　‍</p></section><footer class=article-footer><section class=article-tags><a href=/tags/qemu/>QEMU</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>最后更新于 Oct 30, 2024 08:20 +0800</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/><div class=article-details><h2 class=article-title>QEMU开发环境搭建</h2></div></a></article><article><a href=/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/><div class=article-details><h2 class=article-title>QEMU 命令参数解析</h2></div></a></article><article><a href=/p/linux-perf%E5%B7%A5%E5%85%B7/><div class=article-details><h2 class=article-title>Linux Perf工具</h2></div></a></article><article><a href=/p/gitignore/><div class=article-details><h2 class=article-title>Gitignore</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=codetang-2417/codetang-2417.github.io data-repo-id=R_kgDOMyu4sg data-category=Announcements data-category-id=DIC_kwDOMyu4ss4CiiW6 data-mapping=title data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=zh-CN data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2024 -
+2025 LingLong's Blog</section><section class=powerby>Simple is enough.<br>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

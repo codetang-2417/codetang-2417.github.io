@@ -1,0 +1,1518 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>工具教程 on LingLong</title><link>https://codetang-2417.github.io/categories/%E5%B7%A5%E5%85%B7%E6%95%99%E7%A8%8B/</link><description>Recent content in 工具教程 on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Thu, 31 Oct 2024 16:06:22 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/categories/%E5%B7%A5%E5%85%B7%E6%95%99%E7%A8%8B/index.xml" rel="self" type="application/rss+xml"/><item><title>QEMU开发环境搭建</title><link>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link><pubDate>Wed, 30 Oct 2024 19:57:03 +0800</pubDate><guid>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid><description>&lt;p>　　QEMU开源软件在Linux上进行开发。在windows上可以采用WSL Linux，也可以自行在电脑上安装Linux原生系统。一般采用vscode作为IDE 开发QEMU。&lt;/p>
+&lt;p>　　本文采用 vscode 连接校内 ubuntu 服务器的方式进行开发环境搭建。ubuntu服务器多人使用，采用docker 容器建立各自独立的开发环境。&lt;/p>
+&lt;h2 id="docker环境">docker环境
+&lt;/h2>&lt;p>　　使用docker启动作为编译的系统环境。可以将 docker 视作轻量级虚拟机，先创建 docker镜像，再以镜像为基础启动容器。每一个容器视作虚拟机，系统环境数据存在容器中，工作文件夹等需要保存在硬盘上的重要文件，以共享文件夹的方式映射到容器。镜像不保存任何运行数据。&lt;/p>
+&lt;h3 id="dockfile">dockfile
+&lt;/h3>&lt;p>　　创建名为 &lt;code>Dockerfile&lt;/code>​ 的文件，并填入下列内容。并可以根据自行需要（用户\组 id，软件依赖等），增删其中的内容。&lt;/p>
+&lt;p>　　注意：存放 &lt;code>Dockerfile&lt;/code>​ 的文件夹中最好不要存放任何其他无关的文件，在创建镜像时，docker 会将该文件夹中的所有内容都复制到容器中，这会大大增加镜像创建的时间。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">FROM&lt;/span> &lt;span class="nl">ubuntu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">24.04&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 定义构建时变量，可以在docker build构建通过--build-arg来修改
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ARG&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">developer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 设置 DEBIAN_FRONTEND 环境变量以避免交互式对话框，否则可能会卡在一些交互式输入中
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">noninteractive&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改ubuntu的镜像源为阿里云
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># ubuntu24.04版本修改软件源的位置：/etc/apt/sources.list 替换为 /etc/apt/sources.list.d/ubuntu.sources
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">archive&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">security&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">update&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">locales&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">clean&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;%sudo ALL=(ALL) NOPASSWD:ALL&amp;#34;&lt;/span> &lt;span class="o">&amp;gt;&amp;gt;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sudoers&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改容器或系统中的 sudoers 文件，允许属于 sudo 组的用户执行 sudo 命令时无需输入密码。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改语言环境（locale）设置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">locale&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">gen&lt;/span> &lt;span class="n">en_US&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UTF&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">8&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">update&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">locale&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 添加用户：赋予sudo权限，指定密码123，建议docker的密码不要太复杂，太多了很容易忘记。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 注：用户id和组id尽可能的和当前用户id一致，使得读写共享文件时的权限一致，否则可能出现docker无法写入共享文件的问题。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 命令 id 可以查看用户的各种id
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">group&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">groupadd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">useradd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">ms&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bash&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">u&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">UID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">G&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;${username}:123&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="nl">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">123&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 安装各种以依赖软件，可以根据需要定制，也可以后续手动安装。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># QEMU编译需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> &lt;span class="n">meson&lt;/span> &lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">pkg&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">config&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">diffutils&lt;/span> &lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">venv&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libusb&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">1.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libncursesw5&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libpixman&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libepoxy&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libv4l&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpng&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">image&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgtk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgdk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pixbuf2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libasound2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpulse&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libx11&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libfdt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libiscsi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># riscv-gnu-toolchain 需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">autoconf&lt;/span> &lt;span class="n">automake&lt;/span> &lt;span class="n">autotools&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">curl&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pip&lt;/span> &lt;span class="n">libmpc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libmpfr&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgmp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">gawk&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bison&lt;/span> &lt;span class="n">flex&lt;/span> &lt;span class="n">texinfo&lt;/span> &lt;span class="n">gperf&lt;/span> &lt;span class="n">libtool&lt;/span> &lt;span class="n">patchutils&lt;/span> &lt;span class="n">bc&lt;/span> &lt;span class="n">zlib1g&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libexpat&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libslirp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">gdb&lt;/span> &lt;span class="n">clang&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">vim&lt;/span> &lt;span class="n">gdb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 还原 DEBIAN_FRONTEND 环境变量（可选）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dialog&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的工作目录
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">WORKDIR&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的登录用户
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">USER&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="创建镜像">创建镜像
+&lt;/h3>&lt;p>　　基础构建&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 &lt;code>-t&lt;/code>​ 后跟镜像名称，可任意更改。&lt;code>docker build -t tc-qemu .&lt;/code>​ 这条命令会从当前目录（&lt;code>.&lt;/code>​）中寻找 &lt;code>Dockerfile&lt;/code>​，然后根据其中的指令构建一个名为 &lt;code>tc-qemu&lt;/code>​ 的 Docker 镜像。&lt;/p>
+&lt;p>　　若在创建镜像时希望动态修改 &lt;code>Dockerfile&lt;/code>​ 中的ARG参数，则在构建时，添加参数 &lt;code>--build-arg ARG_name=value&lt;/code>​ ，将 &lt;code>ARG_name&lt;/code>​ 修改为 &lt;code>value&lt;/code>​。&lt;/p>
+&lt;p>　　由于每个用户 id 和组 id 不一样，需要在终端中运行命令&lt;code>id&lt;/code>​查询到当前用户的group和user id，并在构建时修改参数：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　修改用户 id 和组 id 和当前的账户一致，是为了确保在写入共享文件夹的时候有相同的权限，否则可能造成在容器中无法正常写入的情况。&lt;/p>
+&lt;h3 id="创建容器">创建容器
+&lt;/h3>&lt;p>　　下面的命令创建一个名为 tc_qemu_dev 的容器，并将主机的文件夹 &lt;code>/home/tiancheng.tang/Desktop/work/&lt;/code>​ 共享到容器中的 &lt;code>/home/developer/work&lt;/code>​ 文件夹。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">it&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">tc_qemu_dev&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">mount&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">bind&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">source&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">tiancheng&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tang&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Desktop&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">developer&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　注：如果需要使用代理网络，可以通过ssh隧道将流量代理到本机（例如：&lt;a class="link" href="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/#%E5%8F%8D%E5%90%91-ssh-%E9%9A%A7%E9%81%93" target="_blank" rel="noopener"
+>个人Linux主机通过SSH隧道使服务器访问外网&lt;/a>），在创建容器时添加参数&lt;code>--network host&lt;/code>​，让docker位于host网络中。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在设置代理时，可以手动设置 &lt;code>export http_proxy=&amp;quot;localhost:7897&amp;quot; export https_proxy=&amp;quot;localhost:7897&amp;quot;&lt;/code>​，也可以在启动容器时，添加参数直接设置代理环境 &lt;code>-e HTTP_PROXY=http://localhost:7897&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host -e &lt;span class="nv">HTTP_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 -e &lt;span class="nv">HTTPS_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　上述命令的含义自行询问GPT或者查询网络。&lt;/p>
+&lt;h2 id="qemu-源码">QEMU 源码
+&lt;/h2>&lt;p>　　QEMU 是一个大型开源软件，会不断的发布稳定版本，并在 master 主分支上不断更新新的功能。为了便于对旧版本进行维护、修复和发布更新，QEMU 为每一个稳定版本都创建了 stable 分支，并会不断的维护。&lt;/p>
+&lt;p>　　本文以 qemu 9.0 分支版本作为基础，进行开发。&lt;/p>
+&lt;p>　　官方源码仓库：&lt;a class="link" href="https://github.com/qemu/qemu.git" target="_blank" rel="noopener"
+>github.com/qemu/qemu.git&lt;/a>&lt;/p>
+&lt;h3 id="官方仓库-fork-到私人仓库">官方仓库 fork 到私人仓库
+&lt;/h3>&lt;p>　　以 gitee 为例&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031151316-pxi596o.png"
+width="930"
+height="877"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="106"
+data-flex-basis="254px"
+>​&lt;/p>
+&lt;p>　　将私人仓库 clone 到本地：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="nl">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="c1">//gitee.com/code-tang/qemu-sayram2.0.git
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="私人仓库建立工作分支">私人仓库建立工作分支
+&lt;/h3>&lt;p>　　在稳定分支 9.0 基础上，在本地新建新分支 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​，并将本地新建的两个分支 push 远程仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">fetch&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">stable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">9.0&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">checkout&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">b&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　然后查看本地分支情况：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ git branch -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> master 58d49b5895 Merge tag &lt;span class="s1">&amp;#39;net-pull-request&amp;#39;&lt;/span> of https://github.com/jasowang/qemu into staging
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sayram2 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* sayram2-dev 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中，&lt;code>sayram2-dev&lt;/code>​ 作为开发分支，开发稳定后，merge 到稳定分支 &lt;code>sayram2&lt;/code>​ 中。若后续官方的 &lt;code>stable-9.0&lt;/code>​ 分支出现重大更新，可将其 pull 到本地，和 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​两个分支进行 &lt;code>merge&lt;/code>​。&lt;/p>
+&lt;p>　　注意：需要更新官方仓库时，不要在仓库点击强制同步，这样会覆盖仓库代码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031160032-rtr0qeg.png"
+width="720"
+height="64"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1125"
+data-flex-basis="2700px"
+>​&lt;/p>
+&lt;p>　　若要更新官方仓库，需在本地添加官方 github 仓库源，并 pull 代码到对应的分支，完成 merge 工作后，再推送到私有仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git remote add official https://github.com/qemu/qemu.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git checkout sayram2-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0 --rebase
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　执行该命令后，本地分支将基于 &lt;code>official&lt;/code>​ 的 &lt;code>stable-9.0&lt;/code>​ 分支的最新提交进行变基，相当于先将远程的更改应用在当前分支上，再重新应用本地的更改，从而避免出现合并提交。出现冲突需要手动解决。&lt;/p>
+&lt;p>　　如果后续 &lt;code>stable-9.0&lt;/code> 出现更新，并希望将更新应用到 &lt;code>sayram2&lt;/code> 分支，则可以直接 pull &lt;code>stable-9.0&lt;/code>。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git checkout sayram2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="常规编译流程">常规编译流程
+&lt;/h2>&lt;p>　　参考官方文档：&lt;a class="link" href="https://www.qemu.org/docs/master/devel/build-system.html" target="_blank" rel="noopener"
+>www.qemu.org/docs/master/devel/build-system.html&lt;/a>&lt;/p>
+&lt;p>　　一般的开发仅关注于源码，不会对编译脚本做过多改动。&lt;br>
+从源码编译 qemu 总共两步：1. configure 2. build&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>configure&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">riscv32&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">softmmu&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">enable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">debug&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>关于 &lt;code>configure&lt;/code>​ 的更多选项可以参考 &lt;code>./configure --help&lt;/code>​ 的输出。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">developer&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">AS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4124&lt;/span>&lt;span class="n">GS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nl">TNR&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">~/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">official&lt;/span>&lt;span class="err">$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Using&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="n">as&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">directory&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">output&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Usage&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">configure&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">options&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Options&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">defaults&lt;/span> &lt;span class="n">in&lt;/span> &lt;span class="n">brackets&lt;/span> &lt;span class="n">after&lt;/span> &lt;span class="n">descriptions&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Standard&lt;/span> &lt;span class="nl">options&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span> &lt;span class="n">print&lt;/span> &lt;span class="n">this&lt;/span> &lt;span class="n">message&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">LIST&lt;/span> &lt;span class="n">set&lt;/span> &lt;span class="n">target&lt;/span> &lt;span class="nf">list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">default&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">all&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Available&lt;/span> &lt;span class="nl">targets&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">aarch64&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">aarch64_be&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span> &lt;span class="n">alpha&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>build&lt;/p>
+&lt;p>可以使用 make 和 ninja 进行编译，两者都行。区别是 ninja 自动开启多线程加速编译，而 make 需要手动加上参数 &lt;code>-j&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">or&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">make&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">j&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>个人喜欢用 ninja，输出的编译信息不会占满整个屏幕。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="vscode远程开发项目">vscode远程开发项目
+&lt;/h2>&lt;p>　　vscode 实际上就是一个编辑器，但是可以通过各种插件将其变为一个IDE。例如远程开发功能，vscode 需要安装扩展：&lt;code>Remote - SSH&lt;/code>​、 &lt;code>Dev Containers&lt;/code>​。vscode 可以运行在任意电脑上，通过远程网络连接到同一个工作服务器上开发。&lt;/p>
+&lt;h3 id="ssh连接服务器">SSH连接服务器
+&lt;/h3>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211448-d4j9gd9.png"
+width="593"
+height="437"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="135"
+data-flex-basis="325px"
+>​&lt;/p>
+&lt;p>　　新建远程后，会在顶部弹出界面，提示输入 ssh 连接命令。如图所示输入账号和ip地址&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211607-8yard8u.png"
+width="983"
+height="238"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="413"
+data-flex-basis="991px"
+>​&lt;/p>
+&lt;p>　　顶部会弹出选项框，要求选择一个配置文件，保存当前连接的服务器信息。选择第一个即可。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211646-6hsiz16.png"
+width="854"
+height="190"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="449"
+data-flex-basis="1078px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030221157-pqslqt2.png"
+width="417"
+height="332"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="301px"
+>​&lt;/p>
+&lt;p>　　这里的配置文件可以后续再进行修改，其中 &lt;code>Host&lt;/code>​ 表示 ssh 服务器名称，可以任意更改，&lt;code>Hostname&lt;/code>​ 保存服务器 ip地址， &lt;code>User&lt;/code>​ 保存用户名。&lt;/p>
+&lt;p>　　然后远程资源管理器会更新输入的服务器信息。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211726-aibbt0d.png"
+width="602"
+height="524"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="114"
+data-flex-basis="275px"
+>​&lt;/p>
+&lt;p>　　点击连接按钮后，顶部弹出输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211938-9ymbm7u.png"
+width="695"
+height="177"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="392"
+data-flex-basis="942px"
+>​&lt;/p>
+&lt;p>　　首次连接，或者更新 vscode 后，服务器会下载 vscode 服务器，需要一定时间。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212255-07r1nod.png"
+width="1030"
+height="797"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="310px"
+>​&lt;/p>
+&lt;h3 id="vscode连接容器">vscode连接容器
+&lt;/h3>&lt;p>　　当安装完 &lt;code>Dev Containers&lt;/code>​ 扩展后，远程资源管理器会多一个开发容器的选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212814-liiy75b.png"
+width="420"
+height="444"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="94"
+data-flex-basis="227px"
+>​&lt;/p>
+&lt;p>　　已经连接的容器会显示在 &lt;code>开发容器&lt;/code>​ 这一栏，没有连接过的容器显示在 &lt;code>其他容器&lt;/code>​ 这一栏。和 SSH 同理，点击容器连接即可，不需要输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212916-fz5eol8.png"
+width="665"
+height="890"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="74"
+data-flex-basis="179px"
+>​&lt;/p>
+&lt;p>　　连接后，所有的开发环境都存在于 docker 容器，在本文创建镜像时，共享了主机的 &lt;code>work&lt;/code>​ 目录，因此，将代码存放于该目录。&lt;/p>
+&lt;h3 id="vscode-中调试">vscode 中调试
+&lt;/h3>&lt;p>　　vscode 只是编辑器，还需要配置 &lt;code>task.json&lt;/code>​ 调试文件，和 &lt;code>launch.json&lt;/code>​ 文件来决定调试需要运行的文件，调试工具的位置等。&lt;/p>
+&lt;p>　　qemu 在 Linux 上的调试文件如下：&lt;/p>
+&lt;p>　　​&lt;code>.vscode/launch.json&lt;/code>​：调试文件，F5快捷键进入调试模式&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Use IntelliSense to learn about possible attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// Hover to view descriptions of existing attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;0.2.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;configurations&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="c1">//&amp;#34;-init_data&amp;#34;,&amp;#34;${workspaceFolder}/Hmatrix0.dat &amp;#34;ultichip-u1,pipeline=true&amp;#34;,&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --disable-werror --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;(gdb) Launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cppdbg&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;request&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;program&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}/build/qemu-system-riscv32&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// QEMU 启动时的参数，需要根据需要，自行调整。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;args&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;-machine&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ub&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-cpu&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ultichip-u1,pipeline=true&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-bios&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#39;&amp;#39;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-m&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;128M&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-d&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;in_asm&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-display&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;none&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-ulog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/runtime.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;-rlog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/reg.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-savedmem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;./test_sayram/outlog/dmemory.dat&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-nographic&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-kernel&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;./test_sayram/input/dl/vp0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-device&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;loader,file=./test_sayram/input/dl/qemu_indmem.bin,addr=0x17b40&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-lbr&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;32&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;stopAtEntry&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;cwd&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;environment&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;PATH&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;%PATH%;&lt;/span>&lt;span class="se">\b&lt;/span>&lt;span class="s">in&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//&amp;#34;console&amp;#34;: &amp;#34;externalTerminal&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;MIMode&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;miDebuggerArgs&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-q -ex quit; wait() { fg &amp;gt;/dev/null; }; /bin/gdb -q --interpreter=mi&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// &amp;#34;miDebuggerPath&amp;#34;: &amp;#34;F:/msys/mingw64/bin/gdb.exe&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;setupCommands&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;description&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;Enable pretty-printing for gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;text&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-enable-pretty-printing&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;ignoreFailures&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;preLaunchTask&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>.vscode/task.json&lt;/code>​：编译任务，决定如何编译项目&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// See https://go.microsoft.com/fwlink/?LinkId=733558
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// for the documentation about the tasks.json format
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;2.0.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;tasks&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;label&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;shell&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 手动运行一次：./configure --enable-debug --target-list=riscv32-softmmu --disable-werror
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;command&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cd build; ninja; cd ..&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;problemMatcher&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;group&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;kind&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;isDefault&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p></description></item><item><title>搜索引擎收录个人博客-SEO（搜索引擎优化）</title><link>https://codetang-2417.github.io/p/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E6%94%B6%E5%BD%95%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2-seo%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E4%BC%98%E5%8C%96/</link><pubDate>Tue, 17 Sep 2024 10:01:32 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E6%94%B6%E5%BD%95%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2-seo%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E4%BC%98%E5%8C%96/</guid><description>&lt;h2 id="博客seo优化">博客seo优化
+&lt;/h2>&lt;p>　　SEO（搜索引擎优化）指的是一系列的策略和技术，旨在提高博客在搜索引擎结果页面（SERP）上的可见性和排名。SEO的目标是使博客在搜索引擎中更容易被用户找到，从而吸引更多的有针对性的流量。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://www.sulvblog.cn/posts/blog/hugo_seo/" target="_blank" rel="noopener"
+>Hugo博客seo优化&lt;/a>&lt;/p>
+&lt;h3 id="页面关键词">页面关键词
+&lt;/h3>&lt;p>　　为每篇博客文章设置标题、关键词、描述&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">seo优化&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">keywords&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">seo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">hugo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;hugo博客seo优化&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="页面描述">页面描述
+&lt;/h3>&lt;p>　　在站点目录下的config中添加博客描述有利于搜索&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">params&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Ling的个人博客，hugo，papermod，golang，mysql，微服务&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="google搜索优化">Google搜索优化
+&lt;/h3>&lt;p>　　第一步，进入&lt;a class="link" href="https://search.google.com/search-console" target="_blank" rel="noopener"
+>Google Search Console&lt;/a>点击添加资源，输入自己的网站。比如我的是 &lt;a class="link" href="https://codetang-2417.github.io" target="_blank" rel="noopener"
+>https://codetang-2417.github.io&lt;/a>，选择第二种验证方式，然后下载一个html文件放到hugo站点的static文件夹下，然后重新部署站点，回到Google Search Console页面点击验证，如果能访问到表示验证成功。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E6%94%B6%E5%BD%95%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2-seo%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E4%BC%98%E5%8C%96/assets/image-20231005232045-hh5js26.png"
+width="653"
+height="827"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="78"
+data-flex-basis="189px"
+>​&lt;/p>
+&lt;p>　　第二步，在Google Search Console页面点击站点地图，输入当前站点的sitemap.xml，也有可能是其他后缀，hugo部署后一般会自动生成sitemap，在根目录下，如：https://codetang-2417.github.io/sitemap.xml。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E6%94%B6%E5%BD%95%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2-seo%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E4%BC%98%E5%8C%96/assets/image-20231005232543-h4bnoxd.png"
+width="1127"
+height="425"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="265"
+data-flex-basis="636px"
+>​&lt;/p>
+&lt;h3 id="百度搜索优化">百度搜索优化
+&lt;/h3>&lt;p>　　进入&lt;a class="link" href="https://ziyuan.baidu.com/" target="_blank" rel="noopener"
+>百度搜索资源平台&lt;/a>，选择 用户中心-&amp;gt;站点管理-&amp;gt;添加网站，添加上你自己的网站，这里的验证方式也可以选择下载html的方式，步骤和google的一样，验证成功后选择 搜索服务-&amp;gt;普通收录-&amp;gt;sitemap，输入sitemap的网址，和google的站点地图一样，如我的是： &lt;a class="link" href="https://codetang-2417.github.io/sitemap.xml" target="_blank" rel="noopener"
+>https://codetang-2417.github.io/sitemap.xml&lt;/a>。注意百度不允许以子目录的方式提交子站点，和google不一样，只能在提交sitemap文件时，提交多个sitemap文件。&lt;/p>
+&lt;h3 id="必应搜索优化">必应搜索优化
+&lt;/h3>&lt;p>　　进入&lt;a class="link" href="https://www.bing.com/webmasters" target="_blank" rel="noopener"
+>Bing Webmaster Tools&lt;/a>，登录后直接导入google的数据就可以，很方便。&lt;/p>
+&lt;h2 id="收录时间">收录时间
+&lt;/h2>&lt;p>　　我的网站在2023年9月底建立，直到2024年8月底才被大量的收录进谷歌。&lt;/p>
+&lt;p>　　这期间只有一个网页被编入索引。收录的速度和网站的质量以及上述的SEO有关系。所以网站短时间内是不会被立刻收录，需要慢慢等待，不断的更新网站提升质量。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E6%94%B6%E5%BD%95%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2-seo%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E4%BC%98%E5%8C%96/assets/image-20240919230516-xwfyak9.png"
+width="1186"
+height="700"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="169"
+data-flex-basis="406px"
+>​&lt;/p>
+&lt;p>　　还可以点进入查看未编入索引的原因，并验证当前的修正情况。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E6%94%B6%E5%BD%95%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2-seo%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E%E4%BC%98%E5%8C%96/assets/image-20240919230825-5l5sdn8.png"
+width="1286"
+height="834"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>​&lt;/p></description></item><item><title>基于 Hugo 和 github pages搭建bolg</title><link>https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/</link><pubDate>Sun, 15 Sep 2024 09:09:00 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/</guid><description>&lt;p>　　目前搭建个人博客网站分为动态网站和静态网站两种。其中动态网站需要购买服务器，并且需要维护网站安全，虽然功能比静态网站更多更丰富，也有后台管理系统，可以在线写博客，但成本还是太高。这类网站框架有：wordpress（主流，功能丰富但需要时间和优化知识），typecho（轻量级，最近团队开始重新维护），Halo等。&lt;/p>
+&lt;p>　　静态网站则功能有限，只能显示静态编译好的html，不能在线写博客，没有管理系统。但好在可以0成本搭建，结合github page功能，无需服务器就可以搭建。这类网站框架有Hugo（go语言编写，大量博客加载速度快，新框架，但目前已经发展的挺不错的了），Hexo（老牌，网络资源丰富，但大量博文加载很慢）等。&lt;/p>
+&lt;p>　　结合我自己的需求，静态网站就足够我的使用场景了。并考虑到日后的博客数量会很多，选择Hugo。&lt;/p>
+&lt;p>　　且之前也用hugo搭过一个博客网站，但是由于发布太过于繁琐（即使使用了github action），后面没有怎么更新了。但现在思源的发布插件已经支持了一键自动发布，和思源配合，&lt;del>能够解放双手，为这个博客发布的工作流补上最后一块拼图&lt;/del>。由于其效果不好，最终还是不能使用这个一键发布工具，不过考虑参考采用这个发布工具，开发一个针对我的应用场景的发布工具。Todo++&lt;/p>
+&lt;p>　　补充：如果想建立类似于书籍或者使用说明的这种形式的博客网站，可以选择 mkdocs，mdbook可能存在一些小问题。&lt;/p>
+&lt;h2 id="github-page类型选择">github page类型选择
+&lt;/h2>&lt;p>　　我们使用github pages作为静态网站的部署方式，个人用户只有两种 GitHub Pages 网站的类型：一种是 &lt;code>user&lt;/code>​(用户)，一种是&lt;code>project&lt;/code>​(项目)。&lt;/p>
+&lt;p>　　​&lt;code>user&lt;/code>​类型的网址只能对应唯一的用户，而且仓库的名字必须为 &lt;code>&amp;lt;username&amp;gt;.github.io&lt;/code>​，对应的网址为 &lt;code>http(s)://&amp;lt;username&amp;gt;.github.io&lt;/code>​。&lt;/p>
+&lt;p>　　​&lt;code>project&lt;/code>​类型的仓库则可以新建很多，只要仓库的名字不为 &lt;code>&amp;lt;username&amp;gt;.github.io&lt;/code>​ 即可，对应的网址为 &lt;code>http(s)://&amp;lt;username&amp;gt;.github.io/&amp;lt;repository&amp;gt;&lt;/code>​。&lt;/p>
+&lt;p>　　本文采用多种仓库的形式进行管理，因为为了可能会引入不同的网站框架。&lt;/p>
+&lt;p>　　需要注意，我们可以同时拥有&lt;code>user&lt;/code>​和&lt;code>project&lt;/code>​ pages。因此，我们可以将个人博客放到&lt;code>user&lt;/code>​上，而其他的网页，例如专为某一个项目写的说明文档，放在单独的仓库中。这样访问博客站点只需要访问&lt;code>https://&amp;lt;username&amp;gt;.github.io&lt;/code>​即可，而访问其他项目就加上后缀，例如：&lt;code>https://&amp;lt;username&amp;gt;.github.io/HugoStack&lt;/code>​。&lt;/p>
+&lt;p>　　并且按照&lt;a class="link" href="https://krislinzhao.github.io/docs/create-a-wesite-using-github-pages-and-hugo/#1-%E6%A6%82%E5%BF%B5%E6%90%AD%E5%BB%BA%E6%80%9D%E8%B7%AF%E5%92%8C%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83" target="_blank" rel="noopener"
+>这篇博客&lt;/a>中的方式，只公开编译好的站点，隐藏源码仓库。&lt;/p>
+&lt;h2 id="hugo搭建">Hugo搭建
+&lt;/h2>&lt;p>　　最开始按照 &lt;a class="link" href="https://www.bilibili.com/video/BV1pRYPetEWy/?share_source=copy_web&amp;amp;vd_source=762b4cada29221a2afa3d8ad6dc132fd" target="_blank" rel="noopener"
+>【Hugo+PaperMod搭建博客】&lt;/a> 中的教程进行搭建。但后续发现这个主题文档不完善，使用过程中的小问题很多，因此不建议使用。转而使用 &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener"
+>stack&lt;/a> 主题。&lt;/p>
+&lt;p>　　涉及到的工具：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://gohugo.io/" target="_blank" rel="noopener"
+>hugo&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener"
+>stack&lt;/a> 主题&lt;/li>
+&lt;li>&lt;a class="link" href="https://github.com/" target="_blank" rel="noopener"
+>github&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://giscus.app/zh-CN" target="_blank" rel="noopener"
+>giscus&lt;/a> 是评论接口，也很快。使用的也是 github 的服务，利用的是 github discussion，所以，比 discus 之类的小厂要快。稳定性倒是差不多。以及，github 的用户是比较多的，所以会更方便大家评论交流，这一点很重要。&lt;/li>
+&lt;li>&lt;a class="link" href="https://neovim.io/" target="_blank" rel="noopener"
+>neovim&lt;/a>/&lt;a class="link" href="https://code.visualstudio.com/" target="_blank" rel="noopener"
+>vscode&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://git-scm.com/" target="_blank" rel="noopener"
+>git&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.flaticon.com/" target="_blank" rel="noopener"
+>flaticon&lt;/a> 用来挑选网站的 favicon 的。&lt;/li>
+&lt;/ul>
+&lt;h3 id="安装">安装
+&lt;/h3>&lt;p>　　本文在Manjaro系统下操作。&lt;/p>
+&lt;p>　　首先需要安装一些依赖软件：&lt;code>go&lt;/code>​ &lt;code>hugo&lt;/code>​ &lt;code>dart-sass&lt;/code>​&lt;/p>
+&lt;p>　　参考链接：&lt;a class="link" href="https://flynx.dev/post/manjaro_go_env_2021/" target="_blank" rel="noopener"
+>manjaro go环境搭建&lt;/a>、&lt;a class="link" href="https://github.com/adityatelange/hugo-PaperMod/wiki/Installation" target="_blank" rel="noopener"
+>PaperMod Installation&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo pacman -S go
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman -S hugo
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman -S dart-sass
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="安装主题">安装主题
+&lt;/h3>&lt;p>　　两种方式：使用主题给出的模板仓库直接创建仓库；本地建立仓库，通过 git submoudle 安装。&lt;/p>
+&lt;p>　　第一种直接使用模板的方式不会下载主题仓库，修改起来较为麻烦。且使用的配置文件格式是 toml，写起来也繁琐。但好处是不需要自己对网页做各种修改，可以直接使用。&lt;/p>
+&lt;p>　　第二种方式可以修改主题，但是连同一些网页基础的设置也需要自己手动配，可以参考主题仓库中的示例。&lt;/p>
+&lt;p>　　值得注意的是，第二种方式下载的主题其各种配置和hugo所创建的新的站点文件夹结构很类似，我们优先在hugo的根目录下进行修改，hogu会优先使用根目录下的文件，这样就可以覆盖主题中的一些配置。例如&lt;/p>
+&lt;p>　　存在文件 themes/Stack/assets/icons/user.svg，我们可以直接在根目录下创建同名文件，hugo就会优先使用根目录下的 user.svg，而不是themes下的。&lt;/p>
+&lt;h4 id="使用-git-模板">使用 git 模板
+&lt;/h4>&lt;p>　　参考 &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack-starter" target="_blank" rel="noopener"
+>github.com/CaiJimmy/hugo-theme-stack-starter&lt;/a>。&lt;/p>
+&lt;p>　　采用 github template 的形式直接使用主题提供的模板创建仓库，并将仓库设置为github page。且该模板已经配置了github action。&lt;/p>
+&lt;p>　　先按照 readme 中的指示，使用 stack starter 作为模板创建仓库。点击&lt;code>Use this template&lt;/code>​。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240916105942-nc1qlft.png"
+width="1176"
+height="214"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="549"
+data-flex-basis="1318px"
+>​&lt;/p>
+&lt;p>　　这里注意，用这个模板创建的不是&lt;code>&amp;lt;username&amp;gt;.github.io&lt;/code>​为名称的仓库，而是创建一个其他命名的私有仓库，因为这里存放的是源码，我们期望源码为私有仓库，在部署的时候再将其部署到&lt;code>&amp;lt;username&amp;gt;.github.io&lt;/code>​为名称的仓库。&lt;/p>
+&lt;p>　　然后将源码下载到本地，我们对其部署的方式进行修改。&lt;/p>
+&lt;p>　　要从源码仓库部署到站点仓库，则需要我们使用 PAT（Personal access tokens）访问权限。&lt;/p>
+&lt;h5 id="生成pat">生成PAT
+&lt;/h5>&lt;p>　　只有从源码仓库部署到其他仓库需要生成PAT，并在源码仓库中将PAT保存为&lt;code>Actions secrets&lt;/code>​变量。&lt;/p>
+&lt;p>　　使用时，在&lt;code>action&lt;/code>​文件中引用&lt;code>secrets&lt;/code>​设置的变量即可。&lt;/p>
+&lt;p>　　例如，在源码仓库设置的 PAT 名称为HUGO_BUILD，就可以按照下列方式使用。具体语法要查看使用的&lt;code>action&lt;/code>​方法的说明文档。例如&lt;code>JamesIves/github-pages-deploy-action@v4&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy 🚀&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">JamesIves/github-pages-deploy-action@v4&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 一个自动发布github pages的action&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">repository-name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">codetang-2417/codetang-2417.github.io&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">token&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.HUGO_BUILD }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branch&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">main&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">folder&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">public&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">clean&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">single-commit&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol>
+&lt;li>
+&lt;p>生成Personal access tokens&lt;/p>
+&lt;p>点击个人头像，选择 &lt;code>Setting&lt;/code>​，拉到最低下，选择&lt;code>Developer Settings&lt;/code>​-&amp;gt;&lt;code>Personal Access Tokens&lt;/code>​-&amp;gt;&lt;code>Tokens&lt;/code>​。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917111849-74cespr.png"
+width="1987"
+height="514"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="386"
+data-flex-basis="927px"
+>​&lt;/p>
+&lt;p>选择&lt;code>Generate new token&lt;/code>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917112909-0zt1f4u.png"
+width="1609"
+height="1046"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="153"
+data-flex-basis="369px"
+>​&lt;/p>
+&lt;p>创建后需要马上复制生成的&lt;code>Personal Access Tokens&lt;/code>​，因为后续将看不到该&lt;code>Personal Access Tokens&lt;/code>​。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>生成Actions secrets&lt;/p>
+&lt;p>接下来在源码repo中添加上面的personal access token，进入repo的 &lt;code>Settings&lt;/code>​-&amp;gt;&lt;code>Secrets and variable&lt;/code>​-&amp;gt;&lt;code>Actions secrets&lt;/code>​一栏，选择&lt;code>New repository secret&lt;/code>​并添加。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917113836-jz2fzrp.png"
+width="1562"
+height="928"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="168"
+data-flex-basis="403px"
+>​&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h5 id="配置">配置
+&lt;/h5>&lt;p>　　在hugo的配置文件 config/_default/config.toml 更改 base url：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Change baseurl before deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">baseurl = &amp;#34;https://codetang-2417.github.io/&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　然后 git push 到 github，等待 deploy 任务完成，就可以正常通过网址 &lt;code>https://codetang-2417.github.io&lt;/code>​ 访问了。如果直接使用源码仓库作为 git page的域名仓库，则需要在网址最后加上仓库名，否则会导致访问网站时 css 加载不出来等问题（且涉及到绝对域名地址引用位置的也需要修改）。&lt;/p>
+&lt;p>　　下面的部分就是修改模板中的&lt;code>git action&lt;/code>​文件，使之部署到其他仓库&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yml" data-lang="yml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy to Github Pages&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">push&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branches&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="l">master]&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 这里的意思是当 master 分支发生push的时候，运行下面的jobs&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">pull_request&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branches&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="l">master]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">jobs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">build&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-latest&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">permissions&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># Give the default GITHUB_TOKEN write permission to commit and push the&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># added or changed files to the repository.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">contents&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">write&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/checkout@v4&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">submodules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">recursive&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">fetch-depth&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Cache Hugo resources&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/cache@v4&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">env&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">cache-name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">cache-hugo-resources&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">resources&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">key&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ env.cache-name }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/setup-go@v5&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">go-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;^1.17.0&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">go version&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup Hugo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">peaceiris/actions-hugo@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">hugo-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;latest&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">extended&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Build&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">hugo --minify --gc --cleanDestinationDir&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy 🚀&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">JamesIves/github-pages-deploy-action@v4&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 一个自动发布github pages的action&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">repository-name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">codetang-2417/codetang-2417.github.io&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">token&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.HUGO_BUILD }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branch&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">main&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">folder&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">public&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">clean&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">single-commit&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="手动安装">手动安装
+&lt;/h4>&lt;p>　　创建一个新站点，这里可以参考 hugo 官网的&lt;a class="link" href="https://gohugo.io/getting-started/quick-start/" target="_blank" rel="noopener"
+>指导&lt;/a>。&lt;/p>
+&lt;p>　　以及这篇文章，介绍的很详细：&lt;a class="link" href="https://krislinzhao.github.io/docs/create-a-wesite-using-github-pages-and-hugo/" target="_blank" rel="noopener"
+>krislinzhao.github.io/docs/create-a-wesite-using-github-pages-an&amp;hellip;&lt;/a>&lt;/p>
+&lt;p>　　有一些主题默认的配置文件格式是yaml，需要使用 &amp;ndash;format 指定为yaml。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">hugo new site &amp;lt;name of site&amp;gt; --format yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240915184226-gjgase5.png"
+width="1042"
+height="313"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="332"
+data-flex-basis="798px"
+>​&lt;/p>
+&lt;p>　　然后进入站点文件夹，配置git&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> LingLong
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git init
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git add .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git branch -m main
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git commit -m &lt;span class="s2">&amp;#34;Framwork: Init Hugo new site.&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　导入子模块&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">git submodule add https://github.com/CaiJimmy/hugo-theme-stack/ themes/hugo-theme-stack&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　同样需要注意，在hugo的配置文件中，将仓库名加在 base url后。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Change baseurl before deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">baseurl = &amp;#34;https://codetang-2417.github.io/HugoStack/&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　这种方式由于hugo根目录中没有任何配置，因此需要自己手动配置。参考主题目录中的 exampleSite文件夹。&lt;/p>
+&lt;p>　　简单介绍hugo的目录中各个文件夹的含义。&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>archetypes&lt;/strong>：存放用 hugo 命令新建的 Markdown 文件应用的 front matter 模版&lt;/li>
+&lt;li>&lt;strong>content&lt;/strong>：存放内容页面，比如「博客」、「读书笔记」等&lt;/li>
+&lt;li>&lt;strong>layouts&lt;/strong>：存放定义网站的样式，写在&lt;code>layouts&lt;/code>​文件下的样式会覆盖安装的主题中的 &lt;code>layouts&lt;/code>​文件同名的样式&lt;/li>
+&lt;li>&lt;strong>static&lt;/strong>：存放所有静态文件，如图片&lt;/li>
+&lt;li>&lt;strong>data&lt;/strong>：存放创建站点时 Hugo 使用的其他数据&lt;/li>
+&lt;li>&lt;strong>public&lt;/strong>：存放 Hugo 生成的静态网页&lt;/li>
+&lt;li>&lt;strong>themes&lt;/strong>：存放主题文件&lt;/li>
+&lt;li>&lt;strong>config.toml&lt;/strong>：网站配置文件&lt;/li>
+&lt;/ul>
+&lt;p>　　本文不采用这种方式，节省时间。&lt;/p>
+&lt;h2 id="配置-stack-主题">配置 stack 主题
+&lt;/h2>&lt;p>　　这里不选用 PaperMod，因为这个主题总有一些小问题，还需要自行修改大量的代码。&lt;/p>
+&lt;p>　　以下基于 git 模板的仓库。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://stack.jimmycai.com/config/" target="_blank" rel="noopener"
+>stack.jimmycai.com/config/&lt;/a>，说明中写的很详细，每一个字段的作用。&lt;/p>
+&lt;p>　　简单说明一下该主题中的各个文件夹的作用&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">$ tree -d&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">├── assets&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ ├── img&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ └── scss&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">├── config&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ └── _default&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">├── content&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ ├── categories&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ │ └── example-category&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ ├── page&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ │ ├── archives&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ │ ├── links&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ │ └── search&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ └── post&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ ├── hello-world&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ ├── image-gallery&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ ├── markdown-syntax&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ ├── math-typesetting&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">│ └── shortcodes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　assets：存放图片，scss样式&lt;/p>
+&lt;p>　　config：存放hugo和主题配置，toml 格式，分文件配置各个参数，比较清晰明了。&lt;/p>
+&lt;p>　　content：博文内容存放位置。&lt;/p>
+&lt;p>　　 其中 page 存放是导航栏的内容，post 存放文章的内容，categories 为分类。page和post的文件结构一样，每一篇文章单独一个文件夹，里面的 index.md为正文内容，还可以存放一些图片，可以直接在文章中引用。区别在与page和post的 frontmatter 中的layout字段不同，也就是布局。&lt;/p>
+&lt;p>　　pages的 frontmatter如下（即在正文之前的最开头的文字）&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Archives&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">2022-03-06&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">layout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;archives&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">slug&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;archives&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">menu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">main&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">weight&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">params&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">icon&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">archives&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　menu后续的内容是菜单层级。&lt;/p>
+&lt;p>　　post frontmatter如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Hello World&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Welcome to Hugo Theme Stack&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">slug&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">hello-world&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">2022-03-06 00:00:00&lt;/span>&lt;span class="m">+0000&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">cover.jpg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">categories&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 分类，可以在归档界面看到&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">Example Category&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">tags&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">Example Tag&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">weight&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># You can add weight to some posts to override the default sorting (date descending)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　以上是我们在平时写文章时最主要用到的部分。&lt;/p>
+&lt;p>　　categories 为分类，在这下面创建的文件和显示在分类栏，即便没有文件被分在这个类别也会显示。如果categories中没有，但是文章中的 frontmatter引用了，则会自动显示，而不需要在这个目录下创建。&lt;/p>
+&lt;p>　　其格式如下：content/categories/example-category/_index.md&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Example Category&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">A description of this category&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Badge style&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">background&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;#2a9d8f&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">color&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;#fff&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="一些基本信息的配置">一些基本信息的配置
+&lt;/h3>&lt;p>　　修改文件：config/_default/config.toml&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># Change baseurl before deploy&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">baseurl = &amp;#34;https://codetang-2417.github.io/&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">copyright = &amp;#34;LingLong&amp;#39;s Blog&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 网站的版权声明，通常显示在页脚&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">languageCode = &amp;#34;zh-cn&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">title = &amp;#34;LingLong&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 站点标题&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Theme i18n support&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Available values: en, fr, id, ja, ko, pt-br, zh-cn, zh-tw, es, de, nl, it, th, el, uk, ar&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">defaultContentLanguage = &amp;#34;zh-cn&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Set hasCJKLanguage to true if DefaultContentLanguage is in [zh-cn ja ko]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># This will make .Summary and .WordCount behave correctly for CJK languages.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">hasCJKLanguage = true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Change it to your Disqus shortname before using&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">disqusShortname = &amp;#34;Ling&amp;#34;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 标签页简称&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">enableRobotsTXT = true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 允许生成 robots.txt&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">buildDrafts = false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 构建时是否包括草稿&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">buildFuture = false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 构建未来发布的内容&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">buildExpired = false&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 构建过期的内容&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">enableEmoji = true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="l">pagination]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">pagerSize = 8&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 首页最多容纳的文章数量&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="配置导航栏">配置导航栏
+&lt;/h3>&lt;p>　　修改文件：config/_default/menu.toml，这里的导航栏只能新增，不能修改已有的。&lt;/p>
+&lt;p>　　推荐直接在 page文件夹中添加page时，在 frontmatter 里添加。&lt;/p>
+&lt;p>　　详见：&lt;a class="link" href="https://stack.jimmycai.com/config/menu" target="_blank" rel="noopener"
+>stack.jimmycai.com/config/menu&lt;/a>&lt;/p>
+&lt;h3 id="配置评论">配置评论
+&lt;/h3>&lt;p>　　这里的评论使用了 giscus 插件。&lt;/p>
+&lt;p>　　根据 giscus 官网的 &lt;a class="link" href="https://giscus.app/zh-CN" target="_blank" rel="noopener"
+>指导&lt;/a>，最后生成一份代码，主要是安装 github app和开启discussion&lt;/p>
+&lt;p>　　&lt;a class="link" href="https://github.com/apps/giscus" target="_blank" rel="noopener"
+>giscus app安装&lt;/a>&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917122641-syz1flc.png"
+width="1745"
+height="1332"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="314px"
+>​&lt;/p>
+&lt;p>　　然后点击 app 旁边的链接进入app页面。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240917122800-2w4ilp0.png"
+width="1629"
+height="413"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="394"
+data-flex-basis="946px"
+>​&lt;/p>
+&lt;p>　　然后可以先去站点仓库，Setting -&amp;gt; General -&amp;gt; Features，打开&lt;code>disscusion&lt;/code>​。&lt;/p>
+&lt;p>　　打开后，回到&lt;code>giscus&lt;/code>​，填一些配置，主要是仓库名称，mapping方式。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240915202248-d9cobl1.png"
+width="657"
+height="525"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="300px"
+>​&lt;/p>
+&lt;p>　　然后在该网页中的找到这段配置代码：&lt;br>
+​&lt;img src="https://codetang-2417.github.io/p/%E5%9F%BA%E4%BA%8E-hugo-%E5%92%8C-github-pages%E6%90%AD%E5%BB%BAbolg/assets/image-20240915203142-wl8gzt2.png"
+width="933"
+height="586"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="159"
+data-flex-basis="382px"
+>​&lt;/p>
+&lt;p>　　将其填入到配置文件 config/_default/params.toml 中，主要是 repoId，categoryId&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="l">comments.giscus]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">repo = &amp;#34;codetang-2417/codetang-2417.github.io&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">repoID = &amp;#34;xxxxxxxxx&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">category = &amp;#34;Announcements&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">categoryID = &amp;#34;xxxxxxxxx&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">mapping = &amp;#34;pathname&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">lightTheme = &amp;#34;light&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">darkTheme = &amp;#34;dark&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">reactionsEnabled = 1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">emitMetadata = 0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="下面给出常见的几种-frontmatter">下面给出常见的几种 frontmatter
+&lt;/h2>&lt;h3 id="page">page
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;Archives&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">2022-03-06&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">layout&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;archives&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">slug&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;archives&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">menu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">main&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 菜单层级&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">weight&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 用于排序&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">params&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">icon&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">archives&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 图标&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 icon存放于 themes/xxx/assets/icons 或者 根目录assets/icons。&lt;/p>
+&lt;p>　　主题自带的icon有：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">archives.svg back.svg brand-twitter.svg clock.svg date.svg home.svg language.svg messages.svg search.svg toggle-left.svg user.svg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">arrow-back.svg brand-github.svg categories.svg copyright.svg hash.svg infinity.svg link.svg rss.svg tag.svg toggle-right.svg&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="post">post
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Markdown Syntax Guide&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">date&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="ld">2023-09-07&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Sample article showcasing basic Markdown syntax and formatting for HTML elements.&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">tags&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 自定义tag&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">markdown&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">css&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">html&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">themes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">categories&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 自定义分类，可以在 content/categories/ 创建更详细描述&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">themes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">syntax&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　例如，分类 example-category，其文件夹下存放文件 _index.md&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">$ ls content/categories/example-category  ✔ &lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">_index.md&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　_index.md内容为&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">title&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Example Category&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">description&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">A description of this category&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Badge style&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">style&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">background&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;#2a9d8f&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">color&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;#fff&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nn">---&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="编写和发布">编写和发布
+&lt;/h2>&lt;p>　　在博客搭建起来以后，我尝试过 siyuan 的一键发布工具，但是效果不好，不能处理本地图片，需要图床，但 hugo 本身是静态网页，图片也是存在 git 仓库中，是可以直接访问的。因此，还是选择在 siyuan 中编写完导出 md 文件夹，手动复制到本地仓库并上传。&lt;/p>
+&lt;h2 id="参考来源">参考来源
+&lt;/h2>&lt;p>　　&lt;a class="link" href="https://martins3.github.io/setup-github-pages.html" target="_blank" rel="noopener"
+>使用 Github 记录笔记和搭建 blog&lt;/a>&lt;/p>
+&lt;p>　　&lt;a class="link" href="https://zhuanlan.zhihu.com/p/685090023?utm_id=0" target="_blank" rel="noopener"
+>思源笔记一键发布至Hexo、Hugo、Jekyll、Vitepress、Vuepress博客（github）并通过github action构建page并同步gitee page&lt;/a>、&lt;a class="link" href="https://yang-xijie.github.io/BLOG/Markdown/github-pages/" target="_blank" rel="noopener"
+>GitHub Pages&lt;/a>&lt;/p>
+&lt;p>　　&lt;a class="link" href="https://www.bilibili.com/video/BV1bovfeaEtQ/?share_source=copy_web&amp;amp;amp;vd_source=762b4cada29221a2afa3d8ad6dc132fd" target="_blank" rel="noopener"
+>Hugo + Github免费搭建博客，并实现自动化部署&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>IOS 订阅GPT4-购买礼品卡</title><link>https://codetang-2417.github.io/p/ios-%E8%AE%A2%E9%98%85gpt4-%E8%B4%AD%E4%B9%B0%E7%A4%BC%E5%93%81%E5%8D%A1/</link><pubDate>Fri, 29 Mar 2024 09:48:59 +0800</pubDate><guid>https://codetang-2417.github.io/p/ios-%E8%AE%A2%E9%98%85gpt4-%E8%B4%AD%E4%B9%B0%E7%A4%BC%E5%93%81%E5%8D%A1/</guid><description>&lt;p>　　本文介绍在 iPhone 上下载 ChatGPT并订阅 GPT PLUS。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://z197.com/blog/chatgpt-plus-account-purchase.html#google_vignette" target="_blank" rel="noopener"
+>最新ChatGPT Plus订阅开通方法（支付宝礼品卡）&lt;/a>&lt;/p>
+&lt;p>　　先需要一个免税区美区ID：&lt;a class="link" href="siyuan://blocks/20231030145842-ee23ab2" >注册美区账号&lt;/a>&lt;/p>
+&lt;h2 id="支付宝购买">支付宝购买
+&lt;/h2>&lt;p>　　支付宝右上角切换地区到美国&lt;/p>
+&lt;p>　　搜索：礼品卡（不要搜 apple礼品卡）&lt;/p>
+&lt;p>　　选择 pockyt shop&lt;/p>
+&lt;p>　　第二页选择app store进行购买，需要进行注册&lt;/p>
+&lt;p>　　购买后将礼品卡号码复制到app store进行充值&lt;/p>
+&lt;h2 id="订阅">订阅
+&lt;/h2>&lt;p>　　使用美区 Apple ID在 &lt;strong>App Store&lt;/strong> 上登陆（注意：一定 &lt;strong>不要&lt;/strong> 在设置中登陆，会导致锁机！）&lt;/p>
+&lt;p>　　搜索 ChatGPT，下载 OpenAI 版本的官方App。&lt;/p>
+&lt;p>　　进入后直接使用AppleID登陆，然后就可以点击开通Plus，自动从 App Store的已经充值的余额中扣除。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>注册美区账号</title><link>https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/</link><pubDate>Mon, 30 Oct 2023 14:58:42 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/</guid><description>&lt;p>　　IOS的app store在国区有很多软件不能下载，包括科学上网和一些好用的软件，使用美区的账号登陆app store就可以解除限制（注意：只能在app store中登陆，不能在设置中登陆，否则有可能会激活id锁，导致机器无法使用）&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://www.koffuxu.com/article/b1335d9c-49ff-4cc3-9396-0c9ff41255e7" target="_blank" rel="noopener"
+>美区Apple ID注册流程：不需要信用卡、也不需要美国地址&lt;/a>、&lt;a class="link" href="https://zhuanlan.zhihu.com/p/367821925?dt_dapp=1" target="_blank" rel="noopener"
+>知乎：【2023年】五分钟注册美区AppleID，手把手教，稳定且耐用！&lt;/a>&lt;/p>
+&lt;h2 id="一准备工作">&lt;strong>一、准备工作&lt;/strong>
+&lt;/h2>&lt;p>　　1.一个能接收短信的国内手机号2.一个全新邮箱（指从没注册过Apple ID的邮箱）3.美国地址生成器（文中有地址）4.无需任何代理工具&lt;/p>
+&lt;p>　　&lt;strong>注意以下四点可以避免很多问题：&lt;/strong>&lt;/p>
+&lt;p>　　出生日期：一定要设置成大于 18 周岁的日期，否则会导致部分应用由于年龄限制无法使用。&lt;/p>
+&lt;p>　　电子邮件：建议新注册一个全新的从未注册过 Apple ID 的邮箱，比如 163 邮箱，我使用的谷歌邮箱。&lt;/p>
+&lt;p>　　手机号码：亲测，注册过中国区 Apple ID 的手机号码可以用来注册美区账号，不会产生冲突。&lt;/p>
+&lt;p>　　密码：设置密码时，密码中不要包含有名字、生日、邮箱中的信息，否则会卡在验证码那一步。&lt;/p>
+&lt;p>　　‍&lt;/p>
+&lt;h3 id="注意事项">注意事项
+&lt;/h3>&lt;p>　　1.设置密码时，密码中不要包含前面填写的名字、生日、邮箱中的任何信息，否则可能会卡在验证码那一步，总之就是密码尽量原创一个。&lt;/p>
+&lt;p>　　2.不要在「设置」中登录美区Apple ID，以免造成不必要的麻烦。下载美区 App 只需在 App Store 中登录即可，下载完后再换回国区账号即可，对 iCloud 等不会有任何影响。&lt;/p>
+&lt;p>　　3.如果你有在用Apple Music，切换成美区后会导致已下载的歌曲全被清空。&lt;/p>
+&lt;p>　　4.建议不要把美区 Apple ID 当成主力账号，需要下美区应用时登录就行了，以免出现啥问题。&lt;/p>
+&lt;h2 id="二注册教程">&lt;strong>二、注册教程&lt;/strong>
+&lt;/h2>&lt;p>　　可以使用电脑也可以使用手机。&lt;/p>
+&lt;p>　　首先进入美国 Apple ID 注册页面，复制下方网址至 Safari 浏览器中打开即可进入。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tex" data-lang="tex">&lt;span class="line">&lt;span class="cl">https://appleid.apple.com/account ​
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　需要注意以下几点：&lt;/p>
+&lt;blockquote>
+&lt;ol>
+&lt;li>地区需要选择美国&lt;/li>
+&lt;li>出生年龄必须大于18周岁&lt;/li>
+&lt;li>电话可以填大陆&lt;/li>
+&lt;li>邮箱一定要是一个没有注册过的新邮箱&lt;/li>
+&lt;/ol>&lt;/blockquote>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/assets/image-20231030150450-9whqjml.png"
+width="720"
+height="3733"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="19"
+data-flex-basis="46px"
+>​&lt;/p>
+&lt;p>　　接下来验证邮箱地址，输入验证码，继续。确认无误后，就会跳转到你的Appid主页，完成账号注册。&lt;/p>
+&lt;h2 id="三填写付款方式和账单地址">三、填写付款方式和账单地址
+&lt;/h2>&lt;p>　　购买app时，需要我们通过AppleID进行付费，否则无法使用。我们需要通过下面的方法生成一个美国地区的地址、电话、邮编等，然后添加到其中。&lt;/p>
+&lt;p>　　生成美国地址建议选以下&lt;strong>五个免税州&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>蒙大拿州（Montana）&lt;/li>
+&lt;li>俄勒冈州（Oregon）&lt;/li>
+&lt;li>阿拉斯加州（Alaska）&lt;/li>
+&lt;li>特拉华州（Delaware）&lt;/li>
+&lt;li>新罕布什尔州（New Hampshire）&lt;/li>
+&lt;/ul>
+&lt;p>　　打开网址：&lt;a class="link" href="https://www.meiguodizhi.com/" target="_blank" rel="noopener"
+>https://www.meiguodizhi.com/&lt;/a> 生成一个地址&lt;/p>
+&lt;p>　　然后再进入AppleID官网，用新注册的账号登陆、点击付款与配送&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/assets/image-20231030152059-x4kj7w7.png"
+width="1031"
+height="648"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="159"
+data-flex-basis="381px"
+>&lt;/p>
+&lt;p>　　这里有两个选项，第一个是添加付款方式，在开头提到的两个教程的链接中，第一个是点击添加付款方式，并且在弹出的选择框中选择了“无”，但目前实测已经没有这个选项了。第二个选择的是添加购物地址。目前不清楚第二种方法是否有效，这里给出我成功的方法。&lt;/p>
+&lt;p>　　在官网用新账号登陆后，在管理账户里把语言换成英文。&lt;/p>
+&lt;p>　　在手机或者平板的设置—通用/语言与地区，语言改成英文（US），地区改为 美国&lt;/p>
+&lt;p>　　进入App store，用你新注册的苹果号登陆，然后随便下载一个软件，就会提示点选review（检查）。之后就会跳出付款信息的填写，此时会看见强制填写的信用卡号等信息变成了选填，完善完城市街道等基本信息，点选next，就会跳出完成注册的提示。&lt;/p>
+&lt;h2 id="四常见问题汇总">四、常见问题汇总
+&lt;/h2>&lt;p>　　➊ 手机号码提示错误怎么解决？&lt;br>
+答：看看复制的号码是不是开头有数字&amp;quot;1&amp;quot;或者&amp;quot;+1&amp;quot;，有的话去掉即可。&lt;/p>
+&lt;p>　　➋ 更新 App 的时候显示账号被锁定，但可以下载未下载过的 App 是什么原因？&lt;br>
+答：因为你更新的这个 App 之前是用其他 Apple ID 下载的，所以这个 App 是和你之前下载时的那个 Apple ID 绑定在一起的，所以出现被锁定的提示是原先账号出了问题，和当前账号没关系。解决方法很简单，把 App 卸载重新安装即可。&lt;/p>
+&lt;p>　　➌ 邮编错误怎么办？&lt;br>
+答：估计是地址生成器网站数据库中的部分邮编有误，多生成几份地址试试即可。&lt;/p>
+&lt;p>　　➍ Your request could not be completed at this time 怎么办？&lt;br>
+答：应该是地址生成器生成的号码有问题，电话是 xxx-xxx-xxx 的正常，而 +1xxx-xxx-xxx 就不行。解决方法就是去掉号码开头的&amp;quot;1&amp;quot;或者&amp;quot;+1&amp;quot;即可。&lt;/p>
+&lt;p>　　➎ Cannot be created at this time 怎么办？&lt;br>
+答：切换成 4G、5G、或者换个浏览器、或者用电脑注册，或者次日再试试。&lt;/p>
+&lt;p>　　➏ 注册成功后，如何二次修改美区 Apple ID 的地址、姓名等信息？&lt;br>
+答：进入美国苹果官网，拉到底部找到 manage your apple id，登录后即可修改，不懂英文的同学可借助翻译。&lt;br>
+如果以上回答仍然无法解决你的问题，那建议用百度、必应、知乎等搜索工具去寻找解决方法。&lt;/p></description></item></channel></rss>

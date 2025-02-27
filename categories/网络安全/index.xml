@@ -1,0 +1,1082 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>网络安全 on LingLong</title><link>https://codetang-2417.github.io/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/</link><description>Recent content in 网络安全 on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Sun, 10 Nov 2024 12:03:46 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/index.xml" rel="self" type="application/rss+xml"/><item><title>Clash 配置</title><link>https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/</link><pubDate>Tue, 05 Nov 2024 09:07:40 +0800</pubDate><guid>https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/</guid><description>&lt;p>　　使用 mihomo-party 为 Clash.Meta 的前端 GUI软件。对 Clash 进行配置。&lt;/p>
+&lt;p>　　推荐使用&lt;strong>虚拟网卡&lt;/strong>模式，可以解决 DNS 泄漏问题，否则可能出现无法访问 GPT 的现象。系统代理可以同时开启，不开启没有影响，如果有时遇到其他网站可以访问，某些网站不行，可以尝试关闭 &lt;strong>系统代理、虚拟网卡&lt;/strong>，再重新打开。&lt;/p>
+&lt;h2 id="dns-解析">DNS 解析
+&lt;/h2>&lt;p>&lt;img src="https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/assets/image-20241110114332-cunep14.png"
+width="1184"
+height="856"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="138"
+data-flex-basis="331px"
+>​&lt;/p>
+&lt;p>　　虚拟网卡（TUN）模式下自动开启 DNS 模块。这里采用 &lt;code>redir-host&lt;/code>​ 模式的 DNS 解析，也就是&lt;strong>真实 IP&lt;/strong> 模式。同时开启流量嗅探。&lt;/p>
+&lt;p>　　校园网的内部资源可能会因为没有 DNS 服务器而解析 IP 失败。需要手动指定 DNS 服务器。&lt;br>
+可以通过查看系统 dns 配置文件找到当前网络的 DNS 服务器。详见：&lt;a class="link" href="https://www.cnblogs.com/yuhaohao/p/13889240.html" target="_blank" rel="noopener"
+>Linux配置/etc/resolv.conf详解&lt;/a>&lt;br>
+window 直接在 wifi 连接详细信息里查看。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ cat /etc/resolv.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nameserver 202.102.192.68
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nameserver 202.102.192.69
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>redir-host&lt;/code>​ 模式必须开启流量嗅探，否则在配置 DNS 为明文的情况下，会造成 DNS 污染和泄漏。&lt;/p>
+&lt;p>　　其中 &lt;code>代理节点域名解析&lt;/code>​ 对应 clash.meta 的 &lt;code>proxy-server-nameserver&lt;/code>​ 字段，该字段需要启用 &lt;code>连接遵守规则&lt;/code>​ （对应 clash.meta &lt;code>respect-rules&lt;/code>​ 字段）才生效。表示根据节点的路由规则来决定 DNS 请求发往的服务器。走代理节点网站的 DNS 查询使用 &lt;code>proxy-server-nameserver&lt;/code>​ 中定义的 DNS 服务器，直连走 &lt;code>nameserver&lt;/code>​ 中定义的 DNS 服务器。&lt;/p>
+&lt;p>　　图中所有的 DNS 服务器都是 DOH or DOT 服务器，即发送的 DNS 请求被加密，这是为了防止 DNS 泄漏。&lt;/p>
+&lt;h2 id="dns-配置">DNS 配置
+&lt;/h2>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/assets/image-20241110114332-cunep14.png"
+width="1184"
+height="856"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="138"
+data-flex-basis="331px"
+>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">https://doh.dns.sb/dns-query
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">https://dns.alidns.com/dns-query
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tls://dns.google:853
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">https://cloudflare-dns.com/dns-query
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="校园网环境">校园网环境
+&lt;/h2>&lt;p>　　一些纯 IPV6，或者 PT站需要 IPV6 访问。可以将这类网站的出站改为纯 IPV6 的出站。例如 &lt;strong>byr.pt&lt;/strong> 有国内香港的服务器，如果使用代理访问速度会慢一些，可以将其设置为 直连的 IPV6 出站。&lt;/p>
+&lt;p>　　校园内部资源由于网站比较小众，在当前配置下，会被代理到节点。需要手动添加规则使之直连。&lt;/p>
+&lt;p>　　下面是在北邮校园网情况下，设置 &lt;strong>byr.pt&lt;/strong> 直连 IPV6、校内资源直连 的&lt;strong>覆写规则&lt;/strong>。一定要在覆写栏中填写，如果采用订阅网址的方式，每次更新后，规则会被覆盖，而覆写规则可以一直保持生效。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/assets/image-20241105112254-q3tme03.png"
+width="1140"
+height="804"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="141"
+data-flex-basis="340px"
+>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># https://mihomo.party/docs/guide/override/yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">+proxies&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">IPV6&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">direct&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ip-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ipv6&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">+rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">DOMAIN-SUFFIX,bupt.edu.cn,DIRECT&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">DOMAIN-SUFFIX,byr.cn,DIRECT&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">DOMAIN-SUFFIX,byr.pt,IPV6&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　mihomo-party 的覆写规则参见 &lt;a class="link" href="https://mihomo.party/docs/guide/override" target="_blank" rel="noopener"
+>官网&lt;/a>。&lt;/p>
+&lt;h2 id="其他软件直连">其他软件直连
+&lt;/h2>&lt;p>　　使用 bittorrent 类软件，消耗流量比较大，且 byr.pt 支持校园上传，只是不支持校外访问。因此可以让下载流量的软件全部走直连，只让访问网站走代理。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/assets/image-20241110115402-s0wpld3.png"
+width="1176"
+height="906"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="311px"
+>​&lt;/p>
+&lt;p>　　下列是 Linux 系统下设置 qbittorrent 软件走直连的覆写规则，windows 下，可以参考 clash.meta 的配置语法&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># https://mihomo.party/docs/guide/override/yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># https://mihomo.party/docs/guide/override/yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">+rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">PROCESS-PATH,/usr/bin/qbittorrent,DIRECT&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　官网配置语法实例，需要在任务管理器找到自己用的 bt 软件路径，但需要将 &lt;code>PROXY&lt;/code>​ 字段替换为 &lt;code>DIRECT&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">- &lt;span class="l">PROCESS-PATH,/usr/bin/wget,PROXY&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">PROCESS-PATH,C:\Program Files\Google\Chrome\Application\chrome.exe,PROXY&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">PROCESS-PATH-REGEX,.*bin/wget,PROXY&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>- &lt;span class="l">PROCESS-PATH-REGEX,(?i).*Application\\chrome.*,PROXY&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/assets/image-20241110115338-xzrtvy8.png"
+width="1148"
+height="815"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="140"
+data-flex-basis="338px"
+>​&lt;/p>
+&lt;h2 id="覆写规则">覆写规则
+&lt;/h2>&lt;p>　　覆写规则可以在节点管理中设置当前节点需要覆写的规则。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/assets/image-20241110120316-5fqi1kg.png"
+width="841"
+height="765"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="109"
+data-flex-basis="263px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/clash-%E9%85%8D%E7%BD%AE/assets/image-20241110120346-3gkf36p.png"
+width="514"
+height="292"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="176"
+data-flex-basis="422px"
+>​&lt;/p></description></item><item><title>网络原理及 DNS 泄漏简析</title><link>https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/</link><pubDate>Sun, 03 Nov 2024 15:46:40 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/</guid><description>&lt;h2 id="网络代理的三种方案">网络代理的三种方案
+&lt;/h2>&lt;ul>
+&lt;li>系统代理：将数据交给本地 http/socks 服务&lt;/li>
+&lt;li>TUN/TAP：使用虚拟网卡接管系统全局流量&lt;/li>
+&lt;li>真 VPN：封装网络层数据包的真正意义上的VPN&lt;/li>
+&lt;/ul>
+&lt;p>　　其中 TUN 模拟用的最广泛，因为 GPT、奈飞等网站会检测代理模式上网而禁止访问对应服务，TUN 模式在配置良好的情况下，可以正常访问，且 TUN 模式还可以实现软路由等透明代理的代理网络。&lt;/p>
+&lt;h2 id="网络通信流程和代理通信流程">网络通信流程和代理通信流程
+&lt;/h2>&lt;p>　　参考：&lt;a class="link" href="https://www.youtube.com/watch?v=qItL005LUik" target="_blank" rel="noopener"
+>Youtube【进阶•代理模式篇】&lt;/a>&lt;/p>
+&lt;h3 id="无代理正常通信流程">无代理正常通信流程
+&lt;/h3>&lt;p>　　正常情况下，网络通信根据 TCP/IP 四层模型，会通过 应用层-&amp;gt;传输层-&amp;gt;网络层-&amp;gt;接口层，逐层往下封装并发送到互联网中。&lt;/p>
+&lt;p>　　应用层：HTTP 等网络协议对信息的封装&lt;br>
+传输层：TCP 协议的封装，包含通信双方的端口：&lt;strong>源端口&lt;/strong>和&lt;strong>目标端口&lt;/strong>&lt;br>
+网络层：IP 协议的封装，包含通信双方的&lt;strong>源 IP 地址&lt;/strong>和&lt;strong>目的 IP 地址&lt;/strong>&lt;br>
+接口层：物理接口，封装MAC地址，并将数据包发送出去。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103161311-cavqrmg.png"
+width="1277"
+height="658"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="194"
+data-flex-basis="465px"
+>​&lt;/p>
+&lt;p>　　在正常家庭宽带网络中，都使用 IPV4 作为主要的 IP 通信地址，而 IPV4 地址有限，需要使用 NAT 技术为家庭网络中的设备分配 &lt;code>192.168.0.0/16&lt;/code>​ 的c类私有网络地址，因此在路由器发出我们的数据流量时，会主动将其中的 &lt;code>192.168.0.0/16&lt;/code>​ 私有地址替换为其获取的 WAN 共有地址，并发送出去。在接受公网的数据包时，也会再替换成对应的私有网络地址。这部分和代理网络没有相关性，只作了解。代理网络主要关注点在应用层到网络层。&lt;/p>
+&lt;h3 id="代理网络通信流程">代理网络通信流程
+&lt;/h3>&lt;h4 id="系统代理">系统代理
+&lt;/h4>&lt;p>　　最简单，最常见的代理模式，所有的代理软件都会支持的一种模式。&lt;br>
+其主要在应用层工作：&lt;/p>
+&lt;ol>
+&lt;li>设置软件为系统代理模式，并且应用本身访问网络也遵循系统代理，则该应用的网络流量会被交给代理软件。&lt;/li>
+&lt;li>代理软件根据相应的分流规则，决定每一个连接是否需要走代理服务器。&lt;/li>
+&lt;li>根据代理服务器的加密协议，将流量加密。代理加密（例如 Shadowsocks、V2Ray）能隐藏域名和具体内容，监控者只能看到加密流量，难以获取任何访问信息。而普通的 https 协议还是可以发现访问的网址。&lt;/li>
+&lt;li>而代理服务器收到数据流量后，会进行解封装，和解密，然后帮助我们访问对应的网站和内容，最后再通过相同的加密方式再返回给本机。&lt;/li>
+&lt;li>本机再解封装、解密，使得本机可以正常访问被屏蔽的网站。&lt;/li>
+&lt;/ol>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103165345-jmwbasz.png"
+width="791"
+height="530"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="149"
+data-flex-basis="358px"
+>​&lt;/p>
+&lt;p>　　这个模式简单，但有一个问题，并不是所有软件都可以走系统代理访问。大部分软件的行为完全取决于开发者，绝大部分的软件都不会走系统代理，不会给设置系统代理的入口。而且像游戏这类走 udp 协议的流量，就无法通过 http 协议代理，且游戏一般不会添加代理功能。&lt;/p>
+&lt;p>　　系统代理的常见用途就是看网页和聊天。还有一些设置了走代理，但实际并没有，这种情况下，就需要 TUN/TAP 模式。&lt;/p>
+&lt;h4 id="tuntap-模式">TUN/TAP 模式
+&lt;/h4>&lt;p>　　创建一张虚拟网卡，从网络层接管所有的流量。因为所有发往互联网的流量都必须经过网络层的封装，在这层进行拦截就能够获取所有应用产生的网络数据，这是目前主流的模式。&lt;br>
+手机上的代理软件默认就是这种模式，所有可以实现所有软件的代理。软路由接管全家的科学上网也是同样的原理。所以 TUN/TAP 模式是应用最广泛的代理模式。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103163645-ufz4h4s.png"
+width="1104"
+height="696"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="380px"
+>​&lt;/p>
+&lt;p>　　其主要在网络层和接口层工作：&lt;/p>
+&lt;p>　　数据的封装流程和系统代理模式都一致，区别在与，网络层对 IP 协议封装时，&lt;strong>源 IP 地址&lt;/strong>将不再是物理网卡地址，而是被封装为虚拟网卡地址。因为系统现在有两张网卡，具体发送供给哪一张，由路由表决定。&lt;br>
+所以代理软件通过添加路由表项实现所有 IP 地址的数据都转发给虚拟网卡的功能。如下图所示：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103164942-pqzjmjx.png"
+width="1069"
+height="530"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="201"
+data-flex-basis="484px"
+>​&lt;/p>
+&lt;p>　　所以，网络层现在封装的&lt;strong>源 IP 地址&lt;/strong>就是&lt;code>198.18.0.1&lt;/code>​，如果是 TAP 协议，还会向下封装 MAC 地址。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103165106-an8n3db.png"
+width="1054"
+height="729"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="144"
+data-flex-basis="346px"
+>​&lt;/p>
+&lt;p>　　当数据来到虚拟网卡后，代理软件会直接读取数据流量，并根据分流规则，将需要加密的数据加密，继续和正常通信一样封装到接口层，且为了避免流量环回，还会自动的在网络层将源 IP 改为物理网卡地址，最后发送出去。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103165532-49w0rcf.png"
+width="1084"
+height="714"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="151"
+data-flex-basis="364px"
+>​&lt;/p>
+&lt;p>　　所以 TUN 模式的主要特点，就是通过修改路由表接管所有系统流量，不支持走系统代理的软件流量，也会被 TUN 模式接管。&lt;br>
+但软件或者游戏，可以检测到电脑是否开启虚拟网卡。为了让代理过程对电脑完全透明，可以将clash的虚拟网卡转移到路由器里。这样局域网内的设备无需运行任何代理工具，所有设备上网流量必将经过网关路由器。这就是透明代理，也是软路由的由来。&lt;/p>
+&lt;p>　　这种虚拟网卡模式和真正的 VPN 非常接近，但并不是真正的 VPN。因为目前主流的代理网络协议（SS、Vmess、Trojan）都无法封装网络层的数据包，比如 ping 命令的 ICMP 协议流量。当我们 Ping 网站时，会直接从虚拟网卡返回，而不是真实的 ping 命令返回的数据包。&lt;br>
+但真正的 VPN 可以代理网络层协议，可以正常 Ping。&lt;/p>
+&lt;h4 id="真正的-vpn">真正的 VPN
+&lt;/h4>&lt;p>　　VPN 全称 Virtual Private Network，即 虚拟专用网络或者虚拟私有网络。私有网络就是家里的局域网，没有公网 IP，无法从外网直接和你的局域网设备通信。但 VPN 可以不物理的连接私有局域网，和局域网设备通信。只有封装网络层的数据包，才能实现这个功能，实现异地组网。&lt;/p>
+&lt;p>　　但 VPN 并不适合翻墙，因为 VPN 不会隐藏自己的流量，清晰的表明自己就是 VPN 流量，而科学上网的协议将自己隐藏起来，不能判断出究竟是什么类型的流量。&lt;/p>
+&lt;h2 id="dns">DNS
+&lt;/h2>&lt;p>　　Domin Name System，域名系统，用于解析域名，获取域名对应的服务器的 IP 地址。&lt;/p>
+&lt;h3 id="dns-工作流程">DNS 工作流程
+&lt;/h3>&lt;p>　　访问网站时，都是通过域名访问，但需要 IP 地址才能定位一个服务器。在家庭网络中，一般会由运营商分配 DNS 服务器，为网络提供 DNS 服务。当本机需要访问一个域名网站时，会构建一条 UDP &lt;strong>明文&lt;/strong>数据包发往 DNS 服务器，这个数据包的端口一般都是 53。如果该 DNS 服务器中没有缓存对应域名的 IP 地址，则还会继续向上游 DNS 询问。最终会通过 &lt;strong>DNS 迭代查询&lt;/strong> 找到一个权威 DNS 服务器，权威 DNS 服务器会返回域名绑定的 IP 地址和 TTL（Time To Live，标志着缓存有效时间）。每一个链路上查询过的 DNS 服务器都会缓存这个信息。最后，本机会收到该数据包，知道了 IP 地址，就可以正常访问网站了。&lt;/p>
+&lt;h3 id="dns-泄漏">DNS 泄漏
+&lt;/h3>&lt;p>　　而 DNS 泄漏，指的是在开启代理网络的情况下，被运营商，或者 CFW 获取到你要访问的目标网站信息。注意，一定是在开启代理的情况下。因为通常情况下，你发送 DNS 请求，运营商一定知道，并且会帮助你查询，或者是污染你的 DNS 请求，被污染的情况下，你是无法正常访问的。而开启代理后再发送&lt;strong>目标网站&lt;/strong>的&lt;strong>明文&lt;/strong> DNS 请求，然后又发送了一大堆加密数据，那不用想，肯定是在翻墙。所以，只有开启代理时，才会存在 DNS 泄漏。&lt;/p>
+&lt;p>　　还有一些对地区要求高的网站，也可能会通过 DNS 查询，来判断是否是通过代理软件来访问的。还有 OpenAI 也会检测当前地区是否支持访问。当存在 DNS 泄漏时，我们就不能正常访问这些网站了。&lt;/p>
+&lt;h3 id="检查-dns-泄漏">检查 DNS 泄漏
+&lt;/h3>&lt;p>　　可以通过网站 &lt;code>ipleak.net&lt;/code>​ 来查看自己当前的代理网络是否存在 DNS 泄漏。该网站的检测原理是：随机构建域名，并不断的发起随机域名的 DNS 请求。权威 DNS 服务器在受到 DNS 请求时，会记录下对应的上游 DNS 的 IP 地址，并且可以判断 DNS 上游服务器的所属地区，然后发送回该网站。该网站就能够知道你所发起的 DNS 请求，都经过了哪些区域的上游服务器。&lt;/p>
+&lt;p>　　当你没有开启代理时，这个网站返回中国的 DNS 服务器，证明这些服务器在帮助你进行 DNS 解析。如果还配置了其他地区的 DNS，则还可能出现一些少数其他地区的服务器。并不代表 DNS 泄漏或者没有泄漏。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103205923-z9p7bbk.png"
+width="2513"
+height="1046"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="240"
+data-flex-basis="576px"
+>​&lt;/p>
+&lt;p>　　只有当开启代理后，流量被发送到代理软件，此时存在两种情况：1. 不发起 DNS 请求就能判断走代理还是直连。2. 发起 DNS 请求后，才能知道是否走代理。&lt;br>
+第 1 种情况基本不存在 DNS 泄漏。而第 2 种大概率存在 DNS 泄漏。第 2 种，即便手动将 DNS 配置为国外的 DNS 服务器，也存在泄漏，因为 DNS 是明文的。这种情况下，是查不到其他的国内 DNS 服务器的，因为指定了国外 DNS 服务器，所以还会迷惑你，以为没有发生 DNS 泄漏。&lt;br>
+只有使用 DoH 或者 DoT 进行加密，或者代理客户端加密进行远程 DNS，发送的 DNS 才不是明文，不会被其他服务器看到。但这会增加延迟。所以大部分情况是不加密 DNS 的，这回造成运营商或者中间任意一台路由器都知道你的意图是访问被墙网站。&lt;/p>
+&lt;p>　　既然 DNS 泄漏是在开启代理后，发送了目标网站的 DNS 请求造成的。那么只要代理时，不发送这类 DNS 请求，就不会造成泄漏了。这就需要对 DNS 分流规则设置的非常合理才行。&lt;/p>
+&lt;h3 id="解决-dns-泄漏">解决 DNS 泄漏
+&lt;/h3>&lt;p>　　目前 TUN 模式是比较适合科学上网的，但会出现一些网站无法上网的情况，这一般是由于 DNS 设置不当造成的。DNS 负责将域名解析成 IP，但在科学上网中，要实现分流，让 DNS 这个原本简单的协议在代理应用过程中变得非常复杂。&lt;br>
+下面先简要介绍 Clash 的代理分流过程，以及发起 DNS 请求的原因。&lt;/p>
+&lt;h4 id="clash-系统代理流程">Clash 系统代理流程
+&lt;/h4>&lt;p>　　Clash 的分流是基于规则匹配的，详情请阅读 &lt;a class="link" href="https://wiki.metacubex.one/config/" target="_blank" rel="noopener"
+>clash 官方文档&lt;/a> 。一般来说规则文件都按照下面的形式组织：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>port：监听端口&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>proxies：出站节点，也就是代理服务器&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>proxy-groups：节点组，每个节点组可以有多个节点或者策略组，根据 type 选择默认节点。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>rules：分流规则，基于域名或者 IP 匹配。规则将按照从上到下的顺序匹配，列表顶部的规则优先级高于其底下的规则。部分规则如下：&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#domain" title="Permanent link"
+target="_blank" rel="noopener"
+>DOMAIN&lt;/a>：匹配完整域名；&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#domain-suffix" title="Permanent link"
+target="_blank" rel="noopener"
+>DOMAIN-SUFFIX&lt;/a>：匹配域名后缀；例：&lt;code>google.com&lt;/code>​匹配&lt;code>www.google.com&lt;/code>​/&lt;code>mail.google.com&lt;/code>​和&lt;code>google.com&lt;/code>​,但不匹配&lt;code>content-google.com&lt;/code>​&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#domain-keyword" title="Permanent link"
+target="_blank" rel="noopener"
+>DOMAIN-KEYWORD&lt;/a>：使用域名关键字匹配&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#ip-cidr-ip-cidr6" title="Permanent link"
+target="_blank" rel="noopener"
+>IP-CIDR &amp;amp; IP-CIDR6&lt;/a>：匹配 IP 地址范围，&lt;code>IP-CIDR&lt;/code>​和&lt;code>IP-CIDR6&lt;/code>​效果是一样的，&lt;code>IP-CIDR6&lt;/code>​为是 IPV6 地址&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#geoip" title="Permanent link"
+target="_blank" rel="noopener"
+>GEOIP&lt;/a>：匹配 IP 所属国家代码&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#src-ip-cidr" title="Permanent link"
+target="_blank" rel="noopener"
+>SRC-IP-CIDR&lt;/a>：匹配来源 IP 地址范围&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#process-name" title="Permanent link"
+target="_blank" rel="noopener"
+>PROCESS-NAME&lt;/a>：使用进程匹配，在&lt;code>Android&lt;/code>​平台可以匹配包名&lt;/p>
+&lt;p>&lt;a class="link" href="https://wiki.metacubex.one/config/rules/#match" title="Permanent link"
+target="_blank" rel="noopener"
+>MATCH&lt;/a>：匹配所有请求，无需条件&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　根据上述规则，当我们使用浏览器通过系统代理访问 &lt;code>www.google.com&lt;/code>​ 时，源 IP 地址为 &lt;code>127.0.0.1&lt;/code>​，域名为 &lt;code>www.google.com&lt;/code>​。则从上倒下依次根据规则进行判断：&lt;/p>
+&lt;p>　　​&lt;code>DOMIN,google.com,节点组1&lt;/code>​：不匹配，&lt;code>www.google.com&lt;/code>​不是&lt;code>google.com&lt;/code>​&lt;/p>
+&lt;p>　　​&lt;code>DOMIN-SUFFIX,youtube.com,节点组1&lt;/code>​：不匹配，不是&lt;code>youtube.com&lt;/code>​结尾&lt;/p>
+&lt;p>　　​&lt;code>DOMIN-KEYWORD,youtube,节点组1&lt;/code>​：不匹配&lt;/p>
+&lt;p>　　​&lt;code>DOMIN,ad.com,REJECT&lt;/code>​：不匹配，ad是广告，直接拒绝回应。&lt;/p>
+&lt;p>　　​&lt;code>SRC-IP-CIDR,192.168.1.201/32,DIRECT&lt;/code>​ ：源 IP 地址为 &lt;code>127.0.0.1&lt;/code>​，不匹配&lt;/p>
+&lt;p>　　​&lt;code>IP-CIDR,127.0.0.0/8,DIRECT,no-resolve&lt;/code>​：这里&lt;strong>特殊&lt;/strong>，这里匹配的是 IP 网段，当访问的是 &lt;code>127.0.0.0/8&lt;/code>​ 网段，就走直连。但我们匹配的是 &lt;code>www.google.com&lt;/code>​ 域名，无法直接和 IP 进行匹配，因为需要先获取 IP 地址，才能进行匹配。但这里又加了 &lt;code>no-resolve&lt;/code>​，表示不进行 DNS 解析。因此这里直接跳过。&lt;/p>
+&lt;p>　　​&lt;code>IP-CIDR6,2620::7/32,节点组1,no-resolve&lt;/code>​：和上一条一样。也跳过&lt;/p>
+&lt;p>　　​&lt;code>GEOIP,CN,DIRECT&lt;/code>​：&lt;code>GEOIP&lt;/code>​ 是一个常见 IP 归属地分类数据库，如果是国内的 IP，就直连。由于后面没有加 &lt;code>no-resolve&lt;/code>​，所以要将域名解析为 IP 地址。而这里没有配置内置 DNS 模块，因此，采用本地 DNS 解析。这时，构建的就是明文的 DNS 解析请求，就会&lt;strong>造成 DNS 泄漏&lt;/strong>。请求一个被墙的域名，返回的大概率是一条非国内的被污染的 IP。这时也不匹配这条规则。&lt;/p>
+&lt;p>　　​&lt;code>DST-PORT,80,DIRECT&lt;/code>​ 和 &lt;code>SRC-PORT,7777,DIRECT&lt;/code>​ 对目的和源端口进行匹配。这里也不匹配。&lt;/p>
+&lt;p>　　​&lt;code>PROCESS-NAME,curl,节点组2&lt;/code>​：匹配进程，如果是 curl 发起的，则交给节点组2。也不匹配。&lt;/p>
+&lt;p>　　因为所有规则都不匹配，所以 Clash 还有一个兜底的规则，所有不匹配的规则都交给 &lt;code>MATCH&lt;/code>​ 处理。所以这一条访问 &lt;code>www.google.com&lt;/code>​ 的请求，会被交给节点组1，也就是香港节点。这里需要注意，刚刚发起的 DNS 请求获取的 IP 只是用于进行规则匹配，不会用于发给香港节点。香港节点收到的还是域名，因此，香港节点收到后还是会发起 DNS 请求获取到正确的 IP。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103214619-nsqy0oz.png"
+width="466"
+height="701"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="66"
+data-flex-basis="159px"
+>​&lt;/p>
+&lt;h5 id="解决方案">解决方案
+&lt;/h5>&lt;p>　　&lt;strong>下面两种方案仅适用于系统代理模式下。&lt;/strong>&lt;/p>
+&lt;h6 id="白名单模式">白名单模式
+&lt;/h6>&lt;p>　　刚刚的流程中，发生 DNS 泄漏是因为基于 IP 的规则匹配，没有加 &lt;code>no-resolve&lt;/code>​ 而发起了 DNS 请求。那么我们就给所有基于 IP 的规则匹配都加上 &lt;code>no-resolve&lt;/code>​。&lt;br>
+但这样会导致国内网站域名跳过 &lt;code>GEOIP,CN,DIRECT,no-resolve&lt;/code>​ 规则，而走代理节点。这肯定是不对的。所以不仅需要给所有基于 IP 的规则匹配都加上 &lt;code>no-resolve&lt;/code>​，还需要在 &lt;code>GEOIP&lt;/code>​ 之前加上国内域名走直连的规则。&lt;br>
+这样大部分国内的网站都能正常走直连，但还是有一些小众的国内网站不会走直连，需要手动添加。这样的效率最高，实际上就是 v2rayN 的&lt;strong>绕过大陆模式&lt;/strong>。&lt;/p>
+&lt;p>　　在 v2ray 中需要配置：AsIs 匹配模式 + 绕过大陆规则。这种完全可以防止 DNS 泄漏，因为 AsIs 只使用域名匹配，当碰到 GEOIP 这种 IP 规则，直接跳过，不发起 DNS 请求。绕过大陆规则就是所有大陆域名放在前面，直接走直连。而国外域名或者没有在大陆规则中的，就全部走代理。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241104115737-4tlnau5.png"
+width="915"
+height="355"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="257"
+data-flex-basis="618px"
+>​&lt;/p>
+&lt;h6 id="黑名单模式">黑名单模式
+&lt;/h6>&lt;p>　　我们还可以把国外的域名放在最开始解析，以匹配代理节点，这样就不会到后续的 &lt;code>GEOIP&lt;/code>​ 也就不会造成 DNS 泄漏了。&lt;/p>
+&lt;p>　　不论黑名单还是白名单，在使用 &lt;code>ipleak.net&lt;/code>​ 时，由于是随机域名，最终肯定会进行 &lt;code>GEOIP&lt;/code>​ 匹配，因此会发起 DNS 请求，这种情况下，就会检测到国内的 DNS 提供商。不过我们需要访问的国外域名不会出现 DNS 泄漏，所以这样的情况也不能完全算是 DNS 泄漏。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103230958-l3curan.png"
+width="2349"
+height="875"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="268"
+data-flex-basis="644px"
+>​&lt;/p>
+&lt;p>　　在 v2ray 中需要配置：IPIfNoMatch 匹配模式 + 黑名单。这样当黑名单中的国外域名出现时，会走代理。而国内以及小众国外域名还是会 DNS 请求。&lt;/p>
+&lt;h6 id="总结">总结
+&lt;/h6>&lt;p>　　在系统代理模式下，上述两种方式已经足够使用，目标网站的 DNS 是不会泄漏的。对于通常意义上的使用场景来说已经够用。但之前也说过，TUN，软路由这种代理模式应用的最广泛，针对这些场景下的 DNS 泄漏，解决就麻烦一些。&lt;/p>
+&lt;h4 id="tun软路由模式下的代理流程">TUN、软路由模式下的代理流程
+&lt;/h4>&lt;p>　　和系统代理模式的主要区别，是配置了 DNS 模块，接管了系统 DNS 解析模块。下面是 Clash.Meta 的 DNS 工作流程，忽略了 Clash 内部的 DNS 映射处理。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://wiki.metacubex.one/config/dns/diagram/" target="_blank" rel="noopener"
+>Clash 官方 DNS 解析流程&lt;/a>&lt;/p>
+&lt;div class="mermaid">flowchart TD
+Start[客户端发起请求] --> rule[匹配规则]
+rule --> Domain[匹配到基于域名的规则]
+rule --> IP[匹配到基于 IP 的规则]
+Domain --> |域名匹配到直连规则|DNS
+IP --> DNS[通过 Clash DNS 解析域名]
+Domain --> |域名匹配到代理规则|Remote[通过代理服务器解析域名并建立连接]
+Cache --> |Redir-host/FakeIP-Direct 未命中|NS[匹配 nameserver-policy 并查询 ]
+Cache --> |Cache 命中|Get
+Cache --> |FakeIP 未命中,代理域名|Remote
+NS --> |匹配成功| Get[将查询到的 IP 用于匹配 IP 规则]
+NS --> |没匹配到| NF[nameserver/fallback 并发查询]
+NF --> Get[查询得到 IP]
+Get --> |缓存 DNS 结果|Cache[(Cache)]
+Get --> S[通过 IP 直接/通过代理建立连接]
+DNS --> Redir-host/FakeIP
+Redir-host/FakeIP --> |查询 DNS 缓存|Cache
+&lt;/div>
+&lt;p>　　Clash.Meta 支持两种 DNS 配置模式：redir-host 和 fake-ip。redir-host 模式是最初大家使用的一种模式，和 fake-ip 的区别在于 redir-host 模式必须返回一个真实的 IP 地址，因此必须要进行 DNS 查询。而 fake-ip 返回的都是私有的 fake 地址，也就是假地址，因此最开始时不需要 DNS 查询。&lt;/p>
+&lt;p>　　下面根据上述流程图，简单介绍 Clash 中的 TUN 模式的代理行为。&lt;/p>
+&lt;p>　　和系统代理模式相比，TUN 多了一个 DNS 模块的配置。需要配置 DNS 模块的模式 &lt;code>enhanced-mode&lt;/code>​ 和域名服务器 &lt;code>nameserver&lt;/code>​。&lt;br>
+在网络通过过程中，应用程序，例如浏览器，发起网站访问时首先发起 DNS 请求，获取 IP 地址。Clash 将劫持 DNS 请求，并通过配置的 DNS 模块来处理。下面分别简化介绍 redis-host 和 fake-ip 模式下的 DNS 处理过程。和 Clash.Meta 中的过程稍有不一致，但整体一致。&lt;/p>
+&lt;h5 id="解决方案1redis-host">解决方案1：redis-host
+&lt;/h5>&lt;p>　　以下图中的配置为例，浏览器访问域名 &lt;code>google.com&lt;/code>​：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241103231237-ed07hdk.png"
+width="378"
+height="720"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="52"
+data-flex-basis="126px"
+>​&lt;/p>
+&lt;p>　　在 redis-host 模式中，要求必须返回一个真实 IP。所以会同时向 &lt;code>nameserver&lt;/code>​ 中定义的三个域名服务器发起 DNS 请求，以最快返回的 DNS 响应为准，这里大概率会得到一个被污染的 IP，假设是 &lt;code>5.5.5.5&lt;/code>​。Clash 将保存域名 &lt;code>google.com&lt;/code>​ 和 IP &lt;code>5.5.5.5&lt;/code>​ 的映射的关系。&lt;br>
+浏览器会使用这个 IP 发起 http 请求。http 请求会再次被 Clash 捕获，并根据映射表判断是想访问 &lt;code>google.com&lt;/code>​。此时 Clash 就根据 &lt;code>rules&lt;/code>​ 路由规则进行域名匹配。&lt;br>
+​&lt;code>google.com&lt;/code>​直接匹配第一条规则，则会被交给节点组1 的香港节点处理。这里要注意，交给节点的仍然是&lt;code>google.com&lt;/code>​域名，香港节点收到后，还会再次发起 DNS 请求来获取真正的 IP 进行访问。&lt;br>
+所以，redis-host 模式由于必须返回真实 IP，就必然发起 DNS 请求，&lt;strong>必然产生 DNS 泄漏&lt;/strong>。&lt;/p>
+&lt;p>　　这里还有另外一个问题：由于本地发起 DNS 请求会得到被污染的 IP 地址，很有可能会造成两个不同的域名被污染到同一个地址的情况，或者两个不同的域名就是被搭建在同一个服务器上。此时 Clash 就无法确认访问的是哪一个域名了。Clash 遇到这种情况将直接发送污染 IP，而不进行远程 DNS。远程节点服务器拿到数据包后，直接访问被污染 IP，肯定不能正常访问，还有可能出现访问 A 网站，而返回的是 B 网站的现象，并由于证书不一致，浏览器发出警告。之前就遇到过访问 google，返回的却是 facebook 的现象。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241104100429-86in9ld.png"
+width="907"
+height="592"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="153"
+data-flex-basis="367px"
+>​&lt;/p>
+&lt;p>　　解决这个问题，有两种方案：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>使用域名嗅探功能，直接 http 协议中找出需要访问的域名。这样即便映射表中有相同的 IP，也能找出需要访问的具体网站域名，从而使用远程 DNS 解析。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在 DNS 配置中添加一个 &lt;code>fallback&lt;/code>​ 配置，存放不会被污染的 DNS 服务器，一般是经过加密的 DoT 或者 DoH 服务器。在最初发起 DNS 请求时，同时向 &lt;code>nameserver&lt;/code>​ 和 &lt;code>fallback&lt;/code>​ 中的 DNS 服务器发起 DNS 请求。如果 &lt;code>nameserver&lt;/code>​ 上游 DNS 返回的不是国内 IP，则直接使用 &lt;code>fallback&lt;/code>​ 中返回的 IP 地址，确保国外 IP 不被污染。这里有一个注意点：向 &lt;code>fallback&lt;/code>​ 发起 DNS 查询的主机的地理位置，将影响 DNS 返回的 IP。DNS 会选择一个离发起 DNS 主机最近位置的服务器 IP。在 clash 中即使是 &lt;code>fallback&lt;/code>​ 也通过本机发起 DNS 请求，这就导致返回的 IP 并不是离代理节点服务器最近的位置，造成速度负优化。但 clash.meta 中已经修改。&lt;/p>
+&lt;p>但国内访问国外 DoH/DoT 体验很差，间歇性被墙，且需要握手、加密速度也比较慢。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>　　由于 redis-host 在使用过程中，接连出现的问题，clash 在一次更新中彻底除去 redis-host 模式，转而只支持 fake-ip。而 clash.meta 通过加入流量嗅探解决了 redis-host 的 DNS 污染问题。&lt;/p>
+&lt;h5 id="解决方案2fake-ip">解决方案2：fake-ip
+&lt;/h5>&lt;p>　　IOS 端的代理软件都是用的 fake-ip 模式，v2ray 也有类似功能叫作 fake DNS。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241104103249-bgpa1yt.png"
+width="1144"
+height="634"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="180"
+data-flex-basis="433px"
+>​&lt;/p>
+&lt;p>　　以下图中的配置为例，浏览器访问域名 &lt;code>google.com&lt;/code>​：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241104103406-z505nye.png"
+width="329"
+height="691"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="47"
+data-flex-basis="114px"
+>​&lt;/p>
+&lt;p>　　在 fake-ip 模式中，所有应用的 DNS 请求全部返回一个虚拟的 IP，也就是 &lt;code>fake-ip-range&lt;/code>​ 中的私有地址中分配的一个。假设返回的是 &lt;code>198.18.0.3&lt;/code>​。Clash 将保存域名 &lt;code>google.com&lt;/code>​ 和 IP &lt;code>198.18.0.3&lt;/code>​ 的映射的关系。&lt;br>
+浏览器会使用这个 IP 发起 http 请求。http 请求会再次被 Clash 捕获，并根据映射表判断是想访问 &lt;code>google.com&lt;/code>​。此时 Clash 就根据 &lt;code>rules&lt;/code>​ 路由规则进行域名匹配。&lt;br>
+​&lt;code>google.com&lt;/code>​直接匹配第一条规则，则会被交给节点组1 的香港节点处理。这里要注意，交给节点的仍然是&lt;code>google.com&lt;/code>​域名，香港节点收到后，还会再次发起 DNS 请求来获取真正的 IP 进行访问。&lt;/p>
+&lt;p>　　所以 fake-ip 模式，本地并不需要进行 DNS 解析，也就不存在 DNS 泄漏。还解决了 DNS 污染中，多域名指向统一 IP 的问题，因为每一个 fake ip 都由 clash 控制。&lt;br>
+但这不意味着 fake-ip 永远不会发起 DNS 查询。因为在 rules 的路由匹配规则中，一定会有 GEOIP 规则，当我们访问 &lt;code>ipleak.net&lt;/code>​ 时，一定会走到这里，此时仍然会向 &lt;code>nameserver&lt;/code>​ 和 &lt;code>fallback&lt;/code>​ 中的 DNS 服务器发起 DNS 请求。所以在这里，&lt;code>ipleak.net&lt;/code>​ 仍然会返回多家 DNS 提供商。&lt;br>
+这就和系统代理模式下的 DNS 泄漏一样，关键目标网站并没有泄漏。&lt;/p>
+&lt;p>　　fake-ip 虽然可以一定程度上解决 DNS 泄露和 DNS 污染，但是也有自己的问题。比如：当已经访问了网站 &lt;code>www.baidu.com&lt;/code>​ 并缓存了假 IP，此时 clash 异常退出，电脑仍然缓存的是假 IP，此时就无法访问 &lt;code>www.baidu.com&lt;/code>​。即便 clash 将 DNS 响应的缓存 TTL 设置为 1 秒，但应用程序并不一定会遵循 DNS 响应的 TTL 设置，可能会延长缓存时间来防止频繁 DNS 查询。还有一些程序会开启 DNS 重绑保护，当发现 DNS 获取的是一个私有 IP，或认为出现 DNS 劫持而被丢弃。就比如 windows 系统使用 fake-ip 出现联网图标显示没网的情况。在 Linux 上也同理。解决方法是将 windows 的 test 联网的网址，放在 &lt;code>fake-ip-filter&lt;/code>​ 中，放在其中的域名不会获取 fake-ip 而是会发起 DNS 请求，获取真实的 IP。相当于回退到 redir-host 模式。也可以通过 &lt;code>&amp;quot;+.*&amp;quot;&lt;/code>​ 通配符将所有的网站添加到 &lt;code>fake-ip-filter&lt;/code>​ 回退，此时就处于 redir-host 模式了。&lt;br>
+还有 Ping 命令失效的问题，因为都是 fake-ip 所以 ping 命令全部都由 clash 的虚拟网卡返回。&lt;/p>
+&lt;p>　　Windows 测试是否联网的网址为：www.msftconnecttest.com 和 &lt;a class="link" href="https://www.msftncsi.com" target="_blank" rel="noopener"
+>www.msftncsi.com&lt;/a>。参考：&lt;a class="link" href="https://github.com/Loyalsoldier/v2ray-rules-dat/issues/136" target="_blank" rel="noopener"
+>github.com/Loyalsoldier/v2ray-rules-dat/issues/136&lt;/a>&lt;/p>
+&lt;p>　　在 Manjaro 中，测试是否联网的网址如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">cat&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">NetworkManager&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">conf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">connectivity&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">conf&lt;/span> &lt;span class="err">&lt;/span> &lt;span class="err">✔&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="n">connectivity&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">uri&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nl">http&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="c1">//ping.manjaro.org/check_network_status.txt
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　另外，udp 在一定场景下，必须使用真实的 IP，所以 fake-ip 下 udp 流量都会发起 DNS 请求。比如基于 UDP 的 QUIC 协议，也就是 HTTP3。可以在浏览器中，禁用该功能。&lt;/p>
+&lt;p>　　chrome://flags/#enable-quic&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E7%BD%91%E7%BB%9C%E5%8E%9F%E7%90%86%E5%8F%8A-dns-%E6%B3%84%E6%BC%8F%E7%AE%80%E6%9E%90/assets/image-20241104112934-yobdbj0.png"
+width="1300"
+height="400"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="325"
+data-flex-basis="780px"
+>​&lt;/p>
+&lt;h2 id="总结-1">总结
+&lt;/h2>&lt;p>　　通过解析代理网络的 DNS 请求行为以及代理网络的通信流程，结合已有的 clash 模式，可以正确的配置 DNS 模块来防止 DNS 泄漏或者污染。&lt;/p>
+&lt;p>　　DNS 污染导致无法正常访问网站，DNS 泄漏导致一些严格地区的网站无法访问。&lt;/p>
+&lt;p>　　通常系统代理模式下的 DNS 泄漏容易解决，使用白名单或者黑名单加上对应的路由匹配模式，就可以解决。&lt;/p>
+&lt;p>　　而对于 TUN 模式下，或者软路由，这种接管了系统 DNS 的模式，就需要手动配置 DNS 模块，并根据 代理模式（redir-host 或者 fake-ip）来决定是否开启流量嗅探，以及是否配置 DNS代理。&lt;/p>
+&lt;p>　　redir-host + 流量嗅探 + DNS 代理可以完美解决 DNS 泄漏，但是速度会慢。&lt;/p>
+&lt;p>　　fake-ip + 合理路由规则 一定程度上解决 DNS 泄漏，但是速度较快。&lt;br>
+fake-ip 也可以使用 DNS 代理解决 DNS 泄漏。相比于 redir-host 减少了一次 DNS 请求，因此也还是更快。&lt;br>
+但 fake-ip 由于使用的是虚拟 IP，在使用 ping 命令，或者一些检测 DNS 劫持的软件就不能使用了。&lt;/p>
+&lt;p>　　‍&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://youtu.be/50iVDmqzDW8?si=mL9QLqKjFDuexG3G" target="_blank" rel="noopener"
+>【进阶•DNS系列视频】&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>个人Linux主机通过SSH隧道使服务器访问外网</title><link>https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/</link><pubDate>Sun, 20 Oct 2024 18:50:54 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/</guid><description>&lt;p>　　在学校的服务器使用过程中，需要服务器访问外网，但在服务器上可能没有权限创建代理网络，或者不方便使用。而且直接使用服务器访问外网也可能有风险，因此，本文通过ssh隧道，将服务器的网络代理到我们的终端主机，也就是我们自己的电脑上，再在自己的电脑上安装代理软件，实现服务器通过ssh隧道访问外网的功能。&lt;/p>
+&lt;h2 id="本机代理配置">本机代理配置
+&lt;/h2>&lt;p>　　本文中 “&lt;strong>本机”&lt;/strong> 一词代表个人电脑，&lt;strong>服务器&lt;/strong> 代表远程连接的服务器电脑。&lt;/p>
+&lt;p>　　本机系统如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ neofetch  ✔
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ ling@ling-20ym
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ --------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ OS: Manjaro Linux x86_64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ Host: 20YM Lenovo ThinkBook 16p Gen &lt;span class="m">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ Kernel: 6.1.112-1-MANJARO
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Uptime: &lt;span class="m">9&lt;/span> hours, &lt;span class="m">57&lt;/span> mins
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Packages: &lt;span class="m">1772&lt;/span> &lt;span class="o">(&lt;/span>pacman&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Shell: bash 5.2.37
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Resolution: 2560x1600, 2560x1440
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ DE: Plasma 6.1.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ WM: KWin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Theme: &lt;span class="o">[&lt;/span>Plasma&lt;span class="o">]&lt;/span>, Breeze &lt;span class="o">[&lt;/span>GTK2/3&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Icons: &lt;span class="o">[&lt;/span>Plasma&lt;span class="o">]&lt;/span>, McMojave-circle-dark &lt;span class="o">[&lt;/span>GTK2/3&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Terminal: konsole
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CPU: AMD Ryzen &lt;span class="m">7&lt;/span> 5800H with Radeon Graphics &lt;span class="o">(&lt;/span>16&lt;span class="o">)&lt;/span> @ 3.200GHz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> GPU: AMD ATI Radeon Vega Series / Radeon Vega Mobile Series
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> GPU: NVIDIA GeForce RTX &lt;span class="m">3060&lt;/span> Mobile / Max-Q
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Memory: 18054MiB / 23392MiB
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　采用clash verge作为代理软件，该软件能够开放本地端口作为代理访问路径，为ssh隧道提供了出口端口。&lt;/p>
+&lt;p>　　本人使用tun模式，尽可能的避免DNS泄漏。如果使用代理模式也可以。但 Linux上只有少数程序会走系统代理模式，除了在需要在clash verge中开启代理模式，还需要在对应的软件中手动设置代理。因此还是tun模式更适合linux上使用。参考：&lt;a class="link" href="https://github.com/clash-verge-rev/clash-verge-rev/issues/346" target="_blank" rel="noopener"
+>Ubuntu下系统代理只能作用于Firefox？&lt;/a>&lt;/p>
+&lt;p>　　注：开启代理模式后，即便本机其他程序不走clash，我们通过ssh建立隧道依然可行。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020185708-5yl00rv.png"
+width="740"
+height="836"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="88"
+data-flex-basis="212px"
+>​&lt;/p>
+&lt;p>　　这里开启tun模式后，并保证本机能够正常访问外网后，就可以开始ssh隧道搭建。需要注意，clash verge默认开放的代理端口为7897，可以自行修改。&lt;/p>
+&lt;h2 id="ssh隧道">SSH隧道
+&lt;/h2>&lt;p>　　参考：&lt;a class="link" href="https://www.entropy-tree.top/2024/04/18/ssh-tunneling-techniques/" target="_blank" rel="noopener"
+>SSH 隧道技术&lt;/a>、&lt;a class="link" href="https://cloud.tencent.com/developer/article/1901554" target="_blank" rel="noopener"
+>SSH隧道详解与使用AutoSSH实现稳定的内网穿透&lt;/a>、&lt;a class="link" href="https://www.lixueduan.com/posts/linux/07-ssh-tunnel/#%E6%89%A9%E5%B1%95-%E8%B7%A8%E6%9C%BA%E5%99%A8%E8%BD%AC%E5%8F%91" target="_blank" rel="noopener"
+>SSH 隧道简明教程&lt;/a>&lt;/p>
+&lt;p>　　SSH隧道提供三种模式：正向 SSH 隧道（本地转发）、反向 SSH 隧道（远程转发）、动态转发 SSH 隧道（Socket服务器）。&lt;/p>
+&lt;p>　　由于一台电脑上可能有多个网卡（意味着有多个 IP），因此在使用 SSH 隧道时，需要指定：1. 从哪一个 IP建立SSH连接。也就是SSH的登陆地址。2. SSH隧道应该连接到哪一个 IP上。也就是&lt;strong>隧道地址&lt;/strong>。&lt;/p>
+&lt;p>　　在下面的介绍中，destination 表示服务器的地址，也就是登陆服务器的标识符：&lt;strong>Username@Host_IP&lt;/strong>，host:hostport 表示服务器上的隧道地址。host可以和Host_IP不同，但都是服务器上的IP地址。&lt;/p>
+&lt;h3 id="正向-ssh-隧道">正向 SSH 隧道
+&lt;/h3>&lt;p>　　将本主机上的某网络端口上的所有流量，通过 SSH 隧道转发到远程服务器上的网络端口。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -L &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port:host:hostport destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 bind_address 可选（默认为 localhost），是本机上的一个网络ip。该命令会本地开启一个绑定在 [bind_address:]port 上的套接字，并监听。将该套接字上所有的流量都转发到 destination 服务器上的 host:hostport。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -L 9090:localhost:8080 root@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　例如，这个例子就是将本机 localhost:9090 上的流量转发到 10.0.0.2 服务器上的 localhost:8080。&lt;/p>
+&lt;h3 id="反向-ssh-隧道">反向 SSH 隧道
+&lt;/h3>&lt;p>　　将远程服务器上的网络端口上的所有流量，通过 SSH 隧道转发到本主机上的某网络端口。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port:host:hostport destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　和正向隧道的命令行格式相同，不同点在于此命令是在服务器上开启一个绑定在 host:hostport 上的套接字，并监听。将该套接字上所有的流量都转发到 &lt;strong>本机&lt;/strong> 上的 [bind_address:]port。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R 9090:localhost:8080 root@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　例如，这个例子就是将10.0.0.2 服务器上的 localhost:8080 上的流量转发到本机 localhost:9090。&lt;/p>
+&lt;h3 id="动态转发-ssh-隧道">动态转发 SSH 隧道
+&lt;/h3>&lt;p>　　动态转发 SSH 隧道实际上是将远程服务器作为一个 Socket 服务器，专门转发本地端口上的所有流量到&lt;strong>服务器所处的网络中&lt;/strong>。动态转发不像正向隧道与反向隧道一样转发端口与目标端口是一对一的，&lt;strong>动态转发中的转发端口对应的目标是目标主机所在的整个网络&lt;/strong>。不过使用动态转发访问目标主机所在网络时需要应用程序本身支持代理配置或者使用socket代理工具。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -D &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　-D [bind_address:]port 指定监听的端口，会在本地监听该端口，并将请求到该端口流量基于 SOCKS5 协议转发到远程主机上，其中 [bind_address:]可以不填，当不写或者为 * 时表示监听全部地址。示例:-D *:8081,-D 8081,-D 127.0.0.1:8081,-D 192.168.0.1:8081。&lt;/p>
+&lt;p>　　可以参考：&lt;a class="link" href="https://www.lixueduan.com/posts/linux/07-ssh-tunnel/#%E6%89%A9%E5%B1%95-%E8%B7%A8%E6%9C%BA%E5%99%A8%E8%BD%AC%E5%8F%91" target="_blank" rel="noopener"
+>SSH 隧道简明教程&lt;/a> 中&lt;code>扩展-跨机器转发&lt;/code>​章节，介绍的很清楚。&lt;/p>
+&lt;p>　　下面是从中截出的两张图片，主要应用是在A与B之间创建隧道，最终通过隧道访问到ServerC中的 http 服务。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020215213-kvxoreu.png"
+width="1244"
+height="598"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="208"
+data-flex-basis="499px"
+>​&lt;/p>
+&lt;p>　　最常用的就是绕过防火墙，在外网上通过一台可以访问内网的 Server A，访问内容。基于Socket协议的翻墙软件就是这个原理，用一台没被墙的、在国内可以通过SSH访问到的VPS，作为Socket服务器，也就是图中的 Server B。VPS在国外，可以访问国外网络资源，国内就将所有的外网网络请求发往 Server A的SSH 绑定端口，Server A会将其转发给国外网络，例如入中的 Server C。由于 Server A 到 Server B之间是SSH加密传输的，防火墙看不到其中具体访问的网络内容，就不会判断为翻墙。但由于这种方式应用太广泛，现在检测流量特征的手段很强，可以快速判断出并封掉。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020215222-0qvsdqk.png"
+width="946"
+height="676"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="335px"
+>​&lt;/p>
+&lt;h3 id="常用参数">常用参数
+&lt;/h3>&lt;ul>
+&lt;li>​&lt;code>-L&lt;/code>​：local，表示使用本地端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-R&lt;/code>​：remote，表示使用远程端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-D&lt;/code>​：dynamic，表示使用动态端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-N&lt;/code>​： 表示创建隧道以后不连接到 sshServer端，通常与”-f”选项连用&lt;/li>
+&lt;li>​&lt;code>-f&lt;/code>​：表示在后台运行ssh隧道，通常与”-N”选项连用&lt;/li>
+&lt;li>​&lt;code>-q&lt;/code>​ 参数用于启用 &lt;strong>静默模式&lt;/strong>（quiet mode）&lt;/li>
+&lt;li>​&lt;code>-g&lt;/code>​：表示 ssh 隧道对应的转发端口将监听在主机的所有IP中，不使用”-g选项”时，转发端口默认只监听在主机的本地回环地址中，”-g” 表示开启网关模式，远程端口转发中，无法开启网关功能&lt;/li>
+&lt;li>​&lt;code>-C&lt;/code>​：启用压缩，可以提高传输速度。&lt;/li>
+&lt;li>​&lt;code>-p port&lt;/code>​：指定 SSH 服务器监听的端口 (如果不是默认的22端口)。&lt;/li>
+&lt;li>​&lt;code>-i 私钥文件&lt;/code>​：使用指定的私钥文件进行身份验证。&lt;/li>
+&lt;li>​&lt;code>-T&lt;/code>​ ：用于禁用伪终端分配，使用 &lt;code>-N&lt;/code>​ 时，因为本身就没有需要交互的命令，SSH 默认不会分配伪终端，便不需要 &lt;code>-T&lt;/code>​&lt;/li>
+&lt;/ul>
+&lt;h2 id="应用">应用
+&lt;/h2>&lt;p>　　为了达到我们的目的：将服务器上的网络代理到本机上，我们有两种方案：&lt;/p>
+&lt;ol>
+&lt;li>建立反向隧道，将服务器端口上的流量转发到本机，服务器上所有的流量都走代理端口。优点是：比较简单，只需要ssh建立隧道即可，不需要安装其他软件，只要主机能访问外网，服务器就可以。缺点是：如果有其他服务器，需要在主机上为每一个服务器都单独创建SSH隧道。如果主机下线了，服务器就无法访问外网了。&lt;/li>
+&lt;li>建立 Socket服务器，让服务器的所有流量都走 Socket服务器。但这样的话和建立一个翻墙代理的区别就会很小了，不如直接就在服务器上安装代理软件。优点是：更安全，代理管理起来更方便。一般来说Socket服务器不会轻易下线，保证服务器一直有外网网络。缺点是：每一台服务器上都需要单独配置软件，且Socket服务器需要在外网。&lt;/li>
+&lt;/ol>
+&lt;p>　　对于普通的应用场景来说，在自己的电脑上，我们都会安装代理软件，在服务器管理员没有配置跳板机或者跳板机故障时，我们就可以采用第一种，快速 实现 or 恢复 服务器访问外部网络。&lt;/p>
+&lt;p>　　我们假设服务器的ip为10.0.0.2，服务器上有用户名为 server的用户。&lt;/p>
+&lt;h3 id="本机配置">本机配置
+&lt;/h3>&lt;p>　　本机上我们安装clash verge，正常启动后，就会clash verge就会监听 localhost:7897，并转发流量到代理服务器。本示例为方便起见，将主机和远程服务器的端口都设置为 7897，实际上远程服务器可以设置为其他没有被使用的端口，主机也可以在clash verge中将代理端口改为其他端口后，将SSH隧道的本地端口同步修改。&lt;/p>
+&lt;p>　　运行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R 7897:localhost:7897 -fqCN server@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　为远程服务器的 localhost:7897 和本机的 localhost:7897建立ssh隧道。转发方向为：远程服务器 SSH隧道 -&amp;gt; 本机 localhost:7897 -&amp;gt; clash verge。&lt;/p>
+&lt;p>　　​&lt;code>-fqCN&lt;/code>​：后台运行、静默模式、启动压缩模式，加快速度、只转发端口，不连接终端。&lt;/p>
+&lt;h3 id="远程服务器配置">远程服务器配置
+&lt;/h3>&lt;p>　　远程服务器上需要在终端中添加代理变量，也可以写到终端变量文件（~/.bashrc 或者 ~/.profile ）中，每次登陆自动生效。使得所有的流量走代理端口，也就是本地回环地址的7897端口。转发方向：服务器其他网络 -&amp;gt; 服务器 localhost的7897端口 -&amp;gt; 服务器SSH隧道&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;localhost:7897&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;localhost:7897&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="设置好后不能正常联网">设置好后不能正常联网
+&lt;/h2>&lt;p>　　在实践过程中，我遇到了按照上述配置后，主机网络正常访问外网，服务器和主机之间SSH隧道通信正常，但服务器无法访问外网。如下：&lt;/p>
+&lt;p>　　服务器：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl: &lt;span class="o">(&lt;/span>35&lt;span class="o">)&lt;/span> error:0A000126:SSL routines::unexpected eof &lt;span class="k">while&lt;/span> reading
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　添加参数 &lt;code>-v&lt;/code>​ 打印详细日志输出，可以看到使用了本地的DNS解析地址。但国内的DNS在没被代理的时候，会被CFW污染，因此这个地址实际上不是谷歌的服务器IP，但由于已经缓存下来了，所以在访问的时候会通过该IP来访问。于是，传递给代理的ip也是这个错误ip，就会导致访问出错。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -v -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Trying 127.0.0.1:7897...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 connect to IPv4 199.59.148.229:443 &lt;span class="o">(&lt;/span>locally resolved&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　解决办法：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>等几分钟中&amp;hellip;等DNS缓存过期。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>安装 proxychain，并在其中配置&lt;code>proxy_dns&lt;/code>​，使得DNS也通过代理查询。&lt;/p>
+&lt;p>配置 proxychain&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ vim /etc/proxychains.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Proxy DNS requests - no leak for DNS data&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">proxy_dns
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>ProxyList&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># add proxy here ...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># meanwile&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># defaults set to &amp;#34;tor&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">https 127.0.0.1 &lt;span class="m">7897&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">socks5 127.0.0.1 &lt;span class="m">7897&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过 proxychain 访问&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ proxychains curl -I https://www.youtube.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>在使用 systemd 管理服务的 Linux 上。可以通过重启系统解析服务来情况 DNS 缓存 &lt;code>sudo systemctl restart systemd-resolved&lt;/code>​。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>　　正常情况下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -v -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Trying 127.0.0.1:7897...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 connect to IPv4 31.13.94.41:443 &lt;span class="o">(&lt;/span>locally resolved&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 request granted.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Connected to &lt;span class="o">(&lt;/span>nil&lt;span class="o">)&lt;/span> &lt;span class="o">(&lt;/span>127.0.0.1&lt;span class="o">)&lt;/span> port &lt;span class="m">7897&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="c1">#0) &lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* ALPN, offering h2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* ALPN, offering http/1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* CAfile: /etc/ssl/certs/ca-certificates.crt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* CApath: /etc/ssl/certs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.0 &lt;span class="o">(&lt;/span>OUT&lt;span class="o">)&lt;/span>, TLS header, Certificate Status &lt;span class="o">(&lt;/span>22&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.3 &lt;span class="o">(&lt;/span>OUT&lt;span class="o">)&lt;/span>, TLS handshake, Client hello &lt;span class="o">(&lt;/span>1&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.2 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS header, Certificate Status &lt;span class="o">(&lt;/span>22&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.3 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS handshake, Server hello &lt;span class="o">(&lt;/span>2&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.2 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS header, Finished &lt;span class="o">(&lt;/span>20&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="重新建立ssh-隧道后服务器无法访问外网">重新建立SSH 隧道后服务器无法访问外网
+&lt;/h2>&lt;p>　　可能会出现 SSH 隧道已经被清空，但服务器端还没有退出对应的线程的情况，这时需要我们手动找出对应的线程，并kill掉。再重新建立 SSH 隧道。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ sudo lsof -i :7897
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sshd &lt;span class="m">2129065&lt;/span> tiancheng.tang 7u IPv6 &lt;span class="m">48338339&lt;/span> 0t0 TCP ip6-localhost:7897 &lt;span class="o">(&lt;/span>LISTEN&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sshd &lt;span class="m">2129065&lt;/span> tiancheng.tang 9u IPv4 &lt;span class="m">48338340&lt;/span> 0t0 TCP localhost:7897 &lt;span class="o">(&lt;/span>LISTEN&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ &lt;span class="nb">kill&lt;/span> &lt;span class="m">2129065&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　如果需要长时间稳定使用SSH 隧道，可以使用autossh。&lt;/p></description></item><item><title>Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网</title><link>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</link><pubDate>Thu, 12 Oct 2023 11:12:24 +0800</pubDate><guid>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</guid><description>&lt;p>　　参考链接：&lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a>、&lt;a class="link" href="https://blog.zenggyu.com/posts/zh/2022-05-04-%E5%9C%A8%E5%AE%BF%E4%B8%BB%E6%9C%BA%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84vpn%E8%BF%9E%E6%8E%A5/#%E4%B8%BA%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%B7%BB%E5%8A%A0%E7%94%A8%E4%BA%8E%E5%9F%BA%E6%9C%AC%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%BD%91%E5%8D%A1" target="_blank" rel="noopener"
+>在宿主机中使用虚拟机的VPN连接&lt;/a>&lt;/p>
+&lt;p>　　整体思想是：&lt;/p>
+&lt;p>　　建立一张单独的host-only网卡，使得虚拟机和宿主机之间可以通信，利用windows的网络分享功能，将VPN的网卡的网络分享到这张host-only网卡。那么访问这张host-only网卡，就可以访问到VPN的网络。而host-only网卡可以被主机访问到。因此，就是实现了主机通过虚拟机的VPN进行访问的功能。但虚拟机仍然需要一张可以直接上网的网卡。因为虚拟机需要正常和外界通信，因此主机需要为虚拟机创建两张独立的网卡。&lt;/p>
+&lt;p>　　注意：本文的应用场景是在非校园网环境，Linux系统通过虚拟机的VPN来访问校园网资源，在上述参考链接中，其中一个虚拟机使用的是桥接网卡上网，另一个使用的是网络地址转换NAT上网。&lt;/p>
+&lt;p>　　根据我的测试，校园网环境可能会阻止桥接模式下虚拟机获取 ipv4 地址，我们学校最开始允许宿舍有线网络上网，这时还可以通过桥接模式获取到ipv4的地址。后面禁止了有线网络，现在我的虚拟机桥接模式在校园网环境中就获取不到ipv4地址了。于是我在校园网中只能使用NAT模式上网。&lt;/p>
+&lt;p>　　但在公司时，虚拟机使用NAT上网并在开启VPN后，整个虚拟机将无法访问网络。这应该跟网络地址转换NAT有关，因为使用该方法，虚拟机获取的ip地址是10.0.2.16，可能跟VPN代理的10.0.0.0网段有冲突。导致最后虚拟机无法正常上网。&lt;/p>
+&lt;p>　　解决方案就是：在学校校园网用虚拟机NAT上网，在校园网以外的地方，用桥接网卡的方式上网。&lt;/p>
+&lt;p>　　为了方便，我创建了三张网卡：NAT、host-only、桥接。便于在NAT和host-only之间切换。&lt;/p>
+&lt;h2 id="虚拟机添加host-only网络">虚拟机添加host-only网络
+&lt;/h2>&lt;h3 id="virtaulbox建立host-only网卡">virtaulBox建立host-only网卡
+&lt;/h3>&lt;p>　　选中工具-&amp;gt;网络，然后建立一个host-only网络&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111516-d29y5m4.png"
+width="835"
+height="443"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="188"
+data-flex-basis="452px"
+>​&lt;/p>
+&lt;p>　　点击DHCP服务器，启动服务器，也可以不使用DHCP。区别在与在后续Linux宿主机添加路由节点时，DHCP分配到的网址可能不唯一，每次都需要重新查看。而使用默认地址，则固定为192.168.137.1。&lt;/p>
+&lt;p>　　这里需要注意，&lt;code>VirtualBox &amp;gt;= 6.1.28 &lt;/code>​的版本上，默认指定的网段是192.168.56.0/24，无法更改为其他网段。因此不能够像这篇文章 &lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a> 中提到的，修改VirtualBox的网段。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.2，因为windows11在网络共享时默认指定的网络地址192.168.137.1，需要两者在同一网段内。可以在后续少修改一次网络地址。&lt;/p>&lt;/blockquote>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111702-el6bvrq.png"
+width="879"
+height="1016"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111721-nfmelkb.png"
+width="836"
+height="973"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="85"
+data-flex-basis="206px"
+>​&lt;/p>
+&lt;p>　　添加完后，可以在Linux宿主机中查看&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ip addr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012154705-gpygtv4.png"
+width="842"
+height="326"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="258"
+data-flex-basis="619px"
+>​&lt;/p>
+&lt;h3 id="为虚拟机添加host-only的网卡并设置共享vpn网络">为虚拟机添加host-only的网卡并设置共享VPN网络
+&lt;/h3>&lt;p>　　在虚拟机对应的设置中，增加一个网卡，连接方式选择 &lt;code>仅主机（Host-Only）网络&lt;/code>​。但需要先关闭虚拟机，否则无法进行更改，就像我这里一样，没有关闭虚拟机，按钮是灰色的。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151700-y3wbm32.png"
+width="790"
+height="567"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+>​​&lt;/p>
+&lt;p>　　添加完成后，记住这里的MAC地址结尾E124，后续识别网卡的时候会用。打开虚拟机，进入设置-&amp;gt;网络和Internet-&amp;gt;高级网络设置-&amp;gt;更多网络适配器选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012150818-7du5bqc.png"
+width="1267"
+height="1126"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="112"
+data-flex-basis="270px"
+>​&lt;/p>
+&lt;p>　　这里的三个网卡，其中一个是深信服的Sanfor的网卡，也就是我这里的vpn软件使用的网卡。以太网是NAT网络的网卡，以太网2是host-only网卡。&lt;/p>
+&lt;p>　　可以在win11中的终端中输入命令&lt;code>Get-NetAdapter&lt;/code>​查看，前面添加网卡的时候提到，E124结尾的是Host-Only，所以这里就可以区分出哪一些是VPN的网卡，哪一些是virtualbox创建的网卡。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151602-ym2qt1z.png"
+width="1105"
+height="176"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="627"
+data-flex-basis="1506px"
+>​&lt;/p>
+&lt;p>　　然后开启VPN，转到网络适配器界面。右键VPN对应的网卡，选择 属性-&amp;gt;共享，然后选择Host-Only网卡。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152132-xydjf1p.png"
+width="1038"
+height="604"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="171"
+data-flex-basis="412px"
+>​&lt;/p>
+&lt;p>　　这里win10以前的系统可能弹出提示窗，说会前往设置以太网2的IP为192.168.137.1，我是安装的win11，没有弹窗，默认更改。因此，我们需要手动将Host-Only网卡的IP修改回原来的设定好的地址。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.2，因为windows11在网络共享时默认指定的网络地址是192.168.137.1，两者需要在同一网段内不能冲突。这里就不需要更改。&lt;/p>&lt;/blockquote>
+&lt;p>　　右键Host-Only网卡，选择属性，Internet 协议版本 4，然后双击，就会弹出修改IP的弹窗。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152540-j4c3j0u.png"
+width="1322"
+height="840"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>​​&lt;/p>
+&lt;p>　　如果前面开启了DHCP，则可以点自动获取IP，否则需要手动改动IP为Host-Only网络段中与前面设置不同的IP地址。比如前面已经使用了 192.168.56.1 和 192.168.56.2，则就现在就需要设置为192.168.56.3。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012160633-csbnpcr.png"
+width="412"
+height="560"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="73"
+data-flex-basis="176px"
+>​&lt;/p>
+&lt;p>　　设置完成后，回到host。&lt;/p>
+&lt;h3 id="连通性测试">连通性测试
+&lt;/h3>&lt;p>　　设置完成后，在host的终端中，应该可以ping通虚拟机中的host网卡的地址&lt;br>
+​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153053-5ij923e.png"
+width="510"
+height="213"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="239"
+data-flex-basis="574px"
+>​&lt;/p>
+&lt;p>　　如果ping不通，显示无法到达，很可能是win11的防火墙没有开启报文回复功能。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://www.zhihu.com/question/37301003?utm_id=0" target="_blank" rel="noopener"
+>知乎回答&lt;/a>，在设置中按照 隐私安全性 -&amp;gt; Windows安全中心 -&amp;gt; 防火墙和网络保护，打开防火墙设置&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153330-1j6cctx.png"
+width="1425"
+height="996"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+>​&lt;/p>
+&lt;p>　　然后打开高级设置，将入站和出站的&lt;code>ICMPv4回显请求&lt;/code>​功能打开。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153548-0dwqzv1.png"
+width="1474"
+height="928"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="381px"
+>​&lt;/p>
+&lt;h2 id="宿主机设置路由">宿主机设置路由
+&lt;/h2>&lt;h3 id="添加路由规则">添加路由规则
+&lt;/h3>&lt;p>　　我使用的manjaro，默认安装的是ip工具，先查看当前路由表&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153952-d3tfmfr.png"
+width="662"
+height="66"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1003"
+data-flex-basis="2407px"
+>​&lt;/p>
+&lt;p>　　可以看到192.168.56.0/24的网络段都会被路由到虚拟机win11的地址为192.168.56.1的网卡上去。但没有将VPN内网地址路由到虚拟机的表项。&lt;/p>
+&lt;p>　　因此需要添加路由规则，将VPN访问的网段路由到192.168.56.3，也就是之前在虚拟机中的host-only网卡中修改的地址。vboxnet0就是之前添加网卡时，系统中显示的网卡。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route add 10.0.0.0/8 via 192.168.56.3 dev vboxnet0 metric &lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　我要访问的VPN网段为10.0.0.0/8，如有需要可以更改为自己的内网网段。&lt;code>metric 100&lt;/code>​设置路由优先级，避免在Linux宿主机开启其他网络代理时，优先代理该网络段。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.1，因为这是windows11在网络共享时默认指定的网络地址。则这里路由添加表项就应当修改为&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ip route add 10.0.0.0/8 via 192.168.137.1 dev vboxnet0 metric &lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/blockquote>
+&lt;p>　　添加完成后再次查看&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153914-35e5clx.png"
+width="656"
+height="111"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="590"
+data-flex-basis="1418px"
+>​&lt;/p>
+&lt;p>　　此时 PING 自己的内网网段，就可以ping通。如果这里发现，ping不通，则需要在win11中重新将VPN的网卡分享到host-only网卡，然后修改host-only网卡（或者是VPN不会转发ICMP消息，可以直接打开对应VPN内网资源看看是否成功）。下一次开机时，需要先取消共享网络，再重新共享，否则也会出现没有回复的情况。（&lt;strong>即每次开虚拟机并开启VPN后，都需要重新共享网络&lt;/strong>）&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155146-grfnylf.png"
+width="583"
+height="169"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="344"
+data-flex-basis="827px"
+>​&lt;/p>
+&lt;p>　　设置完成后，如果重启虚拟机，需要重新分享网络，然后再更改ip。​​&lt;/p>
+&lt;p>　　目前还没有添加永久路由的方法，每次Linux宿主机重启后，都需要重新添加路由。&lt;/p>
+&lt;h2 id="在主机中访问对应网段">在主机中访问对应网段
+&lt;/h2>&lt;p>　　当可以ping通时，就能够在主机中正常访问了。实测ssh到内网网段服务器也是可以的。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155540-3e0311o.png"
+width="710"
+height="351"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="485px"
+>​&lt;/p>
+&lt;p>　　且不会和主机中的vpn冲突。我的主机使用的是v2ray进行科学上网，实测对本文中的行为没有影响，如果使用其他方式，不能保证。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：
+在 v2ray 不能很好的解决DNS泄漏，以及代理节点转向clash verge后，换用clash verge作为代理软件。在Linux上，Clash需要开启TUN模式，会接管DNS系统。我们学校的一些内网域名需要向VPN软件设立的DNS服务器（198.18.0.1）查询ip地址，而TUN模式的DNS查询不会自动转发到我们自己设立的虚拟机的网路中，因此导致这类网址只能在虚拟机中访问。&lt;/p>
+&lt;p>尝试过在clash中配置单独的域名解析地位，将这类域名DNS解析服务器指定为&lt;code>198.18.0.1&lt;/code>​，并将clash的fake ip域名范围修改为&lt;code>198.19.0.1/16&lt;/code>​（默认为&lt;code>198.18.0.1/16&lt;/code>​，和VPN的网段冲突）。但目前的clash verge版本中，配置&lt;code>nameserver-policy:&lt;/code>​不生效，因此，此方案还没有结果。&lt;/p>
+&lt;p>目前没有其他解决方式，但这种情况不需要在Linux宿主机上解决，直接在虚拟机上访问即可。本文的初衷是在Linux中的终端访问服务器，或者vscode连接服务器工作，因此只需要能够正常通过ip连接内网服务器即可。&lt;/p>
+&lt;p>&lt;strong>2024.11.4补充&lt;/strong>：
+本文只能代理 &lt;code>10.0.0.0/8&lt;/code>​ 的网段，如果希望通过访问内网域名的形式访问内网资源，则还应当配置 DNS 服务器。
+　　‍&lt;/p>&lt;/blockquote></description></item></channel></rss>

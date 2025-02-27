@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on LingLong</title><link>https://codetang-2417.github.io/tags/git/</link><description>Recent content in Git on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Fri, 25 Oct 2024 09:40:39 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Gitignore</title><link>https://codetang-2417.github.io/p/gitignore/</link><pubDate>Thu, 22 Feb 2024 10:43:52 +0800</pubDate><guid>https://codetang-2417.github.io/p/gitignore/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://blog.csdn.net/songyu0120/article/details/77848910" target="_blank" rel="noopener"
+>git中的.gitignore 的忽略规则&lt;/a>、&lt;a class="link" href="https://blog.csdn.net/w8y56f/article/details/103263924" target="_blank" rel="noopener"
+>.gitignore文件语法和常见写法&lt;/a>、&lt;a class="link" href="https://git-scm.com/docs/gitignore" target="_blank" rel="noopener"
+>git-scm.com/docs/gitignore&lt;/a>&lt;/p>
+&lt;h2 id="忽略规则的优先级">忽略规则的优先级
+&lt;/h2>&lt;p>　　​&lt;code>gitignore&lt;/code>​文件中的每一行都指定一个模式。当决定是否忽略该路径的文件时，Git 通常会检查来自多个源的&lt;code>gitignore&lt;/code>​模式，按照以下优先级顺序，从最高到最低（在一个优先级内，最后匹配的模式决定结果）：&lt;/p>
+&lt;ol>
+&lt;li>从命令行中读取可用的忽略规则，从上往下依次读取&lt;/li>
+&lt;li>当前目录定义的规则（即：如果在父目录中定义了一些模式，但在子目录的 &lt;code>.gitignore&lt;/code>​ 中有冲突的模式，则&lt;strong>子目录的规则会优先&lt;/strong>。）&lt;/li>
+&lt;li>父级目录定义的规则，依次递推。&lt;/li>
+&lt;li>$GIT_DIR/info/exclude 文件中定义的规则&lt;/li>
+&lt;li>core.excludesfile中定义的全局规则&lt;/li>
+&lt;/ol>
+&lt;p>　　注：这些模式是&lt;strong>相对&lt;/strong>于 &lt;code>.gitignore&lt;/code>​ 文件所在位置进行匹配的。这意味着如果 &lt;code>.gitignore&lt;/code>​ 文件在某个子目录中，那么它定义的规则只适用于该子目录及其子目录中的文件。称&lt;code>.gitignore&lt;/code>​文件所处的目录为根目录。&lt;/p>
+&lt;h2 id="pattern的格式">PATTERN的格式
+&lt;/h2>&lt;p>　　Pattern可以理解为我们在&lt;code>gitignore&lt;/code>​文件中写下的每一行字符，可以理解为匹配的规则。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>所有空行或者以 #（hash） 开头的行都会被 Git 忽略。其中以 # 开头的行用作注释。&lt;/p>
+&lt;p># 的英文为 hash，对于以哈希开头的Pattern，需要在第一个哈希前面放置一个反斜杠（backslash）（“ &lt;code>\&lt;/code>​ ”）。&lt;code>\&lt;/code>​表示转义。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>末尾的空格也需要加&lt;code>\&lt;/code>​转义，否则空格被忽略。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>前缀“ &lt;code>!&lt;/code>​ ”，用于取消之前的排除规则。已经被前面的Pattern所排除的任何匹配文件（且符合当前Pattern的），将再次被包含在内。&lt;/p>
+&lt;p>如果文件的开头就是&lt;code>!&lt;/code>​那么需要在最开头添加&lt;code>\&lt;/code>​，例如：&lt;code>\~important!.txt&lt;/code>​&lt;/p>
+&lt;p>&lt;strong>注意：&lt;/strong> 如果某个文件的&lt;strong>上级目录已经被排除&lt;/strong>（例如上级目录在 &lt;code>.gitignore&lt;/code>​ 中被忽略了），则无法通过 &amp;ldquo;!&amp;rdquo; 将该文件重新包括进来。因为 Git 出于性能原因，不会保留已被排除的目录内容，因此即便你试图通过规则重新包括某个文件，这个操作也不会生效。&lt;/p>
+&lt;p>举例：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qrkernel/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">!qrkernel/filelist.mk
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;code>!qrkernel/filelist.mk&lt;/code>​操作是无效的，因为&lt;code>qrkernel/&lt;/code>​表示排除当前根目录以及子目录中所有的&lt;code>qrkernel&lt;/code>​目录。因此，文件&lt;code>filelist.mk&lt;/code>​的上级目录已经被排除，所以再次包含&lt;code>filelist.mk&lt;/code>​无效。&lt;/p>
+&lt;p>正确的写法：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">qrkernel/**
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">!qrkernel/filelist.mk
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;code>qrkernel/**&lt;/code>​只排除&lt;code>qrkernel&lt;/code>​目录下的文件和子目录及其内容，不会排除&lt;code>qrkernel&lt;/code>​目录本身。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>“&lt;code>/&lt;/code>​“（slash）符号用作文件夹&lt;strong>分隔符&lt;/strong>，可以出现在pattern的开头，中间，结尾。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>“&lt;code>/&lt;/code>​“出现在pattern的开头或者中间，或者两者同时出现，则表示pattern是&lt;code>.gitignore&lt;/code>​所在的目录层级，否则，pattern表示的范围是&lt;code>.gitignore&lt;/code>​当前目录及其子目录层级。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>如果模式末尾有“&lt;code>/&lt;/code>​“，则该模式将仅匹配目录，否则该模式可以匹配文件和目录。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>例如，模式&lt;code>doc/frotz/&lt;/code>​匹配&lt;code>doc/frotz&lt;/code>​目录，但不匹配&lt;code>a/doc/frotz&lt;/code>​目录；然而&lt;code>frotz/&lt;/code>​匹配&lt;code>frotz&lt;/code>​和&lt;code>a/frotz&lt;/code>​目录（所有路径都以&lt;code>.gitignore&lt;/code>​文件所处的文件夹为根目录，相对于该根目录进行匹配）。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>星号（asterisk）“ &lt;code>*&lt;/code>​ ”匹配除“&lt;code>/&lt;/code>​”之外的任何内容。字符“ &lt;code>?&lt;/code>​ ”匹配除“ &lt;code>/&lt;/code>​ ”之外的&lt;strong>任意1个字符&lt;/strong>。范围表示法，例如&lt;code>[a-zA-Z]&lt;/code>​ ，可用于匹配范围中的字符之一。有关更详细的说明，请参阅 fnmatch(3) 和 FNM_PATHNAME 标志。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>两个连续的“&lt;code>*&lt;/code>​”，在全路径匹配pattern中有特殊的含义&lt;/p>
+&lt;ul>
+&lt;li>以&lt;code>**/&lt;/code>​开头的pattern，表示在所有的文件夹中进行匹配。例如：&amp;quot;&lt;code>**/foo&lt;/code>​&amp;quot;匹配&lt;strong>当前根目录及所有子目录下&lt;/strong>的所有的以foo命名的文件以及文件夹，和pattern&lt;code>foo&lt;/code>​等价。&amp;quot;&lt;code>**/foo/bar&lt;/code>​&amp;quot;则匹配&lt;strong>根目录及子目录下的foo目录&lt;/strong>下的所有&lt;code>bar&lt;/code>​命名的文件及目录。&lt;/li>
+&lt;li>以“ &lt;code>/**&lt;/code>​ ”结尾的pattern，表示匹配目录中的所有内容。例如，“ &lt;code>abc/**&lt;/code>​ ”匹配目录根目录下“ &lt;code>abc&lt;/code>​ ”目录内的所有文件。&lt;/li>
+&lt;li>​&lt;code>/**/&lt;/code>​匹配任意目录，例如，“ &lt;code>a/**/b&lt;/code>​ ”匹配“ &lt;code>a/b&lt;/code>​ ”、“ &lt;code>a/x/b&lt;/code>​ ”、“ &lt;code>a/x/y/b&lt;/code>​ ”等。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　​&lt;code>.gitignore&lt;/code>​只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改&lt;code>.gitignore&lt;/code>​是无效的。例如已经进行了提交，或者add的文件和目录，则需要&lt;code>git rm -r --cached .&lt;/code>​ 命令，将&lt;strong>当前目录下&lt;/strong>所有文件从 Git 的暂存区（Index）中移除，但是保留这些文件在工作目录中的状态。这意味着这些文件不再被 Git 跟踪，但仍然会保留在本地文件系统中，不会被删除。&lt;/p>
+&lt;p>　　然后再修改&lt;code>.gitignore&lt;/code>​文件，此时git就会按照新修正的&lt;code>.gitignore&lt;/code>​进行索引。&lt;/p>
+&lt;p>　　注意：建议只在需要移除的目录下使用该命令，如果在根目录下使用，会直接移除所有的文件索引。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">git rm -r --cached .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git add .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git commit -m &amp;#39;update .gitignore&amp;#39;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="匹配规则举例">匹配规则举例
+&lt;/h2>&lt;p>　　文件 &lt;code>.gitignore&lt;/code>​ 的格式规范如下：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>可以使用标准的 glob 模式匹配，它会递归地应用在整个工作区中。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>匹配是区分大小写的，如：/abc 和 /Abc 含义不同&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>*~ 忽略所有以~结尾的文件（这种文件通常被许多编辑器标记为临时文件）&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>空目录（包括隐藏目录）会被忽略，无法提交追踪&lt;br>
+如果不希望空目录被忽略，需要在里头建.gitkeep文件&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>所谓的 glob 模式是指 shell 所使用的简化了的正则表达式。&lt;/p>
+&lt;p>星号（*）匹配零个或多个任意字符；[abc] 匹配任何一个列在方括号中的字符 （这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）。&lt;/p>
+&lt;p>问号（?）只匹配一个任意字符；如果在方括号中使用短划线分隔两个字符， 表示所有在这两个字符范围内的都可以匹配（比如 [0-9] 表示匹配所有 0 到 9 的数字）。&lt;/p>
+&lt;p>使用两个星号（ ** ）表示匹配任意中间目录，比如 a/**/z 可以匹配 a/z 、 a/b/z 或 a/b/c/z 等。&lt;/p>&lt;/blockquote>
+&lt;h3 id="前提约定">前提约定
+&lt;/h3>&lt;ol>
+&lt;li>
+&lt;p>约定1&lt;br>
+“当前目录、子目录、子子目录…” 的表述包含的目录是：.gitignore文件所在的目录，以及该目录下的所有目录和它们的所有子目录及子子目录… 总之是这颗目录树的所有节点。&lt;/p>
+&lt;p>例如：
+.gitignore文件在 /Users/stonewang/git-ignore-test/.gitignore，即.gitignore文件所在的目录为/Users/stonewang/git-ignore-test/。
+该表述的含义是：以/Users/stonewang/git-ignore-test/作为起点的所有目录树节点&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># 该表述包含了dir1、dir2、dir1_sub、dir1_sub2、dir1_sub_sub、dir1_sub_sub2、dir1_sub2_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/Users/stonewang/git-ignore-test/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |-------.gitignore
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |-------dir1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |----dir1_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |-----dir1_sub_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |-----dir1_sub_sub2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |----dir1_sub2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> | |-----dir1_sub2_sub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> |-------dir2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>‍&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>其他补充&lt;br>
+目录（即文件夹）的名字有各种表现形式，如显示的、隐藏的、带扩展名的和不带扩展名的。例如：dir、.dir、dir.ext、.dir.ext&lt;/p>
+&lt;p>文件名的形式也各种各样，如显示的，隐藏的，带扩展名的，不带扩展名的。如file、.file、file.ext、.file.ext&lt;/p>
+&lt;p>在.gitignore中，以 / 结尾的只会匹配目录，不带 / 结尾的匹配文件和目录，注意没有一种写法仅匹配文件的&lt;/p>
+&lt;p>在Mac和Windows中都不允许文件之间重名，目录之间重名，目录和文件之间重名。不区分大小写&lt;/p>
+&lt;p>在Mac和Windows中，目录名都是允许带点的，如dir.ext 可以作为目录名（看起来就像文件的扩展名）&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="详细例子">详细例子
+&lt;/h3>&lt;ul>
+&lt;li>
+&lt;p>为了表述准确，引入自创数学符号&lt;/p>
+&lt;ul>
+&lt;li>(.gitignore)N 表示.gitignore文件所在的目录+所有子目录包括直接或间接&lt;/li>
+&lt;li>(.gitignore)O 表示.gitignore文件所在的目录，不包括其任何子目录&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>写法&lt;/th>
+&lt;th>作用&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>dir/&lt;/td>
+&lt;td>忽略 (.gitignore)N 中的dir目录（不包含子目录）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/&lt;/td>
+&lt;td>忽略 (.gitignore)O 中的dir目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>file&lt;/td>
+&lt;td>忽略(.gitignore)N 中的file 文件&amp;amp;目录（名为file的目录也会被忽略）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/file&lt;/td>
+&lt;td>忽略(.gitignore)O 中的file文件&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>*.log&lt;/td>
+&lt;td>忽略(.gitignore)N 中的*.log 文件&amp;amp;目录（符合名字的目录也将被忽略）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/file&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下的file文件&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/Abc* 和 /dir/Abc &lt;em>.java 和/dir/&lt;/em> .java&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下符合Abc &lt;em>（或Abc&lt;/em>.java或*.java）规则的文件&amp;amp;目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/Abc*/&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下符合Abc*的目录（不忽略dir下的文件!）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/*/&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下的符合*的子目录（注意/sub/file的文件不会忽略）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/&lt;em>/&lt;/em> .txt&lt;/td>
+&lt;td>忽略(.gitignore)O 中的dir目录下的符合&lt;em>的子目录下的，符合&lt;/em>.txt的文件&amp;amp;目录。注意是一个星，仅忽略一层，即/dir/sub/a.txt 和 /dir/sub/sub2/b.txt，仅仅忽略a.txt，不忽略b.txt，另外/dir/k.txt也不会被忽略&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/dir/**/*.txt&lt;/td>
+&lt;td>忽略 (.gitignore)O 中的dir目录下的直接和间接子目录下的，符合*.txt的文件&amp;amp;目录。两个星号表示0-n层级的目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/sub/** 和 /sub/ 是等价的&lt;/td>
+&lt;td>亲测。前者表示忽略/sub/下的所有直接或间接的目录和文件（**表示文件和目录，因为没有/结尾），后者表示忽略/sub/下的东西&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>/sub/**/ 和 /sub/ 是不等价的&lt;/td>
+&lt;td>亲测。前者明确表示忽略目录除掉了文件，所以对于/sub/file是不会被忽略的。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>sub/ 和 /sub/ 含义不同&lt;/td>
+&lt;td>前者忽略(.gitignore)N下的sub目录，后者忽略(.gitignore)O下的sub&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>sub/abc/ 和 /sub/abc/&lt;/td>
+&lt;td>&lt;strong>这两个的含义完全相同（有点奇怪，本以为前者是递归所有的目录）&lt;/strong>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/src/main/java/ 和 src/main/java/&lt;/td>
+&lt;td>不等价。前者匹配(.gitignore)N下的src/main/java/ 目录，要满足这个目录的层级结构的。后者等价于/src/main/java/，仅仅忽略(.gitignore)O下的该目录&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/src/main/file.txt 和 src/main/file.txt&lt;/td>
+&lt;td>不等价。前者匹配(.gitignore)N下的src/main/file.txt，符合这个目录层级结构的将会被忽略，后者等价于/src/main/file.txt，仅仅忽略(.gitignore)O下所匹配的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/dir/ 和 dir/&lt;/td>
+&lt;td>是等价的。上面的例子等价这个不等价，就是因为目录的层级数的问题导致的&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>**/file.txt 和 file.txt&lt;/td>
+&lt;td>是等价的。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>先后写!a.txt和*.txt&lt;/td>
+&lt;td>后面的配置覆盖前面的，导致所有*.txt文件都被忽略（有点奇怪，实际测试确实如此）&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>先后写*.txt 和 !a.txt&lt;/td>
+&lt;td>正确。能够忽略除了a.txt外的文件。&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>对于.gitignore文件不在git仓库根目录的情况：参考特殊情况&lt;/td>
+&lt;td>（参考特殊情况）&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item></channel></rss>

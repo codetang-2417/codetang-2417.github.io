@@ -1,0 +1,429 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="\u3000QEMU 9.1.50 版本为例。\n数据结构及初始化 QEMU 在 softmmu/vl.c\u200b 文件中定义了 QEMUOption\u200b 结构体来描述不同的命令行参数，其代码如下：\n1 2 3 4 5 6 typedef struct QEMUOption { const char *name; int flags; int index; uint32_t arch_mask; } QEMUOption; 其中 name\u200b 表示参数名称，flags\u200b 表示参数属性，为 1 表示拥有子参数，为 0 则表示无子参数，index\u200b 表示命令索引 (QEMU_OPTION_cmd)，arch_mask\u200b 表示参数支持的架构。在 softmmu/vl.c\u200b 文件中还定义了一个全局 QEMUOption\u200b 数组 qemu_options\u200b 来描述 QEMU 的全部可用参数，具体如下：\n"><meta name=keywords content="QEMU 参数解析,QEMU 选项解析,QEMU options"><title>QEMU 命令参数解析</title>
+<link rel=canonical href=https://codetang-2417.github.io/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="QEMU 命令参数解析"><meta property='og:description' content="\u3000QEMU 9.1.50 版本为例。\n数据结构及初始化 QEMU 在 softmmu/vl.c\u200b 文件中定义了 QEMUOption\u200b 结构体来描述不同的命令行参数，其代码如下：\n1 2 3 4 5 6 typedef struct QEMUOption { const char *name; int flags; int index; uint32_t arch_mask; } QEMUOption; 其中 name\u200b 表示参数名称，flags\u200b 表示参数属性，为 1 表示拥有子参数，为 0 则表示无子参数，index\u200b 表示命令索引 (QEMU_OPTION_cmd)，arch_mask\u200b 表示参数支持的架构。在 softmmu/vl.c\u200b 文件中还定义了一个全局 QEMUOption\u200b 数组 qemu_options\u200b 来描述 QEMU 的全部可用参数，具体如下：\n"><meta property='og:url' content='https://codetang-2417.github.io/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/'><meta property='og:site_name' content='LingLong'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='QEMU'><meta property='article:published_time' content='2024-10-29T16:41:42+08:00'><meta property='article:modified_time' content='2024-10-31T09:06:10+08:00'><meta name=twitter:title content="QEMU 命令参数解析"><meta name=twitter:description content="\u3000QEMU 9.1.50 版本为例。\n数据结构及初始化 QEMU 在 softmmu/vl.c\u200b 文件中定义了 QEMUOption\u200b 结构体来描述不同的命令行参数，其代码如下：\n1 2 3 4 5 6 typedef struct QEMUOption { const char *name; int flags; int index; uint32_t arch_mask; } QEMUOption; 其中 name\u200b 表示参数名称，flags\u200b 表示参数属性，为 1 表示拥有子参数，为 0 则表示无子参数，index\u200b 表示命令索引 (QEMU_OPTION_cmd)，arch_mask\u200b 表示参数支持的架构。在 softmmu/vl.c\u200b 文件中还定义了一个全局 QEMUOption\u200b 数组 qemu_options\u200b 来描述 QEMU 的全部可用参数，具体如下：\n"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_7866f48be1497b78.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>LingLong</a></h1><h2 class=site-description></h2></div></header><ol class=menu-social><li><a href=https://github.com/codetang-2417/ target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#数据结构及初始化>数据结构及初始化</a></li><li><a href=#命令行参数的解析>命令行参数的解析</a><ol><li><a href=#第一阶段>第一阶段</a></li><li><a href=#第二阶段>第二阶段</a></li></ol></li><li><a href=#参考资料>参考资料</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E7%BC%96%E7%A8%8B%E5%BC%80%E5%8F%91/ style=background-color:#2a9d8f;color:#fff>编程开发</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/>QEMU 命令参数解析</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Oct 29, 2024</time></div></footer></div></header><section class=article-content><p>　　QEMU 9.1.50 版本为例。</p><h2 id=数据结构及初始化>数据结构及初始化</h2><p>　　QEMU 在 <code>softmmu/vl.c</code>​ 文件中定义了 <code>QEMUOption</code>​ 结构体来描述不同的命令行参数，其代码如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>typedef</span> <span class=k>struct</span> <span class=n>QEMUOption</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>name</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>flags</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>index</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>uint32_t</span> <span class=n>arch_mask</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>QEMUOption</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　其中 <code>name</code>​ 表示参数名称，<code>flags</code>​ 表示参数属性，为 1 表示拥有子参数，为 0 则表示无子参数，<code>index</code>​ 表示命令索引 (QEMU_OPTION_cmd)，<code>arch_mask</code>​ 表示参数支持的架构。在 <code>softmmu/vl.c</code>​ 文件中还定义了一个全局 <code>QEMUOption</code>​ 数组 <code>qemu_options</code>​ 来描述 QEMU 的全部可用参数，具体如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>enum</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=cp>#define DEF(option, opt_arg, opt_enum, opt_help, arch_mask)     \
+</span></span></span><span class=line><span class=cl><span class=cp>    opt_enum,
+</span></span></span><span class=line><span class=cl><span class=cp>#define DEFHEADING(text)
+</span></span></span><span class=line><span class=cl><span class=cp>#define ARCHHEADING(text, arch_mask)
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&#34;qemu-options.def&#34;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=k>const</span> <span class=n>QEMUOption</span> <span class=n>qemu_options</span><span class=p>[]</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span> <span class=s>&#34;h&#34;</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=n>QEMU_OPTION_h</span><span class=p>,</span> <span class=n>QEMU_ARCH_ALL</span> <span class=p>},</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cp>#define DEF(option, opt_arg, opt_enum, opt_help, arch_mask)     \
+</span></span></span><span class=line><span class=cl><span class=cp>    { option, opt_arg, opt_enum, arch_mask },
+</span></span></span><span class=line><span class=cl><span class=cp>#define DEFHEADING(text)
+</span></span></span><span class=line><span class=cl><span class=cp>#define ARCHHEADING(text, arch_mask)
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&#34;qemu-options.def&#34;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>    <span class=p>{</span> <span class=cm>/* end of list */</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　可以看到，<code>qemu_options</code>​ 数组中首先定义了一个参数 <code>h</code>​，其使用方法为 <code>qemu-system-riscv64 -h</code>​，作用是打印帮助信息。其余所有的可用参数都都通过 <code>DEF</code>​ 宏定义在 <code>&lt;qemu_build_dir>/qemu-options.def</code>​ 文件中。需要注意的是，<code>qemu-options.def</code>​ 文件是由 <code>scripts/hxtool</code>​ 脚本在编译时根据 <code>qemu-options.hx</code>​ 文件生成的，因此不在 QEMU 源代码目录中。</p><blockquote><p>这里需要说明一下，在 QEMU 中常用的一种编程方式：将可重复利用的配置信息通过宏定义的方式放在一个文件中，在正式使用时，通过重新定义宏来实现同一个配置信息文件生成不同结构体或数组的功能。例如需要定义的 <code>qemu_options</code>​ 静态数组和各个选项的 <code>enum</code>​类型，其中对 <code>DEF</code>​ 宏进行了重新定义，并包含了同一个文件 &ldquo;qemu-options.def&rdquo;，但由于 <code>DEF</code>​ 两次定义的内容不同，最终生成的数据结构不同。实现一次配置，多次重复利用。</p></blockquote><p>　　​<code>QEMUOption</code>​ 只定义了每一个大选项的名称、是否有子选项、支持的体系结构，但并没有定义子选项。子选项则是由文件 <code>include/qemu/option_int.h</code>​ 中定义的两个结构体 <code>QemuOpt</code>​、<code>QemuOpts</code>​进行描述。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>struct</span> <span class=n>QemuOpt</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=o>*</span><span class=n>name</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=o>*</span><span class=n>str</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>const</span> <span class=n>QemuOptDesc</span> <span class=o>*</span><span class=n>desc</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>union</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>bool</span> <span class=n>boolean</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=kt>uint64_t</span> <span class=n>uint</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=n>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>QemuOpts</span>     <span class=o>*</span><span class=n>opts</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>QTAILQ_ENTRY</span><span class=p>(</span><span class=n>QemuOpt</span><span class=p>)</span> <span class=n>next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=n>QemuOpts</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=o>*</span><span class=n>id</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>QemuOptsList</span> <span class=o>*</span><span class=n>list</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>Location</span> <span class=n>loc</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>QTAILQ_HEAD</span><span class=p>(,</span> <span class=n>QemuOpt</span><span class=p>)</span> <span class=n>head</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>QTAILQ_ENTRY</span><span class=p>(</span><span class=n>QemuOpts</span><span class=p>)</span> <span class=n>next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　​<code>QemuOpt</code>​ 保存每一个子选项的具体信息，每一个子选项会通过 <code>TailQueue</code>​ 连接成一个双向尾队列 <code>QemuOpts</code>​。因此，也可以将 <code>QemuOpt</code>​ 视作 <code>QemuOpts</code>​ 中的一个队列节点。其中所定义的 <code>QTAILQ_ENTRY</code>​ 是和 <code>TailQueue</code>​ 相关的数据结构，关于 <code>TailQueue</code>​ 的详细信息可查看 <a class=link href=https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/ target=_blank rel=noopener>QEMU中的队列queue</a>。</p><p>　　​<code>QemuOpts</code>​ 是大选项中各个子选项的动态集合。<code>QemuOpts</code>​中保存的<code>QTAILQ_HEAD(, QemuOpt) head;</code>​ 是 <code>QemuOpt</code>​ 队列的头节点，能够访问所有的 <code>QemuOpt</code>​。</p><p>　　以 <code>-device</code>​ 大选项为例，QEMU 中 <code>-device</code>​ 表示设备，设备有非常多种，每一种都是独立的，且可以重复添加。一个 <code>QemuOpts</code>​ 只能保存一种设备的子选项集合。那么多个相同种类的设备，但是参数不同，如何保存？这就需要再引入一个数据结构 <code>QemuOptsList</code>​，<code>QemuOptsList</code>​ 也是一个 <code>TailQueue</code>​，保存 <code>QemuOpts</code>​ 的集合。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>struct</span> <span class=n>QemuOptsList</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>name</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>implied_opt_name</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>bool</span> <span class=n>merge_lists</span><span class=p>;</span>  <span class=cm>/* Merge multiple uses of option into a single list? */</span>
+</span></span><span class=line><span class=cl>    <span class=nf>QTAILQ_HEAD</span><span class=p>(,</span> <span class=n>QemuOpts</span><span class=p>)</span> <span class=n>head</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>QemuOptDesc</span> <span class=n>desc</span><span class=p>[];</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　每一个 <code>QemuOptsList</code>​ 代表了大选项，<code>QemuOptsList</code>​ 中的每一个 <code>QemuOpts</code>​ 代表一类设备，由大选项中的子选项集合组成。</p><p>​<img src=/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/assets/QemuListsConcise-20241030154145-jnl8u0p.svg loading=lazy alt=QemuListsConcise>​</p><p>　　下图给出完整体的数据结构的实例，将 <code>QemuOptsList</code>​ 中的数据结构和 <code>QemuOpts</code>​ 分开绘制，并在 <code>QemuOpts</code>​ 给出了 <code>TailQueue</code>​ 的细节，结合 <a class=link href=https://codetang-2417.github.io/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/ target=_blank rel=noopener>QEMU中的队列queue</a> 理解更佳。</p><p>​<img src=/p/qemu-%E5%91%BD%E4%BB%A4%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/assets/QEMUParameterDataStruct-20241030152802-ppjltu4.svg loading=lazy alt=QEMUParameterDataStruct>​</p><p>　　QEMU 在 <code>util/qemu-config.c</code>​ 中定义了一个全局的 <code>QemuOptsList</code>​ 数组 <code>vm_config_groups</code>​ 来储存所有可用的参数（即上图中提到的数组 <code>vm_config_groups</code>​）：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>static QemuOptsList *vm_config_groups[48];
+</span></span><span class=line><span class=cl>static QemuOptsList *drive_config_groups[5];
+</span></span></code></pre></td></tr></table></div></div><p>　　这两行代码说明了 QEMU 最多支持 48 个参数，5 个驱动器参数。这两个全局数组由位于 <code>softmmu/vl.c</code>​ 文件的 <code>qemu_init</code>​ 函数负责初始化：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_drive_opts);
+</span></span><span class=line><span class=cl>    qemu_add_drive_opts(&amp;qemu_legacy_drive_opts);
+</span></span><span class=line><span class=cl>    qemu_add_drive_opts(&amp;qemu_common_drive_opts);
+</span></span><span class=line><span class=cl>    qemu_add_drive_opts(&amp;qemu_drive_opts);
+</span></span><span class=line><span class=cl>    qemu_add_drive_opts(&amp;bdrv_runtime_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_chardev_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_device_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_netdev_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_nic_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_net_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_rtc_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_global_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_mon_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_trace_opts);
+</span></span><span class=line><span class=cl>    qemu_plugin_add_opts();
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_option_rom_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_accel_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_mem_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_smp_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_boot_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_add_fd_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_object_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_tpmdev_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_overcommit_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_msg_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_name_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_numa_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_icount_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_semihosting_config_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_fw_cfg_opts);
+</span></span><span class=line><span class=cl>    qemu_add_opts(&amp;qemu_action_opts);
+</span></span></code></pre></td></tr></table></div></div><p>　　其中，<code>qemu_add_opts</code>​ 和 <code>qemu_add_drive_opts</code>​ 函数的实现位于 <code>util/qemu-config.c</code>​ 文件中，主要负责将参数中传入的 <code>OemuOptsList</code>​ 添加到全局数组中：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>void qemu_add_drive_opts(QemuOptsList *list)
+</span></span><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>    int entries, i;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    entries = ARRAY_SIZE(drive_config_groups);
+</span></span><span class=line><span class=cl>    entries--; /* keep list NULL terminated */
+</span></span><span class=line><span class=cl>    for (i = 0; i &lt; entries; i++) {
+</span></span><span class=line><span class=cl>        if (drive_config_groups[i] == NULL) {
+</span></span><span class=line><span class=cl>            drive_config_groups[i] = list;
+</span></span><span class=line><span class=cl>            return;
+</span></span><span class=line><span class=cl>        }
+</span></span><span class=line><span class=cl>    }
+</span></span><span class=line><span class=cl>    fprintf(stderr, &#34;ran out of space in drive_config_groups&#34;);
+</span></span><span class=line><span class=cl>    abort();
+</span></span><span class=line><span class=cl>}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>void qemu_add_opts(QemuOptsList *list)
+</span></span><span class=line><span class=cl>{
+</span></span><span class=line><span class=cl>    int entries, i;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    entries = ARRAY_SIZE(vm_config_groups);
+</span></span><span class=line><span class=cl>    entries--; /* keep list NULL terminated */
+</span></span><span class=line><span class=cl>    for (i = 0; i &lt; entries; i++) {
+</span></span><span class=line><span class=cl>        if (vm_config_groups[i] == NULL) {
+</span></span><span class=line><span class=cl>            vm_config_groups[i] = list;
+</span></span><span class=line><span class=cl>            return;
+</span></span><span class=line><span class=cl>        }
+</span></span><span class=line><span class=cl>    }
+</span></span><span class=line><span class=cl>    fprintf(stderr, &#34;ran out of space in vm_config_groups&#34;);
+</span></span><span class=line><span class=cl>    abort();
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><h2 id=命令行参数的解析>命令行参数的解析</h2><p>　　在 qemu 中，参数解析在 <code>vl.c</code>​ 中的 <code>qemu_init</code>​ 函数中，参数的解析分为两部分：</p><ul><li>第一部分检查选项是否是 QEMU 中预定义的 <code>QEMUOption</code>​，并初始化 <code>machine_opts_dict</code>​ 数组，根据是否传入了 <code>-no-user-config</code>​ 参数来加载用户配置。</li><li>真正解析具体参数并执行相应设置</li></ul><h3 id=第一阶段>第一阶段</h3><p>　　首先按照下标顺序依次读取终端传入的参数数组，跳过子选项，只解析主选项。通过 <code>lookup_opt</code>​ 函数查询主选项是否是预定义的 <code>QEMUOption</code>​，如果没找到，退出程序，如果找到，则返回找到的 <code>QEMUOption</code>​ 指针。虽然 <code>lookup_opt</code>​ 函数也会保存主选项对应的子选项参数数组的指针到 <code>optarg</code>​，但是第一阶段并不会使用。</p><p>　　如果在解析主选项过程中，检查到有主选项<code>-no-user-config</code>​，后续就跳过加载用户配置，否则还会加载用户配置。然后会初始化 <code>machine_opts_dict</code>​ 数组，这里的 <code>machine_opts_dict</code>​ 是一个字典结构，主要用于存储终端传入的参数数组中的虚拟机选项和参数，包括 CPU 数量、内存大小、设备配置等。<code>machine_opts_dict</code>​ 的存在使得参数解析机制能够以一种结构化的方式管理和访问虚拟机参数，而不是使用分散的单独变量或者凌乱的数据结构。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl>   <span class=cm>/* first pass of option parsing */</span>
+</span></span><span class=line><span class=cl>    <span class=n>optind</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=p>(</span><span class=n>optind</span> <span class=o>&lt;</span> <span class=n>argc</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>argv</span><span class=p>[</span><span class=n>optind</span><span class=p>][</span><span class=mi>0</span><span class=p>]</span> <span class=o>!=</span> <span class=sc>&#39;-&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=cm>/* disk image */</span>
+</span></span><span class=line><span class=cl>            <span class=n>optind</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>const</span> <span class=n>QEMUOption</span> <span class=o>*</span><span class=n>popt</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>popt</span> <span class=o>=</span> <span class=nf>lookup_opt</span><span class=p>(</span><span class=n>argc</span><span class=p>,</span> <span class=n>argv</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>optarg</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>optind</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=k>switch</span> <span class=p>(</span><span class=n>popt</span><span class=o>-&gt;</span><span class=n>index</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>case</span> <span class=nl>QEMU_OPTION_nouserconfig</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>userconfig</span> <span class=o>=</span> <span class=nb>false</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>machine_opts_dict</span> <span class=o>=</span> <span class=nf>qdict_new</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>userconfig</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>qemu_read_default_config_file</span><span class=p>(</span><span class=o>&amp;</span><span class=n>error_fatal</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　​<code>lookup_opt</code>​ 函数定义如下，由于<code>qemu_options</code>​定义时，最后一个元素为<code>{ }</code>​，在遍历时发现 <code>popt->name</code>​ 为空还没有匹配到主选项，就可以认为该主选项非法。<code>lookup_opt</code>​ 函数若匹配到当前的主选项，且主选项有子选项，则将子选项数组的指针保存到 <code>poptarg</code>​ 并返回给上层函数。<code>lookup_opt</code>​ 同时还会将已经遍历的 <code>optind</code>​ 的值也返回给上层函数，表示已经遍历过参数数组的这些参数。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>static</span> <span class=k>const</span> <span class=n>QEMUOption</span> <span class=o>*</span><span class=nf>lookup_opt</span><span class=p>(</span><span class=kt>int</span> <span class=n>argc</span><span class=p>,</span> <span class=kt>char</span> <span class=o>**</span><span class=n>argv</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>                                    <span class=k>const</span> <span class=kt>char</span> <span class=o>**</span><span class=n>poptarg</span><span class=p>,</span> <span class=kt>int</span> <span class=o>*</span><span class=n>poptind</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>const</span> <span class=n>QEMUOption</span> <span class=o>*</span><span class=n>popt</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>optind</span> <span class=o>=</span> <span class=o>*</span><span class=n>poptind</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=o>*</span><span class=n>r</span> <span class=o>=</span> <span class=n>argv</span><span class=p>[</span><span class=n>optind</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>optarg</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nf>loc_set_cmdline</span><span class=p>(</span><span class=n>argv</span><span class=p>,</span> <span class=n>optind</span><span class=p>,</span> <span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>optind</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=cm>/* Treat --foo the same as -foo.  */</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>r</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=o>==</span> <span class=sc>&#39;-&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>r</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>popt</span> <span class=o>=</span> <span class=n>qemu_options</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span><span class=p>(;;)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>popt</span><span class=o>-&gt;</span><span class=n>name</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nf>error_report</span><span class=p>(</span><span class=s>&#34;invalid option&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=nf>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=nf>strcmp</span><span class=p>(</span><span class=n>popt</span><span class=o>-&gt;</span><span class=n>name</span><span class=p>,</span> <span class=n>r</span> <span class=o>+</span> <span class=mi>1</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>popt</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>popt</span><span class=o>-&gt;</span><span class=n>flags</span> <span class=o>&amp;</span> <span class=n>HAS_ARG</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>optind</span> <span class=o>&gt;=</span> <span class=n>argc</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nf>error_report</span><span class=p>(</span><span class=s>&#34;requires an argument&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=nf>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>optarg</span> <span class=o>=</span> <span class=n>argv</span><span class=p>[</span><span class=n>optind</span><span class=o>++</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>        <span class=nf>loc_set_cmdline</span><span class=p>(</span><span class=n>argv</span><span class=p>,</span> <span class=n>optind</span> <span class=o>-</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>optarg</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=n>poptarg</span> <span class=o>=</span> <span class=n>optarg</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=o>*</span><span class=n>poptind</span> <span class=o>=</span> <span class=n>optind</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>popt</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=第二阶段>第二阶段</h3><p>　　真正开始解析参数。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl>    <span class=cm>/* second pass of option parsing */</span>
+</span></span><span class=line><span class=cl>    <span class=n>optind</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span><span class=p>(;;)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>optind</span> <span class=o>&gt;=</span> <span class=n>argc</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>argv</span><span class=p>[</span><span class=n>optind</span><span class=p>][</span><span class=mi>0</span><span class=p>]</span> <span class=o>!=</span> <span class=sc>&#39;-&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nf>loc_set_cmdline</span><span class=p>(</span><span class=n>argv</span><span class=p>,</span> <span class=n>optind</span><span class=p>,</span> <span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=nf>drive_add</span><span class=p>(</span><span class=n>IF_DEFAULT</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=n>argv</span><span class=p>[</span><span class=n>optind</span><span class=o>++</span><span class=p>],</span> <span class=n>HD_OPTS</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>const</span> <span class=n>QEMUOption</span> <span class=o>*</span><span class=n>popt</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=n>popt</span> <span class=o>=</span> <span class=nf>lookup_opt</span><span class=p>(</span><span class=n>argc</span><span class=p>,</span> <span class=n>argv</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>optarg</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>optind</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=p>(</span><span class=n>popt</span><span class=o>-&gt;</span><span class=n>arch_mask</span> <span class=o>&amp;</span> <span class=n>arch_type</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=nf>error_report</span><span class=p>(</span><span class=s>&#34;Option not supported for this target&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                <span class=nf>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>switch</span><span class=p>(</span><span class=n>popt</span><span class=o>-&gt;</span><span class=n>index</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>case</span> <span class=nl>QEMU_OPTION_cpu</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=p>...</span>
+</span></span><span class=line><span class=cl>                <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>...</span>
+</span></span><span class=line><span class=cl>            <span class=k>default</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>                    <span class=p>...</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　重新按照下标顺序依次遍历终端传入的参数数组，调用 <code>lookup_opt</code>​ 函数找到对应的 <code>QEMUOption</code>​，然后检查对应选项在当前架构下是否支持，最后使用 <code>switch</code>​ 语句根据 <code>QEMUOption</code>​ 的成员变量 <code>index</code>​ 的不同来执行不同的分支完成具体的设置。需要注意，主选项和子选项是成对出现的，在 <code>lookup_opt</code>​ 函数中也是成对解析，如果发现子选项进入了主循环，则默认为 <code>driver</code>​。</p><p>　　‍</p><h2 id=参考资料>参考资料</h2><ul><li><a class=link href=https://blog.jjl9807.com/archives/7/ target=_blank rel=noopener>QEMU 参数解析机制简析</a></li><li>《QEMU/KVM 源码解析与应用》李强，机械工业出版社</li></ul><p>　　‍</p></section><footer class=article-footer><section class=article-tags><a href=/tags/qemu/>QEMU</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>最后更新于 Oct 31, 2024 09:06 +0800</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/><div class=article-details><h2 class=article-title>QEMU开发环境搭建</h2></div></a></article><article><a href=/p/qemu%E4%B8%AD%E7%9A%84%E9%98%9F%E5%88%97queue/><div class=article-details><h2 class=article-title>QEMU中的队列queue</h2></div></a></article><article><a href=/p/linux-perf%E5%B7%A5%E5%85%B7/><div class=article-details><h2 class=article-title>Linux Perf工具</h2></div></a></article><article><a href=/p/gitignore/><div class=article-details><h2 class=article-title>Gitignore</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=codetang-2417/codetang-2417.github.io data-repo-id=R_kgDOMyu4sg data-category=Announcements data-category-id=DIC_kwDOMyu4ss4CiiW6 data-mapping=title data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=zh-CN data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2024 -
+2025 LingLong's Blog</section><section class=powerby>Simple is enough.<br>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

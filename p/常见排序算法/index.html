@@ -1,0 +1,507 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="数据结构算法基础知识点"><meta name=keywords content="数据结构,排序算法"><title>常见排序算法</title>
+<link rel=canonical href=https://codetang-2417.github.io/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="常见排序算法"><meta property='og:description' content="数据结构算法基础知识点"><meta property='og:url' content='https://codetang-2417.github.io/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/'><meta property='og:site_name' content='LingLong'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Algorithm'><meta property='article:published_time' content='2024-03-20T09:44:18+08:00'><meta property='article:modified_time' content='2024-10-10T13:50:55+08:00'><meta name=twitter:title content="常见排序算法"><meta name=twitter:description content="数据结构算法基础知识点"><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_7866f48be1497b78.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>LingLong</a></h1><h2 class=site-description></h2></div></header><ol class=menu-social><li><a href=https://github.com/codetang-2417/ target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#排序算法的评价维度>排序算法的评价维度</a></li><li><a href=#选择排序>选择排序</a><ol><li><a href=#算法特性>算法特性</a></li></ol></li><li><a href=#冒泡排序>冒泡排序</a><ol><li><a href=#算法特性-1>算法特性</a></li><li><a href=#效率优化>效率优化</a><ol><li><a href=#优化一设置标志位>优化一：设置标志位</a></li><li><a href=#优化二设置结束边界>优化二：设置结束边界</a></li><li><a href=#优化三双向冒泡排序>优化三：双向冒泡排序</a></li></ol></li></ol></li><li><a href=#插入排序>插入排序</a><ol><li><a href=#算法特性-2>算法特性</a></li><li><a href=#插入排序的优势>插入排序的优势</a></li></ol></li><li><a href=#快速排序>快速排序</a><ol><li><a href=#算法特性-3>算法特性</a></li><li><a href=#效率优化-1>效率优化</a><ol><li><a href=#优化一基准数优化>优化一：基准数优化</a></li><li><a href=#优化二尾递归优化-空间优化>优化二：尾递归优化-空间优化</a></li></ol></li><li><a href=#注意>注意</a><ol><li><a href=#1-确保每个元素都能正确与基准比较>1. 确保每个元素都能正确与基准比较：</a></li><li><a href=#2-确保最后交换时基准与大于等于基准的元素交换>2. 确保最后交换时基准与大于等于基准的元素交换：</a></li><li><a href=#实例说明>实例说明</a></li></ol></li><li><a href=#插曲>插曲</a><ol><li><a href=#关键算法步骤>关键算法步骤</a></li></ol></li></ol></li><li><a href=#归并排序>归并排序</a></li><li><a href=#堆排序>堆排序</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E4%B8%93%E4%B8%9A%E7%9F%A5%E8%AF%86/ style=background-color:#ffbf61;color:#fff>专业知识</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/>常见排序算法</a></h2><h3 class=article-subtitle>数据结构算法基础知识点</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>Mar 20, 2024</time></div></footer></div></header><section class=article-content><p>　　参考：<a class=link href=https://www.hello-algo.com/chapter_sorting/ target=_blank rel=noopener>第 11 章 排序</a></p><h2 id=排序算法的评价维度>排序算法的评价维度</h2><p>　　<strong>运行效率</strong> ：我们期望排序算法的时间复杂度尽量低，且总体操作数量较少（时间复杂度中的常数项变小）。对于大数据量的情况，运行效率显得尤为重要。</p><p>　　<strong>就地性</strong>：顾名思义，原地排序通过在原数组上直接操作实现排序，无须借助额外的辅助数组，从而节省内存。通常情况下，原地排序的数据搬运操作较少，运行速度也更快。</p><p>　　<strong>稳定性</strong>：稳定排序在完成排序后，<strong>相等元素在数组中的相对顺序</strong>不发生改变。</p><p>　　稳定排序是多级排序场景的必要条件。假设我们有一个存储学生信息的表格，第 1 列和第 2 列分别是姓名和年龄。在这种情况下，非稳定排序可能导致输入数据的有序性丧失：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># 输入数据是按照姓名排序好的
+</span></span><span class=line><span class=cl># (name, age)
+</span></span><span class=line><span class=cl>  (&#39;A&#39;, 19)
+</span></span><span class=line><span class=cl>  (&#39;B&#39;, 18)
+</span></span><span class=line><span class=cl>  (&#39;C&#39;, 21)
+</span></span><span class=line><span class=cl>  (&#39;D&#39;, 19)
+</span></span><span class=line><span class=cl>  (&#39;E&#39;, 23)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 假设使用非稳定排序算法按年龄排序列表，
+</span></span><span class=line><span class=cl># 结果中 (&#39;D&#39;, 19) 和 (&#39;A&#39;, 19) 的相对位置改变，
+</span></span><span class=line><span class=cl># 输入数据按姓名排序的性质丢失
+</span></span><span class=line><span class=cl>  (&#39;B&#39;, 18)
+</span></span><span class=line><span class=cl>  (&#39;D&#39;, 19)
+</span></span><span class=line><span class=cl>  (&#39;A&#39;, 19)
+</span></span><span class=line><span class=cl>  (&#39;C&#39;, 21)
+</span></span><span class=line><span class=cl>  (&#39;E&#39;, 23)
+</span></span></code></pre></td></tr></table></div></div><p>　　<strong>自适应性</strong>：自适应排序能够利用输入数据已有的顺序信息来减少计算量，达到更优的时间效率。自适应排序算法的最佳时间复杂度通常优于平均时间复杂度。</p><p>　　<strong>是否基于比较</strong>：基于比较的排序<strong>依赖比较运算符</strong>（&lt;、=、>）来判断元素的相对顺序，从而排序整个数组，理论最优时间复杂度为 O(nlog⁡n) 。而非比较排序不使用比较运算符，时间复杂度可达 O(n) ，但其通用性相对较差。</p><p>　　‍</p><p>　　复杂度为$O(n^2)$的简单排序方式，为：冒泡、选择、插入</p><p>　　线性对数阶 $O(nlog_2n)$ 排序：快速排序、堆排序和归并排序</p><p>　　‍</p><h2 id=选择排序>选择排序</h2><p>　　选择排序（selection sort）：开启一个循环，每轮从未排序区间选择最小的元素，将其放到已排序区间的末尾。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>/* 选择排序 */
+</span></span><span class=line><span class=cl>void selectionSort(vector&lt;int&gt; &amp;nums) {
+</span></span><span class=line><span class=cl>    int n = nums.size();
+</span></span><span class=line><span class=cl>    // 外循环：[i, n-1)，n-1不需要遍历，一定是最大
+</span></span><span class=line><span class=cl>    // 最后一个元素不需要遍历，因为最后一个元素一定是最大的。
+</span></span><span class=line><span class=cl>    for (int i = 0; i &lt; n - 1; i++) {
+</span></span><span class=line><span class=cl>        // 内循环：找到未排序区间内的最小元素，k只是作为记录。实际遍历的还是[i,n]未排序区间
+</span></span><span class=line><span class=cl>        int k = i;
+</span></span><span class=line><span class=cl>        for (int j = i + 1; j &lt; n; j++) {
+</span></span><span class=line><span class=cl>            if (nums[j] &lt; nums[k])
+</span></span><span class=line><span class=cl>                k = j; // 记录最小元素的索引
+</span></span><span class=line><span class=cl>        }
+</span></span><span class=line><span class=cl>        // 将该最小元素与未排序区间的首个元素交换
+</span></span><span class=line><span class=cl>        swap(nums[i], nums[k]);
+</span></span><span class=line><span class=cl>    }
+</span></span><span class=line><span class=cl>}
+</span></span></code></pre></td></tr></table></div></div><h3 id=算法特性>算法特性</h3><ul><li><p><strong>时间复杂度为</strong> **$O(n^2)$**​ <strong>、非自适应排序</strong>：外循环共 n−1 轮，第一轮的未排序区间长度为 n ，最后一轮的未排序区间长度为 2 ，即各轮外循环分别包含 n、n−1、…、3、2 轮内循环，求和为 $(n−1)(n+2)/2$。</p></li><li><p><strong>空间复杂度为</strong> **$O(1)$**​ <strong>、原地排序</strong>：指针 i 和 j 使用常数大小的额外空间。</p></li><li><p><strong>非稳定排序</strong>：在交换元素时，因此可能出现元素相同时被交换到不同的位置，如图</p><p>​<img src=/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/assets/image-20241001171418-ygtz7im.png width=1056 height=684 loading=lazy alt=image class=gallery-image data-flex-grow=154 data-flex-basis=370px>​</p></li></ul><p>　　‍</p><h2 id=冒泡排序>冒泡排序</h2><p>　　「冒泡排序 bubble sort」通过连续地比较与交换相邻元素实现排序。这个过程就像气泡从底部升到顶部一样,<br>因此得名冒泡排序。实际上，冒泡排序和选择排序原理类似，但冒泡排序的效率更低，因为每一次都需要交换，而选择排序只有在确定是 最小/最大 的时候才会交换。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=cm>/* 冒泡排序 */</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>bubbleSort</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 外循环：未排序区间为 [0, i]
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>nums</span><span class=p>.</span><span class=nf>size</span><span class=p>()</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span> <span class=n>i</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span><span class=o>--</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>j</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>j</span> <span class=o>&lt;</span> <span class=n>i</span><span class=p>;</span> <span class=n>j</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 交换 nums[j] 与 nums[j + 1]
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=c1>// 这里使用了 std::swap() 函数
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=nf>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=算法特性-1>算法特性</h3><ul><li><p><strong>时间复杂度为</strong> **$O(n^2)$**​ <strong>、非自适应排序</strong>：外循环共 n−1 轮，第一轮的未排序区间长度为 n-1 ，最后一轮的未排序区间长度为 1 ，即各轮外循环分别包含 n−1、…、3、2 、1轮内循环，求和为 $(n−1)n/2$。而如果引入优化一，则最佳情况下，时间复杂度可达到 O(n) ，即数据全部有序的情况下，只遍历一次就可以得出结果。</p></li><li><p><strong>空间复杂度为</strong> **$O(1)$**​ <strong>、原地排序</strong>：指针 i 和 j 使用常数大小的额外空间。</p></li><li><p><strong>稳定排序</strong>：在交换元素时，遇到相同的元素不会交换。</p><p>‍</p></li></ul><h3 id=效率优化>效率优化</h3><h4 id=优化一设置标志位>优化一：设置标志位</h4><p>　　我们发现，如果某轮“冒泡”中没有执行任何交换操作，说明数组已经完成排序，可直接返回结果。因此，可以增加一个标志位 <code>flag</code>​ 来监测这种情况，一旦出现就立即返回。</p><p>　　经过优化，冒泡排序的最差时间复杂度和平均时间复杂度仍为 $O(n^2)$ ；但当输入数组完全有序时，可达到最佳时间复杂度 $O(n)$。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=cm>/* 冒泡排序（标志优化）*/</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>bubbleSortWithFlag</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 外循环：未排序区间为 [0, i]
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>nums</span><span class=p>.</span><span class=nf>size</span><span class=p>()</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span> <span class=n>i</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span><span class=o>--</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>bool</span> <span class=n>flag</span> <span class=o>=</span> <span class=nb>false</span><span class=p>;</span> <span class=c1>// 初始化标志位
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=c1>// 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>j</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>j</span> <span class=o>&lt;</span> <span class=n>i</span><span class=p>;</span> <span class=n>j</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 交换 nums[j] 与 nums[j + 1]
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=c1>// 这里使用了 std::swap() 函数
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=nf>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>                <span class=n>flag</span> <span class=o>=</span> <span class=nb>true</span><span class=p>;</span> <span class=c1>// 记录交换元素
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>flag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span> <span class=c1>// 此轮“冒泡”未交换任何元素，直接跳出
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=优化二设置结束边界>优化二：设置结束边界</h4><p>　　参考：<a class=link href=https://mrfzh.github.io/2019/11/17/%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E5%8F%8A%E5%85%B6%E4%BC%98%E5%8C%96%EF%BC%88%E4%B8%89%E7%A7%8D%E4%BC%98%E5%8C%96%EF%BC%89/ target=_blank rel=noopener>冒泡排序及其优化（三种优化）</a></p><p>　　除了检测是否有交换外，还可以记录上一次交换的位置。最后一次交换的位置之后的数据都是有序的，可以记录上一次最后交换的位置，作为下一次循环的结束边界。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cm>/* 冒泡排序（边界）*/</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>bubbleSortWithFlag</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>lastSwap</span> <span class=o>=</span> <span class=n>nums</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 外循环：未排序区间为 [0, i]
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>nums</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span> <span class=n>i</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span><span class=o>--</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>int</span> <span class=n>thisTurnLastSwap</span> <span class=o>=</span> <span class=n>lastSwap</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>j</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>j</span> <span class=o>&lt;</span> <span class=n>thisTurnLastSwap</span><span class=p>;</span> <span class=n>j</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 交换 nums[j] 与 nums[j + 1]
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=c1>// 这里使用了 std::swap() 函数
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>                <span class=n>lastSwap</span> <span class=o>=</span> <span class=n>j</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>thisTurnLastSwap</span> <span class=o>==</span> <span class=n>lastSwap</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span> <span class=c1>// 此轮“冒泡”未交换任何元素，直接跳出
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　这里将 优化一 的思想融入了。</p><h4 id=优化三双向冒泡排序>优化三：双向冒泡排序</h4><p>　　参考：<a class=link href=https://juejin.cn/post/6844903815716536333 target=_blank rel=noopener>最简单的冒泡排序还能怎么优化?</a></p><p>　　双向冒泡排序，又叫鸡尾酒排序（Cocktail Sort）。</p><p>　　它的过程是：先从左往右比较一次，再从右往左比较一次，然后又从左往右比较一次，以此类推。</p><p>　　适用于大部分数据已经排序好的情况，可以减少已排序好数据的比较轮数。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cm>/* 冒泡排序（双向冒泡）*/</span>
+</span></span><span class=line><span class=cl><span class=n>function</span> <span class=nf>bubbleSortOpt3</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// &lt;== 设置每一轮循环的开始与结束位置
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kt>int</span> <span class=n>start</span> <span class=o>=</span> <span class=mi>0</span><span class=p>,</span> <span class=n>end</span> <span class=o>=</span> <span class=n>nums</span><span class=p>.</span><span class=n>size</span><span class=p>()</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=n>start</span> <span class=o>&lt;</span> <span class=n>end</span><span class=p>){</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>start</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>end</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>){</span> <span class=c1>// 从start位置end位置过一遍安排最大值的位置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&gt;</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>]){</span>
+</span></span><span class=line><span class=cl>                <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>end</span><span class=o>--</span><span class=p>;</span> <span class=c1>// &lt;== 由于当前最大的数已经放到了 end 位置, 故 end 位置向前移动
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span><span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>end</span><span class=p>;</span> <span class=n>i</span> <span class=o>&gt;</span> <span class=n>start</span><span class=p>;</span> <span class=n>i</span><span class=o>--</span><span class=p>){</span> <span class=c1>// 从end向start位置过一遍, 安排最小值的位置
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&lt;</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>]){</span>
+</span></span><span class=line><span class=cl>                <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=o>-</span><span class=mi>1</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>start</span><span class=o>++</span><span class=p>;</span> <span class=c1>// &lt;== 由于当前最小的数已经放到了 start 位置, 故 start 位置向后移动
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span> 
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=插入排序>插入排序</h2><p>　　插入排序（insertion sort）是一种简单的排序算法，它的工作原理与手动整理一副牌的过程非常相似。</p><p>　　具体来说，我们在未排序区间选择一个基准元素，将该元素与其左侧已排序区间的元素逐一比较大小，并将该元素插入到正确的位置。</p><p>　　设基准元素为 <code>base</code>​ ，我们需要将从目标索引到 <code>base</code>​ 之间的所有元素向右移动一位，然后将 <code>base</code>​ 赋值给目标索引。</p><p>​<img src=/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/assets/image-20241010112126-vbbexr4.png width=1280 height=720 loading=lazy alt=image class=gallery-image data-flex-grow=177 data-flex-basis=426px>​</p><p>　　插入排序的整体流程如图 11-7 所示。</p><ol><li><p>初始状态下，数组的第 1 个元素已完成排序。</p></li><li><p>选取数组的第 2 个元素作为 <code>base</code>​ ，将其插入到正确位置后，<strong>数组的前 2 个元素已排序</strong>。</p></li><li><p>选取第 3 个元素作为 <code>base</code>​ ，将其插入到正确位置后，<strong>数组的前 3 个元素已排序</strong>。</p><p>以此类推，在最后一轮中，选取最后一个元素作为 <code>base</code>​ ，将其插入到正确位置后，<strong>所有元素均已排序</strong>。</p></li></ol><p>​<img src=/p/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/assets/image-20241010112235-amwdlub.png width=1067 height=662 loading=lazy alt=image class=gallery-image data-flex-grow=161 data-flex-basis=386px>​</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cm>/* 插入排序 */</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>insertionSort</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 外循环：已排序区间为 [0, i-1]
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>nums</span><span class=p>.</span><span class=n>size</span><span class=p>();</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>int</span> <span class=n>base</span> <span class=o>=</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>j</span> <span class=o>=</span> <span class=n>i</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 内循环：将 base 插入到已排序区间 [0, i-1] 中的正确位置
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>while</span> <span class=p>(</span><span class=n>j</span> <span class=o>&gt;=</span> <span class=mi>0</span> <span class=o>&amp;&amp;</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;</span> <span class=n>base</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>]</span> <span class=o>=</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>];</span> <span class=c1>// 将 nums[j] 向右移动一位
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>j</span><span class=o>--</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>nums</span><span class=p>[</span><span class=n>j</span> <span class=o>+</span> <span class=mi>1</span><span class=p>]</span> <span class=o>=</span> <span class=n>base</span><span class=p>;</span> <span class=c1>// 将 base 赋值到正确位置
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=算法特性-2>算法特性</h3><ul><li><strong>时间复杂度为</strong> **$O(n^2)$**​ <strong>、自适应排序</strong>：在最差情况下，每次插入操作分别需要循环 n−1、n−2、…、2、1 次，求和得到 (n−1)n/2 ，因此时间复杂度为 $O(n^2)$ 。在遇到有序数据时，插入操作会提前终止。当输入数组完全有序时，插入排序达到最佳时间复杂度 $O(n)$ 。</li><li><strong>空间复杂度为</strong> **$O(1)$**​ <strong>、原地排序</strong>：指针 i 和 j 使用常数大小的额外空间。</li><li><strong>稳定排序</strong>：在插入操作过程中，我们会将元素插入到相等元素的右侧，不会改变它们的顺序。</li></ul><h3 id=插入排序的优势>插入排序的优势</h3><p>　　插入排序的时间复杂度为 $O(n^2)$ ，而我们即将学习的快速排序的时间复杂度为 $O(n\ log\ ⁡n)$ 。尽管插入排序的时间复杂度更高，<strong>但在数据量较小的情况下，插入排序通常更快</strong>。</p><p>　　这个结论与线性查找和二分查找的适用情况的结论类似。快速排序这类 $O(n\ log⁡\ n)$ 的算法属于基于分治策略的排序算法，往往包含更多单元计算操作。而在数据量较小时，$n^2$ 和 $n\ log\ ⁡n$ 的数值比较接近，复杂度不占主导地位，每轮中的<strong>单元操作数量起到决定性作用</strong>。</p><p>　　实际上，许多编程语言（例如 Java）的内置排序函数采用了插入排序，大致思路为：对于长数组，采用基于分治策略的排序算法，例如快速排序；对于短数组，直接使用插入排序。</p><p>　　虽然冒泡排序、选择排序和插入排序的时间复杂度都为 $O(n^2)$ ，但在实际情况中，<strong>插入排序的使用频率显著高于冒泡排序和选择排序</strong>，主要有以下原因。</p><ul><li>冒泡排序基于元素交换实现，需要借助一个临时变量，共涉及 3 个单元操作；插入排序基于元素赋值实现，仅需 1 个单元操作。因此，<strong>冒泡排序的计算开销通常比插入排序更高</strong>。</li><li>选择排序在任何情况下的时间复杂度都为 $O(n^2)$ 。<strong>如果给定一组部分有序的数据，插入排序通常比选择排序效率更高</strong>。</li><li>选择排序不稳定，无法应用于多级排序。</li></ul><h2 id=快速排序>快速排序</h2><p>　　快速排序（quick sort）是一种基于分治策略的排序算法，运行高效，应用广泛。和归并排序相同点都是使用分治策略，不同点在与快速排序是根据基准数划分，先划分，再排序，归并排序是先分组，再排序，再合并。</p><p>　　快速排序的核心操作是“哨兵划分”，其目标是：选择数组中的某个元素作为“基准数”，<strong>将所有小于基准数的元素移到其左侧，而大于基准数的元素移到其右侧</strong>。具体来说，哨兵划分的流程如图 11-8 所示。</p><ol><li>选取数组最左端元素作为基准数，初始化两个指针 <code>i</code>​ 和 <code>j</code>​ 分别指向数组的两端。</li><li>设置一个循环，在每轮中使用 <code>i</code>​（<code>j</code>​）分别寻找第一个比基准数大（小）的元素，然后交换这两个元素。</li><li>循环执行步骤 <code>2.</code>​ ，直到 <code>i</code>​ 和 <code>j</code>​ 相遇时停止，最后将基准数交换至两个子数组的分界线。</li><li>对左右两个子数组继续快速排序。</li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=cm>/* 哨兵划分 */</span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>partition</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>,</span> <span class=kt>int</span> <span class=n>left</span><span class=p>,</span> <span class=kt>int</span> <span class=n>right</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 以 nums[left] 为基准数
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>left</span><span class=p>,</span> <span class=n>j</span> <span class=o>=</span> <span class=n>right</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span> <span class=o>&amp;&amp;</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;=</span> <span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>            <span class=n>j</span><span class=o>--</span><span class=p>;</span>                <span class=c1>// 从右向左找首个小于基准数的元素
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span> <span class=o>&amp;&amp;</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&lt;=</span> <span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>            <span class=n>i</span><span class=o>++</span><span class=p>;</span>                <span class=c1>// 从左向右找首个大于基准数的元素
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]);</span> <span class=c1>// 交换这两个元素
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nf>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>]);</span>  <span class=c1>// 将基准数交换至两子数组的分界线
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>return</span> <span class=n>i</span><span class=p>;</span>                   <span class=c1>// 返回基准数的索引
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/* 快速排序 */</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>quickSort</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>,</span> <span class=kt>int</span> <span class=n>left</span><span class=p>,</span> <span class=kt>int</span> <span class=n>right</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 子数组长度为 1 时终止递归
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=p>(</span><span class=n>left</span> <span class=o>&gt;=</span> <span class=n>right</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 哨兵划分
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kt>int</span> <span class=n>pivot</span> <span class=o>=</span> <span class=nf>partition</span><span class=p>(</span><span class=n>nums</span><span class=p>,</span> <span class=n>left</span><span class=p>,</span> <span class=n>right</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 递归左子数组、右子数组
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nf>quickSort</span><span class=p>(</span><span class=n>nums</span><span class=p>,</span> <span class=n>left</span><span class=p>,</span> <span class=n>pivot</span> <span class=o>-</span> <span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>quickSort</span><span class=p>(</span><span class=n>nums</span><span class=p>,</span> <span class=n>pivot</span> <span class=o>+</span> <span class=mi>1</span><span class=p>,</span> <span class=n>right</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=算法特性-3>算法特性</h3><ul><li><strong>时间复杂度为</strong> **$O(n\ log\ n)$**​ <strong>、非自适应排序</strong>：在平均情况下，哨兵划分的递归层数为 log⁡n ，每层中的总循环数为 n ，总体使用 $O(n\ log⁡\ n)$时间。在最差情况下，每轮哨兵划分操作都将长度为 n 的数组划分为长度为 0 和 n−1 的两个子数组，此时递归层数达到 n ，每层中的循环数为 n ，总体使用 $O(n^2)$时间。</li><li><strong>空间复杂度为</strong> **$O(1)$**​ <strong>、原地排序</strong>：指针 i 和 j 使用常数大小的额外空间。</li><li><strong>非稳定排序</strong>：在交换基准元素时，有可能会使基准元素被交换到相等元素的后边。</li></ul><h3 id=效率优化-1>效率优化</h3><h4 id=优化一基准数优化>优化一：基准数优化</h4><p>　　<strong>快速排序在某些输入下的时间效率可能降低</strong>。举一个极端例子，假设输入数组是完全倒序的，由于我们选择最左端元素作为基准数，那么在哨兵划分完成后，基准数被交换至数组最右端，导致左子数组长度为 n−1、右子数组长度为 0 。如此递归下去，每轮哨兵划分后都有一个子数组的长度为 0 ，分治策略失效，快速排序退化为“冒泡排序”的近似形式。</p><p>　　为了尽量避免这种情况发生，<strong>我们可以优化哨兵划分中的基准数的选取策略</strong>。例如，我们可以随机选取一个元素作为基准数。然而，如果运气不佳，每次都选到不理想的基准数，效率仍然不尽如人意。</p><p>　　需要注意的是，编程语言通常生成的是“伪随机数”。如果我们针对伪随机数序列构建一个特定的测试样例，那么快速排序的效率仍然可能劣化。</p><p>　　为了进一步改进，我们可以在数组中选取三个候选元素（通常为数组的首、尾、中点元素），<strong>并将这三个候选元素的中位数作为基准数</strong>。这样一来，基准数“既不太小也不太大”的概率将大幅提升。当然，我们还可以选取更多候选元素，以进一步提高算法的稳健性。采用这种方法后，时间复杂度劣化至$O(n^2)$的概率大大降低。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=kt>int</span> <span class=nf>medianThree</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>,</span> <span class=kt>int</span> <span class=n>left</span><span class=p>,</span> <span class=kt>int</span> <span class=n>mid</span><span class=p>,</span> <span class=kt>int</span> <span class=n>right</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>int</span> <span class=n>l</span> <span class=o>=</span> <span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>],</span> <span class=n>r</span> <span class=o>=</span> <span class=n>nums</span><span class=p>[</span><span class=n>right</span><span class=p>],</span> <span class=n>m</span> <span class=o>=</span> <span class=n>nums</span><span class=p>[</span><span class=n>mid</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span><span class=p>((</span><span class=n>l</span> <span class=o>&lt;=</span> <span class=n>m</span> <span class=o>&amp;&amp;</span> <span class=n>m</span> <span class=o>&lt;=</span> <span class=n>r</span><span class=p>)</span> <span class=o>||</span> <span class=p>(</span><span class=n>r</span> <span class=o>&lt;=</span> <span class=n>m</span> <span class=o>&amp;&amp;</span> <span class=n>m</span> <span class=o>&lt;=</span> <span class=n>l</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>mid</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span><span class=p>((</span><span class=n>m</span> <span class=o>&lt;=</span> <span class=n>l</span> <span class=o>&amp;&amp;</span> <span class=n>l</span> <span class=o>&lt;=</span> <span class=n>r</span><span class=p>)</span> <span class=o>||</span> <span class=p>(</span><span class=n>r</span> <span class=o>&lt;=</span> <span class=n>l</span> <span class=o>&amp;&amp;</span> <span class=n>l</span> <span class=o>&lt;=</span> <span class=n>m</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=n>left</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>right</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=nf>partition</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>,</span> <span class=kt>int</span> <span class=n>left</span><span class=p>,</span> <span class=kt>int</span> <span class=n>right</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=n>left</span><span class=p>,</span> <span class=n>j</span> <span class=o>=</span> <span class=n>right</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=kt>int</span> <span class=n>mid</span> <span class=o>=</span> <span class=n>left</span> <span class=o>+</span> <span class=p>(</span><span class=n>right</span> <span class=o>-</span> <span class=n>left</span><span class=p>)</span> <span class=o>/</span> <span class=mi>2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>mid</span> <span class=o>=</span> <span class=n>medianThree</span><span class=p>(</span><span class=n>nums</span><span class=p>,</span> <span class=n>left</span><span class=p>,</span> <span class=n>mid</span><span class=p>,</span> <span class=n>right</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>mid</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>        <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span> <span class=o>&amp;&amp;</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;=</span> <span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>j</span><span class=o>--</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>            <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span> <span class=o>&amp;&amp;</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&lt;=</span> <span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>])</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>i</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>left</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　c++的库函数<code>std::sort</code>​函数（基于快速排序、堆排序和插入排序的混合算法）中快排部分，也采用了基准数优化。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl>  <span class=k>template</span><span class=o>&lt;</span><span class=k>typename</span> <span class=n>_Iterator</span><span class=p>,</span> <span class=k>typename</span> <span class=n>_Compare</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=n>_GLIBCXX20_CONSTEXPR</span>
+</span></span><span class=line><span class=cl>    <span class=kt>void</span>
+</span></span><span class=line><span class=cl>    <span class=n>__move_median_to_first</span><span class=p>(</span><span class=n>_Iterator</span> <span class=n>__result</span><span class=p>,</span><span class=n>_Iterator</span> <span class=n>__a</span><span class=p>,</span> <span class=n>_Iterator</span> <span class=n>__b</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>			   <span class=n>_Iterator</span> <span class=n>__c</span><span class=p>,</span> <span class=n>_Compare</span> <span class=n>__comp</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=n>__comp</span><span class=p>(</span><span class=n>__a</span><span class=p>,</span> <span class=n>__b</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	<span class=p>{</span>
+</span></span><span class=line><span class=cl>	  <span class=k>if</span> <span class=p>(</span><span class=n>__comp</span><span class=p>(</span><span class=n>__b</span><span class=p>,</span> <span class=n>__c</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	    <span class=n>std</span><span class=o>::</span><span class=n>iter_swap</span><span class=p>(</span><span class=n>__result</span><span class=p>,</span> <span class=n>__b</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	  <span class=k>else</span> <span class=nf>if</span> <span class=p>(</span><span class=n>__comp</span><span class=p>(</span><span class=n>__a</span><span class=p>,</span> <span class=n>__c</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	    <span class=n>std</span><span class=o>::</span><span class=n>iter_swap</span><span class=p>(</span><span class=n>__result</span><span class=p>,</span> <span class=n>__c</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	  <span class=k>else</span>
+</span></span><span class=line><span class=cl>	    <span class=n>std</span><span class=o>::</span><span class=n>iter_swap</span><span class=p>(</span><span class=n>__result</span><span class=p>,</span> <span class=n>__a</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>else</span> <span class=nf>if</span> <span class=p>(</span><span class=n>__comp</span><span class=p>(</span><span class=n>__a</span><span class=p>,</span> <span class=n>__c</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	<span class=n>std</span><span class=o>::</span><span class=n>iter_swap</span><span class=p>(</span><span class=n>__result</span><span class=p>,</span> <span class=n>__a</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=k>else</span> <span class=nf>if</span> <span class=p>(</span><span class=n>__comp</span><span class=p>(</span><span class=n>__b</span><span class=p>,</span> <span class=n>__c</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>	<span class=n>std</span><span class=o>::</span><span class=n>iter_swap</span><span class=p>(</span><span class=n>__result</span><span class=p>,</span> <span class=n>__c</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=k>else</span>
+</span></span><span class=line><span class=cl>	<span class=n>std</span><span class=o>::</span><span class=n>iter_swap</span><span class=p>(</span><span class=n>__result</span><span class=p>,</span> <span class=n>__b</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>template</span><span class=o>&lt;</span><span class=k>typename</span> <span class=n>_RandomAccessIterator</span><span class=p>,</span> <span class=k>typename</span> <span class=n>_Compare</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=n>_GLIBCXX20_CONSTEXPR</span>
+</span></span><span class=line><span class=cl>    <span class=kr>inline</span> <span class=n>_RandomAccessIterator</span>
+</span></span><span class=line><span class=cl>    <span class=n>__unguarded_partition_pivot</span><span class=p>(</span><span class=n>_RandomAccessIterator</span> <span class=n>__first</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>				<span class=n>_RandomAccessIterator</span> <span class=n>__last</span><span class=p>,</span> <span class=n>_Compare</span> <span class=n>__comp</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>_RandomAccessIterator</span> <span class=n>__mid</span> <span class=o>=</span> <span class=n>__first</span> <span class=o>+</span> <span class=p>(</span><span class=n>__last</span> <span class=o>-</span> <span class=n>__first</span><span class=p>)</span> <span class=o>/</span> <span class=mi>2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=n>std</span><span class=o>::</span><span class=n>__move_median_to_first</span><span class=p>(</span><span class=n>__first</span><span class=p>,</span> <span class=n>__first</span> <span class=o>+</span> <span class=mi>1</span><span class=p>,</span> <span class=n>__mid</span><span class=p>,</span> <span class=n>__last</span> <span class=o>-</span> <span class=mi>1</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>				  <span class=n>__comp</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=k>return</span> <span class=n>std</span><span class=o>::</span><span class=n>__unguarded_partition</span><span class=p>(</span><span class=n>__first</span> <span class=o>+</span> <span class=mi>1</span><span class=p>,</span> <span class=n>__last</span><span class=p>,</span> <span class=n>__first</span><span class=p>,</span> <span class=n>__comp</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=优化二尾递归优化-空间优化>优化二：尾递归优化-空间优化</h4><p>　　<strong>在某些输入下，快速排序可能占用空间较多</strong>。以完全有序的输入数组为例，设递归中的子数组长度为 m ，每轮哨兵划分操作都将产生长度为 0 的左子数组和长度为 m−1 的右子数组，这意味着每一层递归调用减少的问题规模非常小（只减少一个元素），递归树的高度会达到 n−1 ，此时需要占用 O(n) 大小的栈帧空间。</p><p>　　为了防止栈帧空间的累积，我们可以在每轮哨兵排序完成后，比较两个子数组的长度，<strong>仅对较短的子数组进行递归</strong>。由于较短子数组的长度不会超过 n/2 ，因此这种方法能确保递归深度不超过 $log⁡\ n$，从而将最差空间复杂度优化至 $O(log\ ⁡n)$ 。代码如下所示：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cm>/* 快速排序（尾递归优化） */</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>quickSort</span><span class=p>(</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>nums</span><span class=p>,</span> <span class=kt>int</span> <span class=n>left</span><span class=p>,</span> <span class=kt>int</span> <span class=n>right</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 子数组长度为 1 时终止
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>while</span> <span class=p>(</span><span class=n>left</span> <span class=o>&lt;</span> <span class=n>right</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 哨兵划分操作
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kt>int</span> <span class=n>pivot</span> <span class=o>=</span> <span class=n>partition</span><span class=p>(</span><span class=n>nums</span><span class=p>,</span> <span class=n>left</span><span class=p>,</span> <span class=n>right</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 对两个子数组中较短的那个执行快速排序
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=p>(</span><span class=n>pivot</span> <span class=o>-</span> <span class=n>left</span> <span class=o>&lt;</span> <span class=n>right</span> <span class=o>-</span> <span class=n>pivot</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>quickSort</span><span class=p>(</span><span class=n>nums</span><span class=p>,</span> <span class=n>left</span><span class=p>,</span> <span class=n>pivot</span> <span class=o>-</span> <span class=mi>1</span><span class=p>);</span> <span class=c1>// 递归排序左子数组
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>left</span> <span class=o>=</span> <span class=n>pivot</span> <span class=o>+</span> <span class=mi>1</span><span class=p>;</span>                 <span class=c1>// 剩余未排序区间为 [pivot + 1, right]
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>quickSort</span><span class=p>(</span><span class=n>nums</span><span class=p>,</span> <span class=n>pivot</span> <span class=o>+</span> <span class=mi>1</span><span class=p>,</span> <span class=n>right</span><span class=p>);</span> <span class=c1>// 递归排序右子数组
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>right</span> <span class=o>=</span> <span class=n>pivot</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>                 <span class=c1>// 剩余未排序区间为 [left, pivot - 1]
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=注意>注意</h3><p>　　在快速排序的分区算法中，<strong>​<code>while</code>​</strong>​ <strong>循环的顺序</strong> 与 <strong>基准元素的位置</strong> 密切相关，不能随意颠倒。原因主要有以下两个关键点，并且根据基准位置的不同，处理方式也不同：</p><h4 id=1-确保每个元素都能正确与基准比较>1. 确保每个元素都能正确与基准比较：</h4><p>　　因为程序是顺序执行的，在 i 和 j 相差1时，先执行的 while循环，会多一次比较机会，这决定了最后一次比较中的两个数据能够被正确的划分。</p><ul><li><p><strong>右侧基准时</strong>：<code>i</code>​ 指针从左向右寻找第一个 <strong>大于基准的元素</strong>，<code>j</code>​ 指针从右向左寻找 <strong>小于基准的元素</strong>。如果 <strong>​<code>i</code>​</strong> <strong>指针先行</strong>，它能确保左侧所有元素与基准进行比较，确保小于基准的元素正确地放置在左区间。</p><ul><li>如果颠倒顺序让 <code>j</code>​ 指针先行，可能导致某些靠近基准的元素（特别是小于基准的）无法与基准比较，破坏分区的完整性。</li></ul></li><li><p><strong>左侧基准时</strong>：则相反，应该让 <strong>​<code>j</code>​</strong>​ <strong>指针先行</strong>，这样可以确保右侧的元素都能正确地与基准比较，找到第一个小于基准的元素。</p></li></ul><h4 id=2-确保最后交换时基准与大于等于基准的元素交换>2. 确保最后交换时基准与大于等于基准的元素交换：</h4><ul><li><p><strong>右侧基准时</strong>：如果 <strong>​<code>i</code>​</strong>​ <strong>指针先行</strong>，最后一次交换时，<code>i</code>​ 会停在 <strong>大于等于基准的元素</strong> 上，这样交换后能确保分区结构正确，即 <strong>左区间 &lt; 基准 &lt; 右区间</strong>。</p><ul><li>如果 <code>j</code>​ 指针先行，则可能导致 <code>i</code>​ 停在一个 <strong>小于等于基准的元素</strong> 上，导致错误分区，破坏了左小右大的结构。</li></ul></li><li><p><strong>左侧基准时</strong>：同理，应让 <strong>​<code>j</code>​</strong>​ <strong>指针先行</strong>，这样确保最后交换时基准能够与 <strong>小于等于基准的元素</strong> 交换，保证 <strong>左区间 &lt; 基准 &lt; 右区间</strong>。</p></li></ul><h4 id=实例说明>实例说明</h4><p>　　例如当 i = 0, j = 1，且 nums[0] &lt;= nums[right] 时，上面的代码，会先执行 i++的循环，则 nums[i]就能够和基准 nums[right] 比较，i = j = 1。而若 j&ndash; 的循环在最前面，则先执行 j&ndash;的循环，这之后 i &lt; j就不成立了，nums[i]就无法和基准比较，那么 i = j =0，此时大循环结束，需要交换nums[right] 和 nums[i]（i=0），而 nums[0] &lt;= nums[right]，如果交换，则出现了 <strong>​<code>基准 &lt; 右区间 > 左区间</code>​</strong>​ 的错误分区。正确的交换应该是 nums[right] 和 nums[1]，保证 <strong>​<code>左区间 &lt; 基准 &lt; 右区间</code>​</strong>​。</p><p>　　下面给出上述阐述的数组：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=err>原数组：</span>
+</span></span><span class=line><span class=cl><span class=n>id</span>   <span class=mi>0</span> <span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span>
+</span></span><span class=line><span class=cl><span class=n>nums</span> <span class=mi>1</span> <span class=mi>5</span> <span class=mi>3</span> <span class=mi>2</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>right</span> <span class=o>=</span> <span class=mi>3</span><span class=p>,</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=n>j</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span> <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>right</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>])</span><span class=err>后：</span>
+</span></span><span class=line><span class=cl><span class=n>id</span>   <span class=mi>0</span> <span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span>
+</span></span><span class=line><span class=cl><span class=n>nums</span> <span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span> <span class=mi>5</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>right</span> <span class=o>=</span> <span class=mi>3</span><span class=p>,</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>,</span> <span class=n>j</span> <span class=o>=</span> <span class=mi>0</span><span class=p>,</span> <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>right</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>])</span><span class=err>后：</span>
+</span></span><span class=line><span class=cl><span class=n>id</span>   <span class=mi>0</span> <span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span>
+</span></span><span class=line><span class=cl><span class=n>nums</span> <span class=mi>2</span> <span class=mi>5</span> <span class=mi>3</span> <span class=mi>1</span>
+</span></span></code></pre></td></tr></table></div></div><p>　　所以如果我们把基准指针从 left 替换为 right，相应地，while循环的顺序就需要改变为：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span> <span class=o>&amp;&amp;</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&lt;=</span> <span class=n>nums</span><span class=p>[</span><span class=n>right</span><span class=p>])</span> <span class=p>{</span><span class=c1>// 从左侧开始找第一个大于基准的位置
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>i</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>j</span> <span class=o>&amp;&amp;</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]</span> <span class=o>&gt;=</span> <span class=n>nums</span><span class=p>[</span><span class=n>right</span><span class=p>])</span> <span class=p>{</span><span class=c1>// 从右侧开始找第一个小于基准的位置
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>j</span><span class=o>--</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>j</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>swap</span><span class=p>(</span><span class=n>nums</span><span class=p>[</span><span class=n>right</span><span class=p>],</span> <span class=n>nums</span><span class=p>[</span><span class=n>i</span><span class=p>]);</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=插曲>插曲</h3><p>　　在 C++ 标准库中，<code>std::sort</code>​ 函数是一种用于对容器或数组中的元素进行排序的函数。它是基于快速排序（Quicksort）、堆排序（Heapsort）和插入排序（Insertion Sort）的混合算法，称为 <strong>Introsort</strong>。</p><h4 id=关键算法步骤>关键算法步骤</h4><ol><li><strong>Introsort</strong> 是基于快速排序的，但会在递归深度达到一定程度时切换到堆排序，以防止最坏情况下快速排序退化为 $O(n^2)$ 的时间复杂度。</li><li>在排序过程中，对小规模区间使用插入排序，以利用其在小数据集上的高效性。</li></ol><p>　　leetcode上的排序题目：<a class=link href=https://leetcode.cn/problems/sort-an-array/ target=_blank rel=noopener>912. 排序数组</a> 中的测试数据增加了有序大数组，对快速排序不友好，会退化为类似冒泡排序的 $O(n^2)$算法，因此，使用快排需要经过基准数优化才能通过，另外，堆排序在这个题目中表现很好，因此C++中的sort函数也会快很多。</p><h2 id=归并排序>归并排序</h2><p>　　待续。</p><h2 id=堆排序>堆排序</h2><p>　　待续。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/algorithm/>Algorithm</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>最后更新于 Oct 10, 2024 13:50 +0800</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{const e=document.querySelector(".main-article");renderMathInElement(e,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9F%A5%E8%AF%86%E7%82%B9%E9%9B%86%E5%90%88/><div class=article-details><h2 class=article-title>数据结构知识点集合</h2></div></a></article><article><a href=/p/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/><div class=article-details><h2 class=article-title>时间复杂度</h2></div></a></article><article><a href=/p/linux-perf%E5%B7%A5%E5%85%B7/><div class=article-details><h2 class=article-title>Linux Perf工具</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=codetang-2417/codetang-2417.github.io data-repo-id=R_kgDOMyu4sg data-category=Announcements data-category-id=DIC_kwDOMyu4ss4CiiW6 data-mapping=title data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=zh-CN data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2024 -
+2025 LingLong's Blog</section><section class=powerby>Simple is enough.<br>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>IPhone on LingLong</title><link>https://codetang-2417.github.io/tags/iphone/</link><description>Recent content in IPhone on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Fri, 20 Sep 2024 00:06:03 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/iphone/index.xml" rel="self" type="application/rss+xml"/><item><title>IOS 订阅GPT4-购买礼品卡</title><link>https://codetang-2417.github.io/p/ios-%E8%AE%A2%E9%98%85gpt4-%E8%B4%AD%E4%B9%B0%E7%A4%BC%E5%93%81%E5%8D%A1/</link><pubDate>Fri, 29 Mar 2024 09:48:59 +0800</pubDate><guid>https://codetang-2417.github.io/p/ios-%E8%AE%A2%E9%98%85gpt4-%E8%B4%AD%E4%B9%B0%E7%A4%BC%E5%93%81%E5%8D%A1/</guid><description>&lt;p>　　本文介绍在 iPhone 上下载 ChatGPT并订阅 GPT PLUS。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://z197.com/blog/chatgpt-plus-account-purchase.html#google_vignette" target="_blank" rel="noopener"
+>最新ChatGPT Plus订阅开通方法（支付宝礼品卡）&lt;/a>&lt;/p>
+&lt;p>　　先需要一个免税区美区ID：&lt;a class="link" href="siyuan://blocks/20231030145842-ee23ab2" >注册美区账号&lt;/a>&lt;/p>
+&lt;h2 id="支付宝购买">支付宝购买
+&lt;/h2>&lt;p>　　支付宝右上角切换地区到美国&lt;/p>
+&lt;p>　　搜索：礼品卡（不要搜 apple礼品卡）&lt;/p>
+&lt;p>　　选择 pockyt shop&lt;/p>
+&lt;p>　　第二页选择app store进行购买，需要进行注册&lt;/p>
+&lt;p>　　购买后将礼品卡号码复制到app store进行充值&lt;/p>
+&lt;h2 id="订阅">订阅
+&lt;/h2>&lt;p>　　使用美区 Apple ID在 &lt;strong>App Store&lt;/strong> 上登陆（注意：一定 &lt;strong>不要&lt;/strong> 在设置中登陆，会导致锁机！）&lt;/p>
+&lt;p>　　搜索 ChatGPT，下载 OpenAI 版本的官方App。&lt;/p>
+&lt;p>　　进入后直接使用AppleID登陆，然后就可以点击开通Plus，自动从 App Store的已经充值的余额中扣除。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>注册美区账号</title><link>https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/</link><pubDate>Mon, 30 Oct 2023 14:58:42 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/</guid><description>&lt;p>　　IOS的app store在国区有很多软件不能下载，包括科学上网和一些好用的软件，使用美区的账号登陆app store就可以解除限制（注意：只能在app store中登陆，不能在设置中登陆，否则有可能会激活id锁，导致机器无法使用）&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://www.koffuxu.com/article/b1335d9c-49ff-4cc3-9396-0c9ff41255e7" target="_blank" rel="noopener"
+>美区Apple ID注册流程：不需要信用卡、也不需要美国地址&lt;/a>、&lt;a class="link" href="https://zhuanlan.zhihu.com/p/367821925?dt_dapp=1" target="_blank" rel="noopener"
+>知乎：【2023年】五分钟注册美区AppleID，手把手教，稳定且耐用！&lt;/a>&lt;/p>
+&lt;h2 id="一准备工作">&lt;strong>一、准备工作&lt;/strong>
+&lt;/h2>&lt;p>　　1.一个能接收短信的国内手机号2.一个全新邮箱（指从没注册过Apple ID的邮箱）3.美国地址生成器（文中有地址）4.无需任何代理工具&lt;/p>
+&lt;p>　　&lt;strong>注意以下四点可以避免很多问题：&lt;/strong>&lt;/p>
+&lt;p>　　出生日期：一定要设置成大于 18 周岁的日期，否则会导致部分应用由于年龄限制无法使用。&lt;/p>
+&lt;p>　　电子邮件：建议新注册一个全新的从未注册过 Apple ID 的邮箱，比如 163 邮箱，我使用的谷歌邮箱。&lt;/p>
+&lt;p>　　手机号码：亲测，注册过中国区 Apple ID 的手机号码可以用来注册美区账号，不会产生冲突。&lt;/p>
+&lt;p>　　密码：设置密码时，密码中不要包含有名字、生日、邮箱中的信息，否则会卡在验证码那一步。&lt;/p>
+&lt;p>　　‍&lt;/p>
+&lt;h3 id="注意事项">注意事项
+&lt;/h3>&lt;p>　　1.设置密码时，密码中不要包含前面填写的名字、生日、邮箱中的任何信息，否则可能会卡在验证码那一步，总之就是密码尽量原创一个。&lt;/p>
+&lt;p>　　2.不要在「设置」中登录美区Apple ID，以免造成不必要的麻烦。下载美区 App 只需在 App Store 中登录即可，下载完后再换回国区账号即可，对 iCloud 等不会有任何影响。&lt;/p>
+&lt;p>　　3.如果你有在用Apple Music，切换成美区后会导致已下载的歌曲全被清空。&lt;/p>
+&lt;p>　　4.建议不要把美区 Apple ID 当成主力账号，需要下美区应用时登录就行了，以免出现啥问题。&lt;/p>
+&lt;h2 id="二注册教程">&lt;strong>二、注册教程&lt;/strong>
+&lt;/h2>&lt;p>　　可以使用电脑也可以使用手机。&lt;/p>
+&lt;p>　　首先进入美国 Apple ID 注册页面，复制下方网址至 Safari 浏览器中打开即可进入。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-tex" data-lang="tex">&lt;span class="line">&lt;span class="cl">https://appleid.apple.com/account ​
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　需要注意以下几点：&lt;/p>
+&lt;blockquote>
+&lt;ol>
+&lt;li>地区需要选择美国&lt;/li>
+&lt;li>出生年龄必须大于18周岁&lt;/li>
+&lt;li>电话可以填大陆&lt;/li>
+&lt;li>邮箱一定要是一个没有注册过的新邮箱&lt;/li>
+&lt;/ol>&lt;/blockquote>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/assets/image-20231030150450-9whqjml.png"
+width="720"
+height="3733"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="19"
+data-flex-basis="46px"
+>​&lt;/p>
+&lt;p>　　接下来验证邮箱地址，输入验证码，继续。确认无误后，就会跳转到你的Appid主页，完成账号注册。&lt;/p>
+&lt;h2 id="三填写付款方式和账单地址">三、填写付款方式和账单地址
+&lt;/h2>&lt;p>　　购买app时，需要我们通过AppleID进行付费，否则无法使用。我们需要通过下面的方法生成一个美国地区的地址、电话、邮编等，然后添加到其中。&lt;/p>
+&lt;p>　　生成美国地址建议选以下&lt;strong>五个免税州&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>蒙大拿州（Montana）&lt;/li>
+&lt;li>俄勒冈州（Oregon）&lt;/li>
+&lt;li>阿拉斯加州（Alaska）&lt;/li>
+&lt;li>特拉华州（Delaware）&lt;/li>
+&lt;li>新罕布什尔州（New Hampshire）&lt;/li>
+&lt;/ul>
+&lt;p>　　打开网址：&lt;a class="link" href="https://www.meiguodizhi.com/" target="_blank" rel="noopener"
+>https://www.meiguodizhi.com/&lt;/a> 生成一个地址&lt;/p>
+&lt;p>　　然后再进入AppleID官网，用新注册的账号登陆、点击付款与配送&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E6%B3%A8%E5%86%8C%E7%BE%8E%E5%8C%BA%E8%B4%A6%E5%8F%B7/assets/image-20231030152059-x4kj7w7.png"
+width="1031"
+height="648"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="159"
+data-flex-basis="381px"
+>&lt;/p>
+&lt;p>　　这里有两个选项，第一个是添加付款方式，在开头提到的两个教程的链接中，第一个是点击添加付款方式，并且在弹出的选择框中选择了“无”，但目前实测已经没有这个选项了。第二个选择的是添加购物地址。目前不清楚第二种方法是否有效，这里给出我成功的方法。&lt;/p>
+&lt;p>　　在官网用新账号登陆后，在管理账户里把语言换成英文。&lt;/p>
+&lt;p>　　在手机或者平板的设置—通用/语言与地区，语言改成英文（US），地区改为 美国&lt;/p>
+&lt;p>　　进入App store，用你新注册的苹果号登陆，然后随便下载一个软件，就会提示点选review（检查）。之后就会跳出付款信息的填写，此时会看见强制填写的信用卡号等信息变成了选填，完善完城市街道等基本信息，点选next，就会跳出完成注册的提示。&lt;/p>
+&lt;h2 id="四常见问题汇总">四、常见问题汇总
+&lt;/h2>&lt;p>　　➊ 手机号码提示错误怎么解决？&lt;br>
+答：看看复制的号码是不是开头有数字&amp;quot;1&amp;quot;或者&amp;quot;+1&amp;quot;，有的话去掉即可。&lt;/p>
+&lt;p>　　➋ 更新 App 的时候显示账号被锁定，但可以下载未下载过的 App 是什么原因？&lt;br>
+答：因为你更新的这个 App 之前是用其他 Apple ID 下载的，所以这个 App 是和你之前下载时的那个 Apple ID 绑定在一起的，所以出现被锁定的提示是原先账号出了问题，和当前账号没关系。解决方法很简单，把 App 卸载重新安装即可。&lt;/p>
+&lt;p>　　➌ 邮编错误怎么办？&lt;br>
+答：估计是地址生成器网站数据库中的部分邮编有误，多生成几份地址试试即可。&lt;/p>
+&lt;p>　　➍ Your request could not be completed at this time 怎么办？&lt;br>
+答：应该是地址生成器生成的号码有问题，电话是 xxx-xxx-xxx 的正常，而 +1xxx-xxx-xxx 就不行。解决方法就是去掉号码开头的&amp;quot;1&amp;quot;或者&amp;quot;+1&amp;quot;即可。&lt;/p>
+&lt;p>　　➎ Cannot be created at this time 怎么办？&lt;br>
+答：切换成 4G、5G、或者换个浏览器、或者用电脑注册，或者次日再试试。&lt;/p>
+&lt;p>　　➏ 注册成功后，如何二次修改美区 Apple ID 的地址、姓名等信息？&lt;br>
+答：进入美国苹果官网，拉到底部找到 manage your apple id，登录后即可修改，不懂英文的同学可借助翻译。&lt;br>
+如果以上回答仍然无法解决你的问题，那建议用百度、必应、知乎等搜索工具去寻找解决方法。&lt;/p></description></item></channel></rss>

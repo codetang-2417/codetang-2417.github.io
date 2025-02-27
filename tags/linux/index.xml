@@ -1,0 +1,2028 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on LingLong</title><link>https://codetang-2417.github.io/tags/linux/</link><description>Recent content in Linux on LingLong</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><copyright>LingLong's Blog</copyright><lastBuildDate>Sun, 17 Nov 2024 01:39:13 +0800</lastBuildDate><atom:link href="https://codetang-2417.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>qbittorrent 校验大文件导致Linux内核出问题</title><link>https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/</link><pubDate>Sun, 17 Nov 2024 01:25:27 +0800</pubDate><guid>https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/</guid><description>&lt;h2 id="问题">问题
+&lt;/h2>&lt;p>　　在 &lt;code>qbittorrent&lt;/code>​ 校验大文件时（大概100GB以上？），会出现无法启动新应用的情况。&lt;/p>
+&lt;p>　　KDE 还会在一段时间后，弹出下列通知&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-txt" data-lang="txt">&lt;span class="line">&lt;span class="cl">Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　而且在终端中无法运行系统内核相关的程序，例如：&lt;code>journalctl&lt;/code>​、&lt;code>systemdctl&lt;/code>​ 等。无法通过 &lt;code>reboot&lt;/code>​ 重启电脑，只能通过长按电源键硬重启电脑。&lt;/p>
+&lt;h2 id="解决方案">解决方案
+&lt;/h2>&lt;h3 id="手动">手动
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">sudo renice +10 -p $(pgrep qbittorrent)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　再次校验大文件时，就不会出现上述问题。&lt;/p>
+&lt;h3 id="自动">自动
+&lt;/h3>&lt;p>　　更改开机自启动 &lt;code>desktop&lt;/code>​ 文件，在启动时就将 &lt;code>qbittorrent&lt;/code>​ 优先级降低。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">$ ls ~/.config/autostart&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">$ vim org.qbittorrent.qBittorrent.desktop&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">将 Exec=qbittorrent %U 改为&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">Exec=sh -c &amp;#34;nice -n 10 qbittorrent %U&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　更改通用启动 &lt;code>desktop&lt;/code>​ 文件，在启动时就将 &lt;code>qbittorrent&lt;/code>​ 优先级降低。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="l">$ vim ~/.local/share/applications/org.qbittorrent.qBittorrent.desktop&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">将 Exec=qbittorrent %U 改为&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="l">Exec=sh -c &amp;#34;nice -n 10 qbittorrent %U&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　或者通过图形化界面找到 &lt;code>desktop&lt;/code>​ 文件&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/assets/image-20241117013346-dz1m02x.png"
+width="740"
+height="560"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="132"
+data-flex-basis="317px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qbittorrent-%E6%A0%A1%E9%AA%8C%E5%A4%A7%E6%96%87%E4%BB%B6%E5%AF%BC%E8%87%B4linux%E5%86%85%E6%A0%B8%E5%87%BA%E9%97%AE%E9%A2%98/assets/image-20241117013231-ihde2i5.png"
+width="365"
+height="529"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="68"
+data-flex-basis="165px"
+>​&lt;/p></description></item><item><title>Time 同步</title><link>https://codetang-2417.github.io/p/time-%E5%90%8C%E6%AD%A5/</link><pubDate>Tue, 05 Nov 2024 10:10:41 +0800</pubDate><guid>https://codetang-2417.github.io/p/time-%E5%90%8C%E6%AD%A5/</guid><description>&lt;p>　　使用 Manjaro，最近发现时间不同步。Manjaro 目前使用 systemd-timesyncd 服务同步时间。可通过下列命令查看服务状态：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ systemctl status systemd-timesyncd.service  ✔  9s 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">○ systemd-timesyncd.service - Network Time Synchronization
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Loaded: loaded &lt;span class="o">(&lt;/span>/usr/lib/systemd/system/systemd-timesyncd.service&lt;span class="p">;&lt;/span> enabled&lt;span class="p">;&lt;/span> preset: enabled&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Active: inactive &lt;span class="o">(&lt;/span>dead&lt;span class="o">)&lt;/span> since Tue 2024-11-05 09:49:12 CST&lt;span class="p">;&lt;/span> 21min ago
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Duration: 19min 50.593s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Invocation: ad67794ba19a43cfbb91ef6b058f40a8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Docs: man:systemd-timesyncd.service&lt;span class="o">(&lt;/span>8&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Main PID: &lt;span class="m">892&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="nv">code&lt;/span>&lt;span class="o">=&lt;/span>exited, &lt;span class="nv">status&lt;/span>&lt;span class="o">=&lt;/span>0/SUCCESS&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Status: &lt;span class="s2">&amp;#34;Idle.&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Mem peak: 5.3M
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CPU: 53ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:29:21 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Starting Network Time Synchronization...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:29:21 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Started Network Time Synchronization.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:32:09 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:32:51 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:34:06 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:36:24 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:40:51 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>892&lt;span class="o">]&lt;/span>: Timed out waiting &lt;span class="k">for&lt;/span> reply from 111.203.6.13:123 &lt;span class="o">(&lt;/span>ntp1.nim.ac.cn&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:49:12 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Stopping Network Time Synchronization...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:49:12 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: systemd-timesyncd.service: Deactivated successfully.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 09:49:12 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Stopped Network Time Synchronization.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　可知时间同步服务器访问出现问题。修改服务器为中国区的服务器:&lt;/p>
+&lt;p>　　​&lt;code>sudo vim /etc/systemd/timesyncd.conf&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Time&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">NTP&lt;/span>&lt;span class="o">=&lt;/span>ntp.aliyun.com ntp.ntsc.ac.cn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　重新运行服务，或者手动更新&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 手动更新&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo ntpd -q -g -p ntp.aliyun.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 重新运行服务&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ systemctl status systemd-timesyncd.service  ✔
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">● systemd-timesyncd.service - Network Time Synchronization
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Loaded: loaded &lt;span class="o">(&lt;/span>/usr/lib/systemd/system/systemd-timesyncd.service&lt;span class="p">;&lt;/span> enabled&lt;span class="p">;&lt;/span> preset: enabled&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Active: active &lt;span class="o">(&lt;/span>running&lt;span class="o">)&lt;/span> since Tue 2024-11-05 10:13:50 CST&lt;span class="p">;&lt;/span> 3min 8s ago
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Invocation: 50dde2f5504342deaf3543272c50b332
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Docs: man:systemd-timesyncd.service&lt;span class="o">(&lt;/span>8&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Main PID: &lt;span class="m">14567&lt;/span> &lt;span class="o">(&lt;/span>systemd-timesyn&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Status: &lt;span class="s2">&amp;#34;Contacted time server 203.107.6.88:123 (ntp.aliyun.com).&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Tasks: &lt;span class="m">2&lt;/span> &lt;span class="o">(&lt;/span>limit: 28019&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Memory: 3.3M &lt;span class="o">(&lt;/span>peak: 4.1M&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CPU: 42ms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CGroup: /system.slice/systemd-timesyncd.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> └─14567 /usr/lib/systemd/systemd-timesyncd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:50 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Starting Network Time Synchronization...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:50 ling-20ym systemd&lt;span class="o">[&lt;/span>1&lt;span class="o">]&lt;/span>: Started Network Time Synchronization.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:52 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>14567&lt;span class="o">]&lt;/span>: Contacted &lt;span class="nb">time&lt;/span> server 203.107.6.88:123 &lt;span class="o">(&lt;/span>ntp.aliyun.com&lt;span class="o">)&lt;/span>.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Nov &lt;span class="m">05&lt;/span> 10:13:52 ling-20ym systemd-timesyncd&lt;span class="o">[&lt;/span>14567&lt;span class="o">]&lt;/span>: Initial clock synchronization to Tue 2024-11-05 10:13:52.194984 CST.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　参考：&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Systemd-timesyncd" target="_blank" rel="noopener"
+>systemd-timesyncd&lt;/a>、&lt;a class="link" href="https://www.cnblogs.com/jarsing/articles/17503565.html" target="_blank" rel="noopener"
+>国内常用NTP服务器地址&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>QEMU开发环境搭建</title><link>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link><pubDate>Wed, 30 Oct 2024 19:57:03 +0800</pubDate><guid>https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid><description>&lt;p>　　QEMU开源软件在Linux上进行开发。在windows上可以采用WSL Linux，也可以自行在电脑上安装Linux原生系统。一般采用vscode作为IDE 开发QEMU。&lt;/p>
+&lt;p>　　本文采用 vscode 连接校内 ubuntu 服务器的方式进行开发环境搭建。ubuntu服务器多人使用，采用docker 容器建立各自独立的开发环境。&lt;/p>
+&lt;h2 id="docker环境">docker环境
+&lt;/h2>&lt;p>　　使用docker启动作为编译的系统环境。可以将 docker 视作轻量级虚拟机，先创建 docker镜像，再以镜像为基础启动容器。每一个容器视作虚拟机，系统环境数据存在容器中，工作文件夹等需要保存在硬盘上的重要文件，以共享文件夹的方式映射到容器。镜像不保存任何运行数据。&lt;/p>
+&lt;h3 id="dockfile">dockfile
+&lt;/h3>&lt;p>　　创建名为 &lt;code>Dockerfile&lt;/code>​ 的文件，并填入下列内容。并可以根据自行需要（用户\组 id，软件依赖等），增删其中的内容。&lt;/p>
+&lt;p>　　注意：存放 &lt;code>Dockerfile&lt;/code>​ 的文件夹中最好不要存放任何其他无关的文件，在创建镜像时，docker 会将该文件夹中的所有内容都复制到容器中，这会大大增加镜像创建的时间。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">FROM&lt;/span> &lt;span class="nl">ubuntu&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mf">24.04&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 定义构建时变量，可以在docker build构建通过--build-arg来修改
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ARG&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ARG&lt;/span> &lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">developer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 设置 DEBIAN_FRONTEND 环境变量以避免交互式对话框，否则可能会卡在一些交互式输入中
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">noninteractive&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改ubuntu的镜像源为阿里云
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># ubuntu24.04版本修改软件源的位置：/etc/apt/sources.list 替换为 /etc/apt/sources.list.d/ubuntu.sources
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">archive&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">sed&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="n">s&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">security&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">mirrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">aliyun&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">apt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sources&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sources&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">update&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">locales&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">clean&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;%sudo ALL=(ALL) NOPASSWD:ALL&amp;#34;&lt;/span> &lt;span class="o">&amp;gt;&amp;gt;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">sudoers&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改容器或系统中的 sudoers 文件，允许属于 sudo 组的用户执行 sudo 命令时无需输入密码。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 修改语言环境（locale）设置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">locale&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">gen&lt;/span> &lt;span class="n">en_US&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UTF&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">8&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">update&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">locale&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 添加用户：赋予sudo权限，指定密码123，建议docker的密码不要太复杂，太多了很容易忘记。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 注：用户id和组id尽可能的和当前用户id一致，使得读写共享文件时的权限一致，否则可能出现docker无法写入共享文件的问题。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 命令 id 可以查看用户的各种id
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">group&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">groupadd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">getent&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">useradd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">ms&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bash&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">u&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">UID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">g&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">GID&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">G&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;${username}:123&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">echo&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="nl">root&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">123&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">chpasswd&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 安装各种以依赖软件，可以根据需要定制，也可以后续手动安装。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># QEMU编译需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> &lt;span class="n">meson&lt;/span> &lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">pkg&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">config&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">diffutils&lt;/span> &lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">venv&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libusb&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">1.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libncursesw5&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libpixman&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libepoxy&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libv4l&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpng&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libsdl2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">image&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgtk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgdk&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pixbuf2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libasound2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libpulse&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libx11&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libfdt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libiscsi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># riscv-gnu-toolchain 需要的依赖
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">autoconf&lt;/span> &lt;span class="n">automake&lt;/span> &lt;span class="n">autotools&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">curl&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">python3&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pip&lt;/span> &lt;span class="n">libmpc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libmpfr&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libgmp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">gawk&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bison&lt;/span> &lt;span class="n">flex&lt;/span> &lt;span class="n">texinfo&lt;/span> &lt;span class="n">gperf&lt;/span> &lt;span class="n">libtool&lt;/span> &lt;span class="n">patchutils&lt;/span> &lt;span class="n">bc&lt;/span> &lt;span class="n">zlib1g&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libexpat&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">build&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">libglib2&lt;/span>&lt;span class="mf">.0&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libslirp&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">RUN&lt;/span> &lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="n">git&lt;/span> &lt;span class="n">gdb&lt;/span> &lt;span class="n">clang&lt;/span> &lt;span class="n">cmake&lt;/span> &lt;span class="n">vim&lt;/span> &lt;span class="n">gdb&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 还原 DEBIAN_FRONTEND 环境变量（可选）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">ENV&lt;/span> &lt;span class="n">DEBIAN_FRONTEND&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dialog&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的工作目录
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">WORKDIR&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 指定容器启动后的登录用户
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">USER&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="创建镜像">创建镜像
+&lt;/h3>&lt;p>　　基础构建&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 &lt;code>-t&lt;/code>​ 后跟镜像名称，可任意更改。&lt;code>docker build -t tc-qemu .&lt;/code>​ 这条命令会从当前目录（&lt;code>.&lt;/code>​）中寻找 &lt;code>Dockerfile&lt;/code>​，然后根据其中的指令构建一个名为 &lt;code>tc-qemu&lt;/code>​ 的 Docker 镜像。&lt;/p>
+&lt;p>　　若在创建镜像时希望动态修改 &lt;code>Dockerfile&lt;/code>​ 中的ARG参数，则在构建时，添加参数 &lt;code>--build-arg ARG_name=value&lt;/code>​ ，将 &lt;code>ARG_name&lt;/code>​ 修改为 &lt;code>value&lt;/code>​。&lt;/p>
+&lt;p>　　由于每个用户 id 和组 id 不一样，需要在终端中运行命令&lt;code>id&lt;/code>​查询到当前用户的group和user id，并在构建时修改参数：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">GID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">arg&lt;/span> &lt;span class="n">UID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1004&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">t&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span> &lt;span class="p">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　修改用户 id 和组 id 和当前的账户一致，是为了确保在写入共享文件夹的时候有相同的权限，否则可能造成在容器中无法正常写入的情况。&lt;/p>
+&lt;h3 id="创建容器">创建容器
+&lt;/h3>&lt;p>　　下面的命令创建一个名为 tc_qemu_dev 的容器，并将主机的文件夹 &lt;code>/home/tiancheng.tang/Desktop/work/&lt;/code>​ 共享到容器中的 &lt;code>/home/developer/work&lt;/code>​ 文件夹。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">docker&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">it&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">name&lt;/span> &lt;span class="n">tc_qemu_dev&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">mount&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">bind&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">source&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">tiancheng&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">tang&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Desktop&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">=/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">developer&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">work&lt;/span> &lt;span class="n">tc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　注：如果需要使用代理网络，可以通过ssh隧道将流量代理到本机（例如：&lt;a class="link" href="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/#%E5%8F%8D%E5%90%91-ssh-%E9%9A%A7%E9%81%93" target="_blank" rel="noopener"
+>个人Linux主机通过SSH隧道使服务器访问外网&lt;/a>），在创建容器时添加参数&lt;code>--network host&lt;/code>​，让docker位于host网络中。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　在设置代理时，可以手动设置 &lt;code>export http_proxy=&amp;quot;localhost:7897&amp;quot; export https_proxy=&amp;quot;localhost:7897&amp;quot;&lt;/code>​，也可以在启动容器时，添加参数直接设置代理环境 &lt;code>-e HTTP_PROXY=http://localhost:7897&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">docker run -it --network host -e &lt;span class="nv">HTTP_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 -e &lt;span class="nv">HTTPS_PROXY&lt;/span>&lt;span class="o">=&lt;/span>http://localhost:7897 --name tc_qemu_dev --mount &lt;span class="nv">type&lt;/span>&lt;span class="o">=&lt;/span>bind,source&lt;span class="o">=&lt;/span>/home/tiancheng.tang/Desktop/work/,target&lt;span class="o">=&lt;/span>/home/developer/work tc-qemu
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　上述命令的含义自行询问GPT或者查询网络。&lt;/p>
+&lt;h2 id="qemu-源码">QEMU 源码
+&lt;/h2>&lt;p>　　QEMU 是一个大型开源软件，会不断的发布稳定版本，并在 master 主分支上不断更新新的功能。为了便于对旧版本进行维护、修复和发布更新，QEMU 为每一个稳定版本都创建了 stable 分支，并会不断的维护。&lt;/p>
+&lt;p>　　本文以 qemu 9.0 分支版本作为基础，进行开发。&lt;/p>
+&lt;p>　　官方源码仓库：&lt;a class="link" href="https://github.com/qemu/qemu.git" target="_blank" rel="noopener"
+>github.com/qemu/qemu.git&lt;/a>&lt;/p>
+&lt;h3 id="官方仓库-fork-到私人仓库">官方仓库 fork 到私人仓库
+&lt;/h3>&lt;p>　　以 gitee 为例&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031151316-pxi596o.png"
+width="930"
+height="877"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="106"
+data-flex-basis="254px"
+>​&lt;/p>
+&lt;p>　　将私人仓库 clone 到本地：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="nl">https&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="c1">//gitee.com/code-tang/qemu-sayram2.0.git
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="私人仓库建立工作分支">私人仓库建立工作分支
+&lt;/h3>&lt;p>　　在稳定分支 9.0 基础上，在本地新建新分支 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​，并将本地新建的两个分支 push 远程仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">fetch&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">stable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mf">9.0&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">checkout&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">b&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">push&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">set&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">upstream&lt;/span> &lt;span class="n">origin&lt;/span> &lt;span class="n">sayram2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　然后查看本地分支情况：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ git branch -v
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> master 58d49b5895 Merge tag &lt;span class="s1">&amp;#39;net-pull-request&amp;#39;&lt;/span> of https://github.com/jasowang/qemu into staging
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sayram2 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* sayram2-dev 6a54d5cf55 Update version &lt;span class="k">for&lt;/span> 9.0.3 release
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中，&lt;code>sayram2-dev&lt;/code>​ 作为开发分支，开发稳定后，merge 到稳定分支 &lt;code>sayram2&lt;/code>​ 中。若后续官方的 &lt;code>stable-9.0&lt;/code>​ 分支出现重大更新，可将其 pull 到本地，和 &lt;code>sayram2&lt;/code>​、&lt;code>sayram2-dev&lt;/code>​两个分支进行 &lt;code>merge&lt;/code>​。&lt;/p>
+&lt;p>　　注意：需要更新官方仓库时，不要在仓库点击强制同步，这样会覆盖仓库代码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241031160032-rtr0qeg.png"
+width="720"
+height="64"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1125"
+data-flex-basis="2700px"
+>​&lt;/p>
+&lt;p>　　若要更新官方仓库，需在本地添加官方 github 仓库源，并 pull 代码到对应的分支，完成 merge 工作后，再推送到私有仓库。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git remote add official https://github.com/qemu/qemu.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git checkout sayram2-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0 --rebase
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　执行该命令后，本地分支将基于 &lt;code>official&lt;/code>​ 的 &lt;code>stable-9.0&lt;/code>​ 分支的最新提交进行变基，相当于先将远程的更改应用在当前分支上，再重新应用本地的更改，从而避免出现合并提交。出现冲突需要手动解决。&lt;/p>
+&lt;p>　　如果后续 &lt;code>stable-9.0&lt;/code> 出现更新，并希望将更新应用到 &lt;code>sayram2&lt;/code> 分支，则可以直接 pull &lt;code>stable-9.0&lt;/code>。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git checkout sayram2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git pull official stable-9.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="常规编译流程">常规编译流程
+&lt;/h2>&lt;p>　　参考官方文档：&lt;a class="link" href="https://www.qemu.org/docs/master/devel/build-system.html" target="_blank" rel="noopener"
+>www.qemu.org/docs/master/devel/build-system.html&lt;/a>&lt;/p>
+&lt;p>　　一般的开发仅关注于源码，不会对编译脚本做过多改动。&lt;br>
+从源码编译 qemu 总共两步：1. configure 2. build&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>configure&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">qemu&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">riscv32&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">softmmu&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">enable&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">debug&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>关于 &lt;code>configure&lt;/code>​ 的更多选项可以参考 &lt;code>./configure --help&lt;/code>​ 的输出。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">developer&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">ubuntu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">AS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4124&lt;/span>&lt;span class="n">GS&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nl">TNR&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">~/&lt;/span>&lt;span class="n">work&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">qemu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">official&lt;/span>&lt;span class="err">$&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">configure&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Using&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">build&lt;/span>&lt;span class="err">&amp;#39;&lt;/span> &lt;span class="n">as&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">directory&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">output&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Usage&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">configure&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">options&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">Options&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">defaults&lt;/span> &lt;span class="n">in&lt;/span> &lt;span class="n">brackets&lt;/span> &lt;span class="n">after&lt;/span> &lt;span class="n">descriptions&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Standard&lt;/span> &lt;span class="nl">options&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">help&lt;/span> &lt;span class="n">print&lt;/span> &lt;span class="n">this&lt;/span> &lt;span class="n">message&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">--&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">LIST&lt;/span> &lt;span class="n">set&lt;/span> &lt;span class="n">target&lt;/span> &lt;span class="nf">list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">default&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">build&lt;/span> &lt;span class="n">all&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Available&lt;/span> &lt;span class="nl">targets&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">aarch64&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">aarch64_be&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span> &lt;span class="n">alpha&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">linux&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">user&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>build&lt;/p>
+&lt;p>可以使用 make 和 ninja 进行编译，两者都行。区别是 ninja 自动开启多线程加速编译，而 make 需要手动加上参数 &lt;code>-j&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ninja&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">or&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cd&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">make&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">j&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>个人喜欢用 ninja，输出的编译信息不会占满整个屏幕。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="vscode远程开发项目">vscode远程开发项目
+&lt;/h2>&lt;p>　　vscode 实际上就是一个编辑器，但是可以通过各种插件将其变为一个IDE。例如远程开发功能，vscode 需要安装扩展：&lt;code>Remote - SSH&lt;/code>​、 &lt;code>Dev Containers&lt;/code>​。vscode 可以运行在任意电脑上，通过远程网络连接到同一个工作服务器上开发。&lt;/p>
+&lt;h3 id="ssh连接服务器">SSH连接服务器
+&lt;/h3>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211448-d4j9gd9.png"
+width="593"
+height="437"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="135"
+data-flex-basis="325px"
+>​&lt;/p>
+&lt;p>　　新建远程后，会在顶部弹出界面，提示输入 ssh 连接命令。如图所示输入账号和ip地址&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211607-8yard8u.png"
+width="983"
+height="238"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="413"
+data-flex-basis="991px"
+>​&lt;/p>
+&lt;p>　　顶部会弹出选项框，要求选择一个配置文件，保存当前连接的服务器信息。选择第一个即可。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211646-6hsiz16.png"
+width="854"
+height="190"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="449"
+data-flex-basis="1078px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030221157-pqslqt2.png"
+width="417"
+height="332"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="301px"
+>​&lt;/p>
+&lt;p>　　这里的配置文件可以后续再进行修改，其中 &lt;code>Host&lt;/code>​ 表示 ssh 服务器名称，可以任意更改，&lt;code>Hostname&lt;/code>​ 保存服务器 ip地址， &lt;code>User&lt;/code>​ 保存用户名。&lt;/p>
+&lt;p>　　然后远程资源管理器会更新输入的服务器信息。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211726-aibbt0d.png"
+width="602"
+height="524"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="114"
+data-flex-basis="275px"
+>​&lt;/p>
+&lt;p>　　点击连接按钮后，顶部弹出输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030211938-9ymbm7u.png"
+width="695"
+height="177"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="392"
+data-flex-basis="942px"
+>​&lt;/p>
+&lt;p>　　首次连接，或者更新 vscode 后，服务器会下载 vscode 服务器，需要一定时间。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212255-07r1nod.png"
+width="1030"
+height="797"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="129"
+data-flex-basis="310px"
+>​&lt;/p>
+&lt;h3 id="vscode连接容器">vscode连接容器
+&lt;/h3>&lt;p>　　当安装完 &lt;code>Dev Containers&lt;/code>​ 扩展后，远程资源管理器会多一个开发容器的选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212814-liiy75b.png"
+width="420"
+height="444"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="94"
+data-flex-basis="227px"
+>​&lt;/p>
+&lt;p>　　已经连接的容器会显示在 &lt;code>开发容器&lt;/code>​ 这一栏，没有连接过的容器显示在 &lt;code>其他容器&lt;/code>​ 这一栏。和 SSH 同理，点击容器连接即可，不需要输入密码。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/qemu%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/assets/image-20241030212916-fz5eol8.png"
+width="665"
+height="890"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="74"
+data-flex-basis="179px"
+>​&lt;/p>
+&lt;p>　　连接后，所有的开发环境都存在于 docker 容器，在本文创建镜像时，共享了主机的 &lt;code>work&lt;/code>​ 目录，因此，将代码存放于该目录。&lt;/p>
+&lt;h3 id="vscode-中调试">vscode 中调试
+&lt;/h3>&lt;p>　　vscode 只是编辑器，还需要配置 &lt;code>task.json&lt;/code>​ 调试文件，和 &lt;code>launch.json&lt;/code>​ 文件来决定调试需要运行的文件，调试工具的位置等。&lt;/p>
+&lt;p>　　qemu 在 Linux 上的调试文件如下：&lt;/p>
+&lt;p>　　​&lt;code>.vscode/launch.json&lt;/code>​：调试文件，F5快捷键进入调试模式&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Use IntelliSense to learn about possible attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// Hover to view descriptions of existing attributes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;0.2.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;configurations&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>&lt;span class="c1">//&amp;#34;-init_data&amp;#34;,&amp;#34;${workspaceFolder}/Hmatrix0.dat &amp;#34;ultichip-u1,pipeline=true&amp;#34;,&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//配置编译./configure --enable-debug --disable-werror --target-list=riscv32-softmmu
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;(gdb) Launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cppdbg&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;request&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;launch&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;program&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}/build/qemu-system-riscv32&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// QEMU 启动时的参数，需要根据需要，自行调整。
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;args&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;-machine&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ub&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-cpu&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;ultichip-u1,pipeline=true&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-bios&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&amp;#39;&amp;#39;&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-m&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;128M&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-d&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;in_asm&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-display&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;none&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-ulog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/runtime.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;-rlog&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;./test_sayram/outlog/reg.log&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-savedmem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;./test_sayram/outlog/dmemory.dat&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-nographic&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="s">&amp;#34;-kernel&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;./test_sayram/input/dl/vp0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-device&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;loader,file=./test_sayram/input/dl/qemu_indmem.bin,addr=0x17b40&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;-lbr&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;32&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;stopAtEntry&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;cwd&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;${workspaceFolder}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;environment&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;PATH&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;%PATH%;&lt;/span>&lt;span class="se">\b&lt;/span>&lt;span class="s">in&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//&amp;#34;console&amp;#34;: &amp;#34;externalTerminal&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;MIMode&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;miDebuggerArgs&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-q -ex quit; wait() { fg &amp;gt;/dev/null; }; /bin/gdb -q --interpreter=mi&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// &amp;#34;miDebuggerPath&amp;#34;: &amp;#34;F:/msys/mingw64/bin/gdb.exe&amp;#34;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;setupCommands&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;description&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;Enable pretty-printing for gdb&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;text&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;-enable-pretty-printing&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;ignoreFailures&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;preLaunchTask&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　​&lt;code>.vscode/task.json&lt;/code>​：编译任务，决定如何编译项目&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// See https://go.microsoft.com/fwlink/?LinkId=733558
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// for the documentation about the tasks.json format
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;version&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;2.0.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;tasks&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;label&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;shell&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 手动运行一次：./configure --enable-debug --target-list=riscv32-softmmu --disable-werror
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="s">&amp;#34;command&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;cd build; ninja; cd ..&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;problemMatcher&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">[],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;group&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;kind&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;build&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s">&amp;#34;isDefault&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p></description></item><item><title>SSH 免登陆</title><link>https://codetang-2417.github.io/p/ssh-%E5%85%8D%E7%99%BB%E9%99%86/</link><pubDate>Fri, 25 Oct 2024 10:44:56 +0800</pubDate><guid>https://codetang-2417.github.io/p/ssh-%E5%85%8D%E7%99%BB%E9%99%86/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://blog.csdn.net/jeikerxiao/article/details/84105529" target="_blank" rel="noopener"
+>SSH 三步解决免密登录&lt;/a>&lt;/p>
+&lt;h2 id="本地生成ssh密钥">本地生成SSH密钥
+&lt;/h2>&lt;p>　　本地客户端生成公私钥：（一路回车默认即可）&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh-keygen
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　上述命令会在用户目录&lt;code>.ssh&lt;/code>​文件夹下创建公私钥&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ ls ~/.ssh  ✔  44s 
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">config id_rsa id_rsa.pub known_hosts
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　id_rsa （私钥）id_rsa.pub (公钥)&lt;/p>
+&lt;h2 id="上传公钥到服务器">上传公钥到服务器
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ssh-copy-id -i ~/.ssh/id_rsa.pub uasername@server_ip
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　将本地公钥上传到服务器的&lt;code>~/.ssh/authorized_keys&lt;/code>​中。&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>个人Linux主机通过SSH隧道使服务器访问外网</title><link>https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/</link><pubDate>Sun, 20 Oct 2024 18:50:54 +0800</pubDate><guid>https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/</guid><description>&lt;p>　　在学校的服务器使用过程中，需要服务器访问外网，但在服务器上可能没有权限创建代理网络，或者不方便使用。而且直接使用服务器访问外网也可能有风险，因此，本文通过ssh隧道，将服务器的网络代理到我们的终端主机，也就是我们自己的电脑上，再在自己的电脑上安装代理软件，实现服务器通过ssh隧道访问外网的功能。&lt;/p>
+&lt;h2 id="本机代理配置">本机代理配置
+&lt;/h2>&lt;p>　　本文中 “&lt;strong>本机”&lt;/strong> 一词代表个人电脑，&lt;strong>服务器&lt;/strong> 代表远程连接的服务器电脑。&lt;/p>
+&lt;p>　　本机系统如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ neofetch  ✔
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ ling@ling-20ym
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ --------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ OS: Manjaro Linux x86_64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">██████████████████ ████████ Host: 20YM Lenovo ThinkBook 16p Gen &lt;span class="m">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ Kernel: 6.1.112-1-MANJARO
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Uptime: &lt;span class="m">9&lt;/span> hours, &lt;span class="m">57&lt;/span> mins
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Packages: &lt;span class="m">1772&lt;/span> &lt;span class="o">(&lt;/span>pacman&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Shell: bash 5.2.37
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Resolution: 2560x1600, 2560x1440
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ DE: Plasma 6.1.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ WM: KWin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Theme: &lt;span class="o">[&lt;/span>Plasma&lt;span class="o">]&lt;/span>, Breeze &lt;span class="o">[&lt;/span>GTK2/3&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Icons: &lt;span class="o">[&lt;/span>Plasma&lt;span class="o">]&lt;/span>, McMojave-circle-dark &lt;span class="o">[&lt;/span>GTK2/3&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">████████ ████████ ████████ Terminal: konsole
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> CPU: AMD Ryzen &lt;span class="m">7&lt;/span> 5800H with Radeon Graphics &lt;span class="o">(&lt;/span>16&lt;span class="o">)&lt;/span> @ 3.200GHz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> GPU: AMD ATI Radeon Vega Series / Radeon Vega Mobile Series
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> GPU: NVIDIA GeForce RTX &lt;span class="m">3060&lt;/span> Mobile / Max-Q
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Memory: 18054MiB / 23392MiB
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　采用clash verge作为代理软件，该软件能够开放本地端口作为代理访问路径，为ssh隧道提供了出口端口。&lt;/p>
+&lt;p>　　本人使用tun模式，尽可能的避免DNS泄漏。如果使用代理模式也可以。但 Linux上只有少数程序会走系统代理模式，除了在需要在clash verge中开启代理模式，还需要在对应的软件中手动设置代理。因此还是tun模式更适合linux上使用。参考：&lt;a class="link" href="https://github.com/clash-verge-rev/clash-verge-rev/issues/346" target="_blank" rel="noopener"
+>Ubuntu下系统代理只能作用于Firefox？&lt;/a>&lt;/p>
+&lt;p>　　注：开启代理模式后，即便本机其他程序不走clash，我们通过ssh建立隧道依然可行。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020185708-5yl00rv.png"
+width="740"
+height="836"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="88"
+data-flex-basis="212px"
+>​&lt;/p>
+&lt;p>　　这里开启tun模式后，并保证本机能够正常访问外网后，就可以开始ssh隧道搭建。需要注意，clash verge默认开放的代理端口为7897，可以自行修改。&lt;/p>
+&lt;h2 id="ssh隧道">SSH隧道
+&lt;/h2>&lt;p>　　参考：&lt;a class="link" href="https://www.entropy-tree.top/2024/04/18/ssh-tunneling-techniques/" target="_blank" rel="noopener"
+>SSH 隧道技术&lt;/a>、&lt;a class="link" href="https://cloud.tencent.com/developer/article/1901554" target="_blank" rel="noopener"
+>SSH隧道详解与使用AutoSSH实现稳定的内网穿透&lt;/a>、&lt;a class="link" href="https://www.lixueduan.com/posts/linux/07-ssh-tunnel/#%E6%89%A9%E5%B1%95-%E8%B7%A8%E6%9C%BA%E5%99%A8%E8%BD%AC%E5%8F%91" target="_blank" rel="noopener"
+>SSH 隧道简明教程&lt;/a>&lt;/p>
+&lt;p>　　SSH隧道提供三种模式：正向 SSH 隧道（本地转发）、反向 SSH 隧道（远程转发）、动态转发 SSH 隧道（Socket服务器）。&lt;/p>
+&lt;p>　　由于一台电脑上可能有多个网卡（意味着有多个 IP），因此在使用 SSH 隧道时，需要指定：1. 从哪一个 IP建立SSH连接。也就是SSH的登陆地址。2. SSH隧道应该连接到哪一个 IP上。也就是&lt;strong>隧道地址&lt;/strong>。&lt;/p>
+&lt;p>　　在下面的介绍中，destination 表示服务器的地址，也就是登陆服务器的标识符：&lt;strong>Username@Host_IP&lt;/strong>，host:hostport 表示服务器上的隧道地址。host可以和Host_IP不同，但都是服务器上的IP地址。&lt;/p>
+&lt;h3 id="正向-ssh-隧道">正向 SSH 隧道
+&lt;/h3>&lt;p>　　将本主机上的某网络端口上的所有流量，通过 SSH 隧道转发到远程服务器上的网络端口。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -L &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port:host:hostport destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　其中 bind_address 可选（默认为 localhost），是本机上的一个网络ip。该命令会本地开启一个绑定在 [bind_address:]port 上的套接字，并监听。将该套接字上所有的流量都转发到 destination 服务器上的 host:hostport。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -L 9090:localhost:8080 root@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　例如，这个例子就是将本机 localhost:9090 上的流量转发到 10.0.0.2 服务器上的 localhost:8080。&lt;/p>
+&lt;h3 id="反向-ssh-隧道">反向 SSH 隧道
+&lt;/h3>&lt;p>　　将远程服务器上的网络端口上的所有流量，通过 SSH 隧道转发到本主机上的某网络端口。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port:host:hostport destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　和正向隧道的命令行格式相同，不同点在于此命令是在服务器上开启一个绑定在 host:hostport 上的套接字，并监听。将该套接字上所有的流量都转发到 &lt;strong>本机&lt;/strong> 上的 [bind_address:]port。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R 9090:localhost:8080 root@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　例如，这个例子就是将10.0.0.2 服务器上的 localhost:8080 上的流量转发到本机 localhost:9090。&lt;/p>
+&lt;h3 id="动态转发-ssh-隧道">动态转发 SSH 隧道
+&lt;/h3>&lt;p>　　动态转发 SSH 隧道实际上是将远程服务器作为一个 Socket 服务器，专门转发本地端口上的所有流量到&lt;strong>服务器所处的网络中&lt;/strong>。动态转发不像正向隧道与反向隧道一样转发端口与目标端口是一对一的，&lt;strong>动态转发中的转发端口对应的目标是目标主机所在的整个网络&lt;/strong>。不过使用动态转发访问目标主机所在网络时需要应用程序本身支持代理配置或者使用socket代理工具。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -D &lt;span class="o">[&lt;/span>bind_address:&lt;span class="o">]&lt;/span>port destination
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　-D [bind_address:]port 指定监听的端口，会在本地监听该端口，并将请求到该端口流量基于 SOCKS5 协议转发到远程主机上，其中 [bind_address:]可以不填，当不写或者为 * 时表示监听全部地址。示例:-D *:8081,-D 8081,-D 127.0.0.1:8081,-D 192.168.0.1:8081。&lt;/p>
+&lt;p>　　可以参考：&lt;a class="link" href="https://www.lixueduan.com/posts/linux/07-ssh-tunnel/#%E6%89%A9%E5%B1%95-%E8%B7%A8%E6%9C%BA%E5%99%A8%E8%BD%AC%E5%8F%91" target="_blank" rel="noopener"
+>SSH 隧道简明教程&lt;/a> 中&lt;code>扩展-跨机器转发&lt;/code>​章节，介绍的很清楚。&lt;/p>
+&lt;p>　　下面是从中截出的两张图片，主要应用是在A与B之间创建隧道，最终通过隧道访问到ServerC中的 http 服务。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020215213-kvxoreu.png"
+width="1244"
+height="598"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="208"
+data-flex-basis="499px"
+>​&lt;/p>
+&lt;p>　　最常用的就是绕过防火墙，在外网上通过一台可以访问内网的 Server A，访问内容。基于Socket协议的翻墙软件就是这个原理，用一台没被墙的、在国内可以通过SSH访问到的VPS，作为Socket服务器，也就是图中的 Server B。VPS在国外，可以访问国外网络资源，国内就将所有的外网网络请求发往 Server A的SSH 绑定端口，Server A会将其转发给国外网络，例如入中的 Server C。由于 Server A 到 Server B之间是SSH加密传输的，防火墙看不到其中具体访问的网络内容，就不会判断为翻墙。但由于这种方式应用太广泛，现在检测流量特征的手段很强，可以快速判断出并封掉。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/%E4%B8%AA%E4%BA%BAlinux%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87ssh%E9%9A%A7%E9%81%93%E4%BD%BF%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BF%E9%97%AE%E5%A4%96%E7%BD%91/assets/image-20241020215222-0qvsdqk.png"
+width="946"
+height="676"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="335px"
+>​&lt;/p>
+&lt;h3 id="常用参数">常用参数
+&lt;/h3>&lt;ul>
+&lt;li>​&lt;code>-L&lt;/code>​：local，表示使用本地端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-R&lt;/code>​：remote，表示使用远程端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-D&lt;/code>​：dynamic，表示使用动态端口转发创建 ssh 隧道&lt;/li>
+&lt;li>​&lt;code>-N&lt;/code>​： 表示创建隧道以后不连接到 sshServer端，通常与”-f”选项连用&lt;/li>
+&lt;li>​&lt;code>-f&lt;/code>​：表示在后台运行ssh隧道，通常与”-N”选项连用&lt;/li>
+&lt;li>​&lt;code>-q&lt;/code>​ 参数用于启用 &lt;strong>静默模式&lt;/strong>（quiet mode）&lt;/li>
+&lt;li>​&lt;code>-g&lt;/code>​：表示 ssh 隧道对应的转发端口将监听在主机的所有IP中，不使用”-g选项”时，转发端口默认只监听在主机的本地回环地址中，”-g” 表示开启网关模式，远程端口转发中，无法开启网关功能&lt;/li>
+&lt;li>​&lt;code>-C&lt;/code>​：启用压缩，可以提高传输速度。&lt;/li>
+&lt;li>​&lt;code>-p port&lt;/code>​：指定 SSH 服务器监听的端口 (如果不是默认的22端口)。&lt;/li>
+&lt;li>​&lt;code>-i 私钥文件&lt;/code>​：使用指定的私钥文件进行身份验证。&lt;/li>
+&lt;li>​&lt;code>-T&lt;/code>​ ：用于禁用伪终端分配，使用 &lt;code>-N&lt;/code>​ 时，因为本身就没有需要交互的命令，SSH 默认不会分配伪终端，便不需要 &lt;code>-T&lt;/code>​&lt;/li>
+&lt;/ul>
+&lt;h2 id="应用">应用
+&lt;/h2>&lt;p>　　为了达到我们的目的：将服务器上的网络代理到本机上，我们有两种方案：&lt;/p>
+&lt;ol>
+&lt;li>建立反向隧道，将服务器端口上的流量转发到本机，服务器上所有的流量都走代理端口。优点是：比较简单，只需要ssh建立隧道即可，不需要安装其他软件，只要主机能访问外网，服务器就可以。缺点是：如果有其他服务器，需要在主机上为每一个服务器都单独创建SSH隧道。如果主机下线了，服务器就无法访问外网了。&lt;/li>
+&lt;li>建立 Socket服务器，让服务器的所有流量都走 Socket服务器。但这样的话和建立一个翻墙代理的区别就会很小了，不如直接就在服务器上安装代理软件。优点是：更安全，代理管理起来更方便。一般来说Socket服务器不会轻易下线，保证服务器一直有外网网络。缺点是：每一台服务器上都需要单独配置软件，且Socket服务器需要在外网。&lt;/li>
+&lt;/ol>
+&lt;p>　　对于普通的应用场景来说，在自己的电脑上，我们都会安装代理软件，在服务器管理员没有配置跳板机或者跳板机故障时，我们就可以采用第一种，快速 实现 or 恢复 服务器访问外部网络。&lt;/p>
+&lt;p>　　我们假设服务器的ip为10.0.0.2，服务器上有用户名为 server的用户。&lt;/p>
+&lt;h3 id="本机配置">本机配置
+&lt;/h3>&lt;p>　　本机上我们安装clash verge，正常启动后，就会clash verge就会监听 localhost:7897，并转发流量到代理服务器。本示例为方便起见，将主机和远程服务器的端口都设置为 7897，实际上远程服务器可以设置为其他没有被使用的端口，主机也可以在clash verge中将代理端口改为其他端口后，将SSH隧道的本地端口同步修改。&lt;/p>
+&lt;p>　　运行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh -R 7897:localhost:7897 -fqCN server@10.0.0.2
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　为远程服务器的 localhost:7897 和本机的 localhost:7897建立ssh隧道。转发方向为：远程服务器 SSH隧道 -&amp;gt; 本机 localhost:7897 -&amp;gt; clash verge。&lt;/p>
+&lt;p>　　​&lt;code>-fqCN&lt;/code>​：后台运行、静默模式、启动压缩模式，加快速度、只转发端口，不连接终端。&lt;/p>
+&lt;h3 id="远程服务器配置">远程服务器配置
+&lt;/h3>&lt;p>　　远程服务器上需要在终端中添加代理变量，也可以写到终端变量文件（~/.bashrc 或者 ~/.profile ）中，每次登陆自动生效。使得所有的流量走代理端口，也就是本地回环地址的7897端口。转发方向：服务器其他网络 -&amp;gt; 服务器 localhost的7897端口 -&amp;gt; 服务器SSH隧道&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;localhost:7897&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;localhost:7897&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="设置好后不能正常联网">设置好后不能正常联网
+&lt;/h2>&lt;p>　　在实践过程中，我遇到了按照上述配置后，主机网络正常访问外网，服务器和主机之间SSH隧道通信正常，但服务器无法访问外网。如下：&lt;/p>
+&lt;p>　　服务器：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl: &lt;span class="o">(&lt;/span>35&lt;span class="o">)&lt;/span> error:0A000126:SSL routines::unexpected eof &lt;span class="k">while&lt;/span> reading
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　添加参数 &lt;code>-v&lt;/code>​ 打印详细日志输出，可以看到使用了本地的DNS解析地址。但国内的DNS在没被代理的时候，会被CFW污染，因此这个地址实际上不是谷歌的服务器IP，但由于已经缓存下来了，所以在访问的时候会通过该IP来访问。于是，传递给代理的ip也是这个错误ip，就会导致访问出错。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -v -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Trying 127.0.0.1:7897...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 connect to IPv4 199.59.148.229:443 &lt;span class="o">(&lt;/span>locally resolved&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　解决办法：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>等几分钟中&amp;hellip;等DNS缓存过期。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>安装 proxychain，并在其中配置&lt;code>proxy_dns&lt;/code>​，使得DNS也通过代理查询。&lt;/p>
+&lt;p>配置 proxychain&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ vim /etc/proxychains.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Proxy DNS requests - no leak for DNS data&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">proxy_dns
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>ProxyList&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># add proxy here ...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># meanwile&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># defaults set to &amp;#34;tor&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">https 127.0.0.1 &lt;span class="m">7897&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">socks5 127.0.0.1 &lt;span class="m">7897&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过 proxychain 访问&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ proxychains curl -I https://www.youtube.com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>在使用 systemd 管理服务的 Linux 上。可以通过重启系统解析服务来情况 DNS 缓存 &lt;code>sudo systemctl restart systemd-resolved&lt;/code>​。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>　　正常情况下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ curl -v -x socks5://localhost:7897 https://www.google.com
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Trying 127.0.0.1:7897...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 connect to IPv4 31.13.94.41:443 &lt;span class="o">(&lt;/span>locally resolved&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* SOCKS5 request granted.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* Connected to &lt;span class="o">(&lt;/span>nil&lt;span class="o">)&lt;/span> &lt;span class="o">(&lt;/span>127.0.0.1&lt;span class="o">)&lt;/span> port &lt;span class="m">7897&lt;/span> &lt;span class="o">(&lt;/span>&lt;span class="c1">#0) &lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* ALPN, offering h2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* ALPN, offering http/1.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* CAfile: /etc/ssl/certs/ca-certificates.crt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* CApath: /etc/ssl/certs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.0 &lt;span class="o">(&lt;/span>OUT&lt;span class="o">)&lt;/span>, TLS header, Certificate Status &lt;span class="o">(&lt;/span>22&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.3 &lt;span class="o">(&lt;/span>OUT&lt;span class="o">)&lt;/span>, TLS handshake, Client hello &lt;span class="o">(&lt;/span>1&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.2 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS header, Certificate Status &lt;span class="o">(&lt;/span>22&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.3 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS handshake, Server hello &lt;span class="o">(&lt;/span>2&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">* TLSv1.2 &lt;span class="o">(&lt;/span>IN&lt;span class="o">)&lt;/span>, TLS header, Finished &lt;span class="o">(&lt;/span>20&lt;span class="o">)&lt;/span>:
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="重新建立ssh-隧道后服务器无法访问外网">重新建立SSH 隧道后服务器无法访问外网
+&lt;/h2>&lt;p>　　可能会出现 SSH 隧道已经被清空，但服务器端还没有退出对应的线程的情况，这时需要我们手动找出对应的线程，并kill掉。再重新建立 SSH 隧道。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">$ sudo lsof -i :7897
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sshd &lt;span class="m">2129065&lt;/span> tiancheng.tang 7u IPv6 &lt;span class="m">48338339&lt;/span> 0t0 TCP ip6-localhost:7897 &lt;span class="o">(&lt;/span>LISTEN&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sshd &lt;span class="m">2129065&lt;/span> tiancheng.tang 9u IPv4 &lt;span class="m">48338340&lt;/span> 0t0 TCP localhost:7897 &lt;span class="o">(&lt;/span>LISTEN&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">$ &lt;span class="nb">kill&lt;/span> &lt;span class="m">2129065&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　如果需要长时间稳定使用SSH 隧道，可以使用autossh。&lt;/p></description></item><item><title>Linux Perf工具</title><link>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</link><pubDate>Sat, 19 Oct 2024 10:27:24 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/</guid><description>&lt;p>　　参考：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>，&lt;a class="link" href="https://perfwiki.github.io/main/" target="_blank" rel="noopener"
+>perfwiki&lt;/a>，&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　&lt;a class="link" href="https://perf.wiki.kernel.org/index.php/Main_Page" target="_blank" rel="noopener"
+>perf&lt;/a> 是由 Linux 官方提供的系统性能分析工具 。我们通常说的 perf 实际上包含两部分：&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>perf&lt;/strong> 命令，用户空间的应用程序，是内核子系统 &lt;strong>perf_events&lt;/strong> 的前端工具。&lt;/li>
+&lt;li>&lt;strong>perf_events&lt;/strong> ，Linux 内核中的一个子系统。&lt;/li>
+&lt;/ul>
+&lt;p>　　&lt;strong>perf_events&lt;/strong>是Linux 2.6.31版本引入的内核子系统，可以提供多种来源的事件的性能计数器，供用户空间软件 &lt;strong>perf&lt;/strong> 使用，完成性能分析（Performance profiling）。perf 和 perf_events 最初支持硬件计数器（performance monitoring counters，&lt;strong>PMC&lt;/strong>），后来扩展到下列的多种事件源的支持。&lt;/p>
+&lt;p>　　&lt;strong>perf_events&lt;/strong> 4类事件源：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;strong>Hardware Events&lt;/strong>:：由CPU 性能计数器（performance counters）以及其内部的 Performance Monitoring Unit (PMU)获取，用来统计 Hardware event，例如 cpu-cycles、instructions executed 、cache-misses、branch mispredicted、周期数（the number of cycles）、退役指令（instructions retired）， 缓存未命中（L1 cache misses L1 ）等。这些 event 因每种处理器类型和型号而异。&lt;/p>
+&lt;p>注：Last Branch Record（LBR）是Intel CPU中最先引入的一个功能，记录最近执行过的分支指令，可以用来分析分支指令的执行情况，在perf list中，branch相关的功能也被划分到PMU分类，认为LBR的相关数据是通过PMU来获取的。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Software Events&lt;/strong>: 基于内核计数器的低优先级events， 例如, context-switches，CPU migrations(处理器迁移次数)， minor faults(soft page faults)，major faults(hard page faults)。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Tracepoints&lt;/strong>:：由内核的 ftrace 实现的跟踪点事件，是散落在内核源代码中的一些 hook，用来调用probe函数。开启后，它们便可以在特定的代码被运行到时被触发，这一特性可以被各种 trace/debug 工具所使用。Perf 就是该特性的用户之一。假如您想知道在应用程序运行期间，内核内存管理模块的行为，便可以利用潜伏在 slab 分配器中的 tracepoint。当内核运行到这些 tracepoint 时，便会通知 perf。仅仅适用于2.6.3以及之后的 linux 内核。除了内核中的tracepoint，还有用户态中的，USDT（User-level statically-defined tracing）。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;strong>Dynamic Tracing&lt;/strong>： probe函数（探针or探测函数），kprobe（kernel probe）内核态探针，用来创建和管理内核代码中的探测点。Uprobes，user-probe，用户态探针，用来对用户态应用程序进行探测点的创建和管理，关于&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/kprobetrace.html" target="_blank" rel="noopener"
+>kprobe&lt;/a>和&lt;a class="link" href="https://www.kernel.org/doc/html/latest/trace/uprobetracer.html" target="_blank" rel="noopener"
+>uprobe&lt;/a>可参考对应的内核文档。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>　　下图显示了 perf 命令和 perf_events 的关系，以及 perf_events 支持的事件源。下面的分类和linux perf wiki上的perf_envent分类有些许不同，主要在与tracepoint的定义，下图包含了Static Tracing以及Dynamic Tracing。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019173251-5nhjlei.png"
+width="2616"
+height="1362"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="192"
+data-flex-basis="460px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://mazhen.tech/p/%E6%B7%B1%E5%85%A5%E6%8E%A2%E7%B4%A2-perf-cpu-profiling-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" target="_blank" rel="noopener"
+>深入探索 perf CPU Profiling 实现原理&lt;/a>&lt;/p>
+&lt;p>　　我们可以通过命令&lt;code>perf list&lt;/code>​来查看perf支持的事件类型，但&lt;code>perf list&lt;/code>​不能完全显示所有支持的事件类型，需要&lt;code>sudo perf list&lt;/code>​。&lt;/p>
+&lt;p>　　同时还可以显示特定模块支持的perf事件：hw/cache/pmu都是硬件相关的；tracepoint基于内核的ftrace；sw（software）实际上是内核计数器。&lt;/p>
+&lt;p>　　下边列出一些&lt;code>sudo perf list&lt;/code>​的输出例子：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">branches&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">context&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">switches&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cs&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">cpu&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">clock&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Software&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">misses&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">L1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dcache&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">loads&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Hardware&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span> &lt;span class="n">OR&lt;/span> &lt;span class="n">cpu&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">branch&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">instructions&lt;/span>&lt;span class="o">/&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Kernel&lt;/span> &lt;span class="n">PMU&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nl">block&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">block_bio_backmerge&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Tracepoint&lt;/span> &lt;span class="n">event&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　下图是很有名的brendan gregg的博客中的分类，他写了很多关于性能分析的书籍和博客。&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019114014-vosgddz.png"
+width="1500"
+height="1050"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="342px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix.html" target="_blank" rel="noopener"
+>www.brendangregg.com/blog/2015-02-27/linux-profiling-at-netflix&amp;hellip;.&lt;/a>、&lt;a class="link" href="https://www.brendangregg.com/perf.html" target="_blank" rel="noopener"
+>www.brendangregg.com/perf.html&lt;/a>&lt;/p>
+&lt;h2 id="原理">原理
+&lt;/h2>&lt;p>　　CPU 和其他硬件设备通常提供用于观测性能数据的 PMC。简单来说，&lt;strong>PMC&lt;/strong> 就是 CPU 上的&lt;strong>可编程寄存器&lt;/strong>，可通过编程对特定硬件事件进行计数。通过 PMC 可以监控和计算 CPU 内部各种事件，比如 CPU 指令的执行效率、CPU caches 的命中率、分支预测的成功率等微结构级别的性能信息。利用这些数据分析性能，可以实现各种性能优化。&lt;/p>
+&lt;p>　　perf 命令通过 &lt;a class="link" href="https://www.man7.org/linux/man-pages/man2/perf_event_open.2.html" target="_blank" rel="noopener"
+>perf_event_open(2)&lt;/a> 系统调用访问 PMC，配置想要捕获的硬件事件。PMC 可以在两种模式下使用：&lt;/p>
+&lt;ul>
+&lt;li>Counting（计数模式），只报告Hardware Event、Software Events、PMU计数等。相关命令perf stat。开销几乎为零。&lt;/li>
+&lt;li>Sampling（采样模式），当发生一定数量的事件后，会触发一个中断，以便捕获系统的状态信息。perf将事件数据缓存到一块buffer中，然后异步写入到perf.data文件中。使用perf report等工具进行离线分析。可用于采集代码路径。&lt;/li>
+&lt;li>bpf：Kernel 4.4+新增功能，可以提供更多有效filter和输出总结。&lt;/li>
+&lt;/ul>
+&lt;p>　　下面详细介绍一下 Sampling 模式：&lt;/p>
+&lt;p>　　Perf 通过系统调用 sys_perf_event_open 陷入到内核中，内核根据 perf 提供的信息在&lt;a class="link" href="https://so.csdn.net/so/search?q=PMU&amp;amp;spm=1001.2101.3001.7020" target="_blank" rel="noopener"
+>PMU&lt;/a>（Performance Monitoring Unit）上初始化一个硬件性能计数器（PMC: Performance Monitoring Counter）。PMC随着指定硬件事件的发生而自动累加。如果不触发溢出中断，则就是counting模式，例如 perf stat模式。&lt;/p>
+&lt;p>　　在PMC 溢出时，PMU触发一个PMI（Performance Monitoring Interrupt）中断。内核在PMI 中断的处理函数中保存PMC的计数值，触发中断时的指令地址，当前时间戳以及当前进程的PID、TID、comm 等信息。我们把这些信息统称为一个采样（sample）。内核会将收集到的sample放入用于跟用户空间通信的Ring Buffer。用户空间里的perf分析程序采用mmap机制从ring buffer中读入采样，并对其解析。&lt;/p>
+&lt;p>　　下图从系统调用和数据结构的层面展示了用户空间如何获取PMU信息的流程。还有一张类似的图，是来自阿里的pdf中的，被其他博客转载，或者重绘后使用，其大体内容和下图是一致的。pdf地址：&lt;a class="link" href="https://greenteajug.cn/images/%E5%BC%82%E6%9E%84%E4%BD%93%E7%B3%BB%E4%B8%8B%E7%9A%84Java%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90.pdf" target="_blank" rel="noopener"
+>类似图&lt;/a>&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux-perf%E5%B7%A5%E5%85%B7/assets/image-20241019164150-xfko25z.png"
+width="2030"
+height="930"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="523px"
+>​&lt;/p>
+&lt;p>　　图片来源：&lt;a class="link" href="https://plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%88%A9%E7%94%A8%E7%8E%87/" target="_blank" rel="noopener"
+>plantegg.github.io/2021/05/16/Perf_IPC%E4%BB%A5%E5%8F%8ACPU%E5%8&amp;hellip;&lt;/a>&lt;/p>
+&lt;h2 id="使用">使用
+&lt;/h2>&lt;p>　　关于 perf 的详细使用，参考：&lt;a class="link" href="https://www.cnblogs.com/arnoldlu/p/6241297.html" title="发布于 2017-01-04 21:13"
+target="_blank" rel="noopener"
+>系统级性能分析工具perf的介绍与使用&lt;/a>&lt;/p>
+&lt;p>　　‍&lt;/p></description></item><item><title>ubuntu创建新用户并分配VNC远程桌面</title><link>https://codetang-2417.github.io/p/ubuntu%E5%88%9B%E5%BB%BA%E6%96%B0%E7%94%A8%E6%88%B7%E5%B9%B6%E5%88%86%E9%85%8Dvnc%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2/</link><pubDate>Sat, 08 Jun 2024 09:56:31 +0800</pubDate><guid>https://codetang-2417.github.io/p/ubuntu%E5%88%9B%E5%BB%BA%E6%96%B0%E7%94%A8%E6%88%B7%E5%B9%B6%E5%88%86%E9%85%8Dvnc%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2/</guid><description>&lt;p>　　使用命令&lt;code>useradd&lt;/code>​。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">$ useradd -h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Usage: useradd &lt;span class="o">[&lt;/span>options&lt;span class="o">]&lt;/span> LOGIN
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> useradd -D
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> useradd -D &lt;span class="o">[&lt;/span>options&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Options:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --badnames &lt;span class="k">do&lt;/span> not check &lt;span class="k">for&lt;/span> bad names
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -b, --base-dir BASE_DIR base directory &lt;span class="k">for&lt;/span> the home directory of the
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --btrfs-subvolume-home use BTRFS subvolume &lt;span class="k">for&lt;/span> home directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -c, --comment COMMENT GECOS field of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -d, --home-dir HOME_DIR home directory of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -D, --defaults print or change default useradd configuration
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -e, --expiredate EXPIRE_DATE expiration date of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -f, --inactive INACTIVE password inactivity period of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -g, --gid GROUP name or ID of the primary group of the new
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -G, --groups GROUPS list of supplementary groups of the new
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> account 新用户需要添加到的其他组的组名的列表
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -h, --help display this &lt;span class="nb">help&lt;/span> message and &lt;span class="nb">exit&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -k, --skel SKEL_DIR use this alternative skeleton directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -K, --key &lt;span class="nv">KEY&lt;/span>&lt;span class="o">=&lt;/span>VALUE override /etc/login.defs defaults
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -l, --no-log-init &lt;span class="k">do&lt;/span> not add the user to the lastlog and
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> faillog databases
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -m, --create-home create the user&lt;span class="s1">&amp;#39;s home directory
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> -M, --no-create-home do not create the user&amp;#39;&lt;/span>s home directory
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -N, --no-user-group &lt;span class="k">do&lt;/span> not create a group with the same name as
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> the user
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -o, --non-unique allow to create users with duplicate
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">(&lt;/span>non-unique&lt;span class="o">)&lt;/span> UID
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -p, --password PASSWORD encrypted password of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -r, --system create a system account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -R, --root CHROOT_DIR directory to chroot into
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -P, --prefix PREFIX_DIR prefix directory where are located the /etc/* files
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -s, --shell SHELL login shell of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -u, --uid UID user ID of the new account
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -U, --user-group create a group with the same name as the user
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> -Z, --selinux-user SEUSER use a specific SEUSER &lt;span class="k">for&lt;/span> the SELinux user mapping
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> --extrausers Use the extra users database
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　使用useradd创建新用户，创建家目录，指定用户id和组id，以及默认的shell，并将其添加到sudo组。需要保证组id在useradd之前已经创建。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">groupadd -g &lt;span class="m">1000&lt;/span> dev &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> useradd -ms /bin/bash -u &lt;span class="m">1000&lt;/span> -g &lt;span class="m">1000&lt;/span> -G sudo &lt;span class="si">${&lt;/span>&lt;span class="nv">username&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p>
+&lt;p>　　添加到sudo组：&lt;/p>
+&lt;p>　　用 usermod 命令可以将现有用户添加到附加组，例如：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo usermod -aG sudo &lt;span class="si">${&lt;/span>&lt;span class="nv">user&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">-a 选项表示追加（append），即将用户添加到指定组而不从现有组中移除。
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo usermod -aG docker &lt;span class="nv">$USER&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">将当前用户添加到docker组
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　删除用户以及其用户目录&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">userdel&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="n">username&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="脚本">脚本
+&lt;/h2>&lt;p>　　使用方法：先按照下面的脚本建立 xstartup、vnc_run.sh、addUser.sh 并放在通用路径。然后运行 &lt;code>./addUser.sh username&lt;/code>​&lt;/p>
+&lt;p>　　脚本：/home/vnc_example/xstartup，避免使用ubuntu自带的gnome，目前的版本中出现锁屏无法输入密码的问题。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/sh
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">XKL_XMODMAP_DISABLE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_CURRENT_DESKTOP&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;GNOME-Flashback:GNOME&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">XDG_MENU_PREFIX&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;gnome-flashback-&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 服务器物理显示器会默认使用显示端口 5901，需要确保 VNC端口以及配置 不与现有的 GNOME 会话发生冲突。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> SESSION_MANAGER
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">unset&lt;/span> DBUS_SESSION_BUS_ADDRESS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gnome-session --session&lt;span class="o">=&lt;/span>gnome-flashback-metacity --disable-acceleration-check
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　脚本：/home/vnc_run.sh&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#! /bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>vncserver -geometry 1920x1080 :2 -localhost no &lt;span class="c1"># :1 reserved for local connection offline.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　脚本：&lt;code>addUser.sh&lt;/code>​，创建新用户，并为其分配home空间、vnc设置（需要手动更改端口号）。创建过程中会使用上面提到的两个脚本。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">set&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="err">#&lt;/span> &lt;span class="err">若有命令出错，立即退出&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># set -x # 调试模式
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 检查是否输入了用户名
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="p">[&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">z&lt;/span> &lt;span class="s">&amp;#34;$1&amp;#34;&lt;/span> &lt;span class="p">];&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mError: Please provide a username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 获取用户名
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">username&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="err">$&lt;/span>&lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 创建用户并将其添加到 docker 组
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">useradd&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">ms&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">bin&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">bash&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">G&lt;/span> &lt;span class="n">docker&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mUser $username added successfully and added to docker group.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mFailed to add user $username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 设置用户密码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[33mPlease set the password for the new user: $username&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">passwd&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 确保 .vnc 目录存在
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">sudo&lt;/span> &lt;span class="n">mkdir&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">p&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 复制 VNC 脚本
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">cp&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">vnc_run&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sh&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">vnc_run&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">sh&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mvnc.sh copied successfully to /home/$username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mFailed to copy vnc.sh to /home/$username.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 复制 xstartup 配置文件
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">cp&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">vnc_example&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">xstartup&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">xstartup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chmod&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">home&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">vnc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">xstartup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mxstartup copied successfully to /home/$username/.vnc.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mFailed to copy xstartup to /home/$username/.vnc.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span> &lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 在 ~/.profile 文件中添加自动启动 VNC 的命令
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">vnc_run_script&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/home/$username/vnc_run.sh&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">profile_file&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;/home/$username/.profile&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="o">!&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">grep&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">q&lt;/span> &lt;span class="s">&amp;#34;$vnc_run_script&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;$profile_file&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="s">&amp;#34;$vnc_run_script&amp;#34;&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">sudo&lt;/span> &lt;span class="n">tee&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">a&lt;/span> &lt;span class="s">&amp;#34;$profile_file&amp;#34;&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">/&lt;/span>&lt;span class="n">dev&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">null&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sudo&lt;/span> &lt;span class="n">chown&lt;/span> &lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span>&lt;span class="o">:&lt;/span>&lt;span class="s">&amp;#34;$username&amp;#34;&lt;/span> &lt;span class="s">&amp;#34;$profile_file&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mAdded VNC auto-start to $username&amp;#39;s .profile.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[33mVNC auto-start script already exists in $username&amp;#39;s .profile.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 输出提示修改 VNC 端口
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[31mPlease modify the VNC port manually for user $username in $vnc_run_script if needed.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp"># 添加成功创建用户的提示
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="n">echo&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">e&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[32mAdd user $username in this server successfully.&lt;/span>&lt;span class="se">\033&lt;/span>&lt;span class="s">[0m&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　‍&lt;/p></description></item><item><title>Linux（Manjaro）宿主机通过virtualBox虚拟机win11连接vpn访问内网</title><link>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</link><pubDate>Thu, 12 Oct 2023 11:12:24 +0800</pubDate><guid>https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/</guid><description>&lt;p>　　参考链接：&lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a>、&lt;a class="link" href="https://blog.zenggyu.com/posts/zh/2022-05-04-%E5%9C%A8%E5%AE%BF%E4%B8%BB%E6%9C%BA%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84vpn%E8%BF%9E%E6%8E%A5/#%E4%B8%BA%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%B7%BB%E5%8A%A0%E7%94%A8%E4%BA%8E%E5%9F%BA%E6%9C%AC%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84%E7%BD%91%E5%8D%A1" target="_blank" rel="noopener"
+>在宿主机中使用虚拟机的VPN连接&lt;/a>&lt;/p>
+&lt;p>　　整体思想是：&lt;/p>
+&lt;p>　　建立一张单独的host-only网卡，使得虚拟机和宿主机之间可以通信，利用windows的网络分享功能，将VPN的网卡的网络分享到这张host-only网卡。那么访问这张host-only网卡，就可以访问到VPN的网络。而host-only网卡可以被主机访问到。因此，就是实现了主机通过虚拟机的VPN进行访问的功能。但虚拟机仍然需要一张可以直接上网的网卡。因为虚拟机需要正常和外界通信，因此主机需要为虚拟机创建两张独立的网卡。&lt;/p>
+&lt;p>　　注意：本文的应用场景是在非校园网环境，Linux系统通过虚拟机的VPN来访问校园网资源，在上述参考链接中，其中一个虚拟机使用的是桥接网卡上网，另一个使用的是网络地址转换NAT上网。&lt;/p>
+&lt;p>　　根据我的测试，校园网环境可能会阻止桥接模式下虚拟机获取 ipv4 地址，我们学校最开始允许宿舍有线网络上网，这时还可以通过桥接模式获取到ipv4的地址。后面禁止了有线网络，现在我的虚拟机桥接模式在校园网环境中就获取不到ipv4地址了。于是我在校园网中只能使用NAT模式上网。&lt;/p>
+&lt;p>　　但在公司时，虚拟机使用NAT上网并在开启VPN后，整个虚拟机将无法访问网络。这应该跟网络地址转换NAT有关，因为使用该方法，虚拟机获取的ip地址是10.0.2.16，可能跟VPN代理的10.0.0.0网段有冲突。导致最后虚拟机无法正常上网。&lt;/p>
+&lt;p>　　解决方案就是：在学校校园网用虚拟机NAT上网，在校园网以外的地方，用桥接网卡的方式上网。&lt;/p>
+&lt;p>　　为了方便，我创建了三张网卡：NAT、host-only、桥接。便于在NAT和host-only之间切换。&lt;/p>
+&lt;h2 id="虚拟机添加host-only网络">虚拟机添加host-only网络
+&lt;/h2>&lt;h3 id="virtaulbox建立host-only网卡">virtaulBox建立host-only网卡
+&lt;/h3>&lt;p>　　选中工具-&amp;gt;网络，然后建立一个host-only网络&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111516-d29y5m4.png"
+width="835"
+height="443"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="188"
+data-flex-basis="452px"
+>​&lt;/p>
+&lt;p>　　点击DHCP服务器，启动服务器，也可以不使用DHCP。区别在与在后续Linux宿主机添加路由节点时，DHCP分配到的网址可能不唯一，每次都需要重新查看。而使用默认地址，则固定为192.168.137.1。&lt;/p>
+&lt;p>　　这里需要注意，&lt;code>VirtualBox &amp;gt;= 6.1.28 &lt;/code>​的版本上，默认指定的网段是192.168.56.0/24，无法更改为其他网段。因此不能够像这篇文章 &lt;a class="link" href="https://www.freebuf.com/sectool/234695.html" target="_blank" rel="noopener"
+>宿主机利用在虚拟机中建立的VPN加密隧道连接内网&lt;/a> 中提到的，修改VirtualBox的网段。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.2，因为windows11在网络共享时默认指定的网络地址192.168.137.1，需要两者在同一网段内。可以在后续少修改一次网络地址。&lt;/p>&lt;/blockquote>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111702-el6bvrq.png"
+width="879"
+height="1016"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="86"
+data-flex-basis="207px"
+>​&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012111721-nfmelkb.png"
+width="836"
+height="973"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="85"
+data-flex-basis="206px"
+>​&lt;/p>
+&lt;p>　　添加完后，可以在Linux宿主机中查看&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ip addr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012154705-gpygtv4.png"
+width="842"
+height="326"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="258"
+data-flex-basis="619px"
+>​&lt;/p>
+&lt;h3 id="为虚拟机添加host-only的网卡并设置共享vpn网络">为虚拟机添加host-only的网卡并设置共享VPN网络
+&lt;/h3>&lt;p>　　在虚拟机对应的设置中，增加一个网卡，连接方式选择 &lt;code>仅主机（Host-Only）网络&lt;/code>​。但需要先关闭虚拟机，否则无法进行更改，就像我这里一样，没有关闭虚拟机，按钮是灰色的。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151700-y3wbm32.png"
+width="790"
+height="567"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="139"
+data-flex-basis="334px"
+>​​&lt;/p>
+&lt;p>　　添加完成后，记住这里的MAC地址结尾E124，后续识别网卡的时候会用。打开虚拟机，进入设置-&amp;gt;网络和Internet-&amp;gt;高级网络设置-&amp;gt;更多网络适配器选项。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012150818-7du5bqc.png"
+width="1267"
+height="1126"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="112"
+data-flex-basis="270px"
+>​&lt;/p>
+&lt;p>　　这里的三个网卡，其中一个是深信服的Sanfor的网卡，也就是我这里的vpn软件使用的网卡。以太网是NAT网络的网卡，以太网2是host-only网卡。&lt;/p>
+&lt;p>　　可以在win11中的终端中输入命令&lt;code>Get-NetAdapter&lt;/code>​查看，前面添加网卡的时候提到，E124结尾的是Host-Only，所以这里就可以区分出哪一些是VPN的网卡，哪一些是virtualbox创建的网卡。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012151602-ym2qt1z.png"
+width="1105"
+height="176"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="627"
+data-flex-basis="1506px"
+>​&lt;/p>
+&lt;p>　　然后开启VPN，转到网络适配器界面。右键VPN对应的网卡，选择 属性-&amp;gt;共享，然后选择Host-Only网卡。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152132-xydjf1p.png"
+width="1038"
+height="604"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="171"
+data-flex-basis="412px"
+>​&lt;/p>
+&lt;p>　　这里win10以前的系统可能弹出提示窗，说会前往设置以太网2的IP为192.168.137.1，我是安装的win11，没有弹窗，默认更改。因此，我们需要手动将Host-Only网卡的IP修改回原来的设定好的地址。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.2，因为windows11在网络共享时默认指定的网络地址是192.168.137.1，两者需要在同一网段内不能冲突。这里就不需要更改。&lt;/p>&lt;/blockquote>
+&lt;p>　　右键Host-Only网卡，选择属性，Internet 协议版本 4，然后双击，就会弹出修改IP的弹窗。&lt;/p>
+&lt;p>​​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012152540-j4c3j0u.png"
+width="1322"
+height="840"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>​​&lt;/p>
+&lt;p>　　如果前面开启了DHCP，则可以点自动获取IP，否则需要手动改动IP为Host-Only网络段中与前面设置不同的IP地址。比如前面已经使用了 192.168.56.1 和 192.168.56.2，则就现在就需要设置为192.168.56.3。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012160633-csbnpcr.png"
+width="412"
+height="560"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="73"
+data-flex-basis="176px"
+>​&lt;/p>
+&lt;p>　　设置完成后，回到host。&lt;/p>
+&lt;h3 id="连通性测试">连通性测试
+&lt;/h3>&lt;p>　　设置完成后，在host的终端中，应该可以ping通虚拟机中的host网卡的地址&lt;br>
+​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153053-5ij923e.png"
+width="510"
+height="213"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="239"
+data-flex-basis="574px"
+>​&lt;/p>
+&lt;p>　　如果ping不通，显示无法到达，很可能是win11的防火墙没有开启报文回复功能。&lt;/p>
+&lt;p>　　参考：&lt;a class="link" href="https://www.zhihu.com/question/37301003?utm_id=0" target="_blank" rel="noopener"
+>知乎回答&lt;/a>，在设置中按照 隐私安全性 -&amp;gt; Windows安全中心 -&amp;gt; 防火墙和网络保护，打开防火墙设置&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153330-1j6cctx.png"
+width="1425"
+height="996"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="143"
+data-flex-basis="343px"
+>​&lt;/p>
+&lt;p>　　然后打开高级设置，将入站和出站的&lt;code>ICMPv4回显请求&lt;/code>​功能打开。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153548-0dwqzv1.png"
+width="1474"
+height="928"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="158"
+data-flex-basis="381px"
+>​&lt;/p>
+&lt;h2 id="宿主机设置路由">宿主机设置路由
+&lt;/h2>&lt;h3 id="添加路由规则">添加路由规则
+&lt;/h3>&lt;p>　　我使用的manjaro，默认安装的是ip工具，先查看当前路由表&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153952-d3tfmfr.png"
+width="662"
+height="66"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1003"
+data-flex-basis="2407px"
+>​&lt;/p>
+&lt;p>　　可以看到192.168.56.0/24的网络段都会被路由到虚拟机win11的地址为192.168.56.1的网卡上去。但没有将VPN内网地址路由到虚拟机的表项。&lt;/p>
+&lt;p>　　因此需要添加路由规则，将VPN访问的网段路由到192.168.56.3，也就是之前在虚拟机中的host-only网卡中修改的地址。vboxnet0就是之前添加网卡时，系统中显示的网卡。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo ip route add 10.0.0.0/8 via 192.168.56.3 dev vboxnet0 metric &lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>　　我要访问的VPN网段为10.0.0.0/8，如有需要可以更改为自己的内网网段。&lt;code>metric 100&lt;/code>​设置路由优先级，避免在Linux宿主机开启其他网络代理时，优先代理该网络段。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：目前virtualbox &lt;code>7.1.2&lt;/code>​已经支持修改网段。我将该host-only网址指定为 192.168.137.1，因为这是windows11在网络共享时默认指定的网络地址。则这里路由添加表项就应当修改为&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ip route add 10.0.0.0/8 via 192.168.137.1 dev vboxnet0 metric &lt;span class="m">100&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/blockquote>
+&lt;p>　　添加完成后再次查看&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012153914-35e5clx.png"
+width="656"
+height="111"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="590"
+data-flex-basis="1418px"
+>​&lt;/p>
+&lt;p>　　此时 PING 自己的内网网段，就可以ping通。如果这里发现，ping不通，则需要在win11中重新将VPN的网卡分享到host-only网卡，然后修改host-only网卡（或者是VPN不会转发ICMP消息，可以直接打开对应VPN内网资源看看是否成功）。下一次开机时，需要先取消共享网络，再重新共享，否则也会出现没有回复的情况。（&lt;strong>即每次开虚拟机并开启VPN后，都需要重新共享网络&lt;/strong>）&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155146-grfnylf.png"
+width="583"
+height="169"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="344"
+data-flex-basis="827px"
+>​&lt;/p>
+&lt;p>　　设置完成后，如果重启虚拟机，需要重新分享网络，然后再更改ip。​​&lt;/p>
+&lt;p>　　目前还没有添加永久路由的方法，每次Linux宿主机重启后，都需要重新添加路由。&lt;/p>
+&lt;h2 id="在主机中访问对应网段">在主机中访问对应网段
+&lt;/h2>&lt;p>　　当可以ping通时，就能够在主机中正常访问了。实测ssh到内网网段服务器也是可以的。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linuxmanjaro%E5%AE%BF%E4%B8%BB%E6%9C%BA%E9%80%9A%E8%BF%87virtualbox%E8%99%9A%E6%8B%9F%E6%9C%BAwin11%E8%BF%9E%E6%8E%A5vpn%E8%AE%BF%E9%97%AE%E5%86%85%E7%BD%91/assets/image-20231012155540-3e0311o.png"
+width="710"
+height="351"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="485px"
+>​&lt;/p>
+&lt;p>　　且不会和主机中的vpn冲突。我的主机使用的是v2ray进行科学上网，实测对本文中的行为没有影响，如果使用其他方式，不能保证。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>2024.10.21补充&lt;/strong>：
+在 v2ray 不能很好的解决DNS泄漏，以及代理节点转向clash verge后，换用clash verge作为代理软件。在Linux上，Clash需要开启TUN模式，会接管DNS系统。我们学校的一些内网域名需要向VPN软件设立的DNS服务器（198.18.0.1）查询ip地址，而TUN模式的DNS查询不会自动转发到我们自己设立的虚拟机的网路中，因此导致这类网址只能在虚拟机中访问。&lt;/p>
+&lt;p>尝试过在clash中配置单独的域名解析地位，将这类域名DNS解析服务器指定为&lt;code>198.18.0.1&lt;/code>​，并将clash的fake ip域名范围修改为&lt;code>198.19.0.1/16&lt;/code>​（默认为&lt;code>198.18.0.1/16&lt;/code>​，和VPN的网段冲突）。但目前的clash verge版本中，配置&lt;code>nameserver-policy:&lt;/code>​不生效，因此，此方案还没有结果。&lt;/p>
+&lt;p>目前没有其他解决方式，但这种情况不需要在Linux宿主机上解决，直接在虚拟机上访问即可。本文的初衷是在Linux中的终端访问服务器，或者vscode连接服务器工作，因此只需要能够正常通过ip连接内网服务器即可。&lt;/p>
+&lt;p>&lt;strong>2024.11.4补充&lt;/strong>：
+本文只能代理 &lt;code>10.0.0.0/8&lt;/code>​ 的网段，如果希望通过访问内网域名的形式访问内网资源，则还应当配置 DNS 服务器。
+　　‍&lt;/p>&lt;/blockquote></description></item><item><title>Ryzen随机卡死问题</title><link>https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/</link><pubDate>Sun, 08 Oct 2023 22:49:25 +0800</pubDate><guid>https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/</guid><description>&lt;p>现象：浏览网页，编写文字等正常工作时，会突然卡死，屏幕显示内容不动，鼠标无法移动，键盘没有反应（按下大小写键，大写提示灯不会改变）。且完全随机 ，跟打开软件没有关系。经过一年多的使用，的确是AMD CPU的问题。因此尝试下面这个方案：&lt;a class="link" href="https://mrswolf.github.io/my-manjaro-log/#Ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98" target="_blank" rel="noopener"
+>Ryzen随机卡死问题&lt;/a>、&lt;a class="link" href="https://github.com/jfredrickson/disable-c6" target="_blank" rel="noopener"
+>解决方案原git仓库&lt;/a>&lt;/p>
+&lt;p>原博主内容截图：&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231008162752-i4kjf46.png"
+width="1148"
+height="567"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="202"
+data-flex-basis="485px"
+>​&lt;/p>
+&lt;p>根据其中的描述&lt;/p>
+&lt;p>先安装守护进程服务软件&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -S disable-c6-systemd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo modprobe msr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>编辑/etc/modules-load.d/modules.conf，添加msr这一行，以便在启动时加载msr模块：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">msr
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>最后，启动如下service，完成上述操作完成后，推荐重启电脑后才能启动。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo systemctl &lt;span class="nb">enable&lt;/span> disable-c6.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl start disable-c6.service
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果报错，就在重启后重新安装一下，再开service。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231008162943-651uf71.png"
+width="553"
+height="37"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="1494"
+data-flex-basis="3587px"
+>​&lt;/p>
+&lt;p>另，根据在Manjaro中的讨论，有人在Archlinux的wiki中也找到了同样的问题描述，称之为 &lt;a class="link" href="https://wiki.archlinux.org/title/Ryzen" target="_blank" rel="noopener"
+>Soft lock freezing&lt;/a> 。根据其解决方案的描述，提供了四种方案：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>关闭rcu。考虑到需要编译内核，比较麻烦，大多数情况下不会尝试。&lt;/p>
+&lt;p>当&lt;code>Kernel &amp;gt;= 4.10.0&lt;/code>​，编译内核时，追加参数&lt;code>CONFIG_RCU_NOCB_CPU&lt;/code>​进行编译。将&lt;code>echo rcu_nocbs=0-$(($(nproc)-1))&lt;/code>​的结果，添加到grub的&lt;code>GRUB_CMDLINE_LINUX&lt;/code>​中。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>关闭c6 state&lt;/p>
+&lt;p>kernel参数追加&lt;code>processor.max_cstate=5&lt;/code>​：在grub的&lt;code>GRUB_CMDLINE_LINUX&lt;/code>​中添加&lt;code>processor.max_cstate=5processor.max_cstate=5&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo nano /etc/default/grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;img src="https://codetang-2417.github.io/p/ryzen%E9%9A%8F%E6%9C%BA%E5%8D%A1%E6%AD%BB%E9%97%AE%E9%A2%98/assets/image-20231009094631-98vuju1.png"
+width="533"
+height="170"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="313"
+data-flex-basis="752px"
+>​&lt;/p>
+&lt;p>保存后，还要运行&lt;code>sudo update-grub&lt;/code>​以更新grub。&lt;/p>
+&lt;p>但这个方法有可能不能正确关闭c6状态，此时就需要本文提到的方法，使用&lt;code>disable-c6-systemd&lt;/code>​进行关闭。该方法在我的电脑上不可行的，因此我通过&lt;code>disable-c6-systemd&lt;/code>​进行关闭。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>某一些笔记本中（例如HP Envy x360 15-bq100na），可能存在CPU软件锁定的问题，通过在kernel中追加参数&lt;code>idle=nomwait&lt;/code>​，可以避免。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>kernel参数追加&lt;code>pci=nomsi&lt;/code>​，这个办法我尝试过，但不起作用，仍然会冻结。尝试：&lt;code>acpi_osi=Linux&lt;/code>​加入的到kernel参数或许有用(我增加这个参数后，仍然会死机，但相较于之前概率小很多)。&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;p>补充：这个问题所有的AMD的Ryzen处理器都会遇到！根据 &lt;a class="link" href="https://bugzilla.kernel.org/show_bug.cgi?id=196683" target="_blank" rel="noopener"
+>Bug 196683 - Random Soft Lockup on new Ryzen build&lt;/a> 这个帖子中的讨论，从2017年就开始存在，一直到现在都没有修复，我使用的是 R7 5800H，甚至在windows下，都有一定概率发生。因此，AMD真的不能yes，下一台笔记本还是intel算了。AMD虽然整体性能已经追上来了，但仍然有一些小问题，虽然不致命，但很让人心烦。&lt;/p>
+&lt;p>2023/10/13 更新&lt;br>
+最近的卡死概率降低了很多，但是在半夜仍然会卡死，看来通过软件在开机启动的时候关闭C6不能完全解决这个问题。&lt;/p>
+&lt;p>又通过一些搜索，找到了下面的文章：&lt;a class="link" href="https://cloud-atlas.readthedocs.io/zh_CN/latest/kernel/cpu/amd/amd_cpu_c-state.html" target="_blank" rel="noopener"
+>ADM Ryzon处理器随机”冻结”问题&lt;/a>、&lt;a class="link" href="https://gist.github.com/dlqqq/876d74d030f80dc899fc58a244b72df0" target="_blank" rel="noopener"
+>AMD Ryzen CPU 随机“冻结”&lt;/a>、&lt;a class="link" href="https://blog.udn.com/wldtw2008/118678592" target="_blank" rel="noopener"
+>AMD Ryzen 2700X + CentOS7 隨機鎖死問題&lt;/a>&lt;/p>
+&lt;p>根据其中的各种描述，解决方法如下：&lt;/p>
+&lt;ol>
+&lt;li>如果你的BIOS支持关闭CPU电源管理，则需要在BIOS中关闭。&lt;/li>
+&lt;li>在内核参数中增加​&lt;code>idle=nomwait&lt;/code>​&lt;/li>
+&lt;li>在内核参数中增加​&lt;code>processor.max_cstate=1 intel_idle.max_cstate=0&lt;/code>​&lt;/li>
+&lt;li>内核参数更新后，需要手动执行&lt;code>sudo update-grub&lt;/code>​以更新配置&lt;/li>
+&lt;/ol>
+&lt;p>通过下列命令查看&lt;code>max_cstate&lt;/code>​，没有更改之前其值为9。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat /sys/module/intel_idle/parameters/max_cstate
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过&lt;code>cat /proc/cmdline&lt;/code>​可以查看内核启动参数。&lt;/p>
+&lt;p>最后，我有一个不算办法的办法：启动 linux 后启动 virtualbox 虚拟机，运行 windows。这样的话，virtualbox 一直运行，能够保证不处于低功耗状态，且因为 Linux 现在并不支持微信，日常使用还是需要安装 windows 的虚拟机，因此这也算是一个卡死问题的解决方案。&lt;/p>
+&lt;p>2024/9/16 更新&lt;br>&lt;/p>
+&lt;p>Linux现在是6.1内核，更新几次内核以后现在已经不存在卡死的问题了，即便是低功耗运行。&lt;/p>
+&lt;p>但是，windows 11更新以后却开始了。。。也是低功耗运行时卡死，或者重启。为了玩黑神话我重装了系统，坏消息是重装系统没用；好消息是，高负载下不会卡死，不会重启。&lt;/p></description></item><item><title>Linux中的SysRq魔术键</title><link>https://codetang-2417.github.io/p/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/</link><pubDate>Sat, 07 Oct 2023 11:12:13 +0800</pubDate><guid>https://codetang-2417.github.io/p/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/</guid><description>&lt;p>当系统死机，没有响应（freezes），需要重启时，大多数人使用的方法是长按电源按钮进行硬关机，这样会导致系统数据丢失，严重情况下甚至会损坏系统。但在linux内核中，有一个特殊的按键：SysRq（&lt;strong>Sys&lt;/strong> tem &lt;strong>R&lt;/strong> e &lt;strong>q&lt;/strong> uest key）。如果激活SysRq键，就可以输入一些特殊的系统操作命令，用于在系统崩溃时进行一些操作（同步数据、杀进程、卸载文件系统，甚至系统重启）。可以安全的重启系统。&lt;/p>
+&lt;p>参考：&lt;a class="link" href="https://rqsir.github.io/2019/05/02/linux%E4%B8%AD%E7%9A%84SysRq%E9%AD%94%E6%9C%AF%E9%94%AE/" target="_blank" rel="noopener"
+>linux 中的 SysRq 魔术键&lt;/a>&lt;/p>
+&lt;h2 id="sysrq-键">&lt;a class="link" href="https://en.wikipedia.org/wiki/Magic_SysRq_key" target="_blank" rel="noopener"
+>SysRq&lt;/a> 键
+&lt;/h2>&lt;p>在 QWERT 的全尺寸键盘上与 &lt;code>PrtSc&lt;/code>​ 同键，并且会在按键上标注有SysRq。使用&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​激活&lt;code>SysRq&lt;/code>​。&lt;/p>
+&lt;p>在一些笔记本上虽然没有标注，但可以通过&lt;code>Fn&lt;/code>​+&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​组合键的方式激活SysRq按键。&lt;/p>
+&lt;p>如果上面的组合都不起作用，则可以尝试下面几种：&lt;/p>
+&lt;ul>
+&lt;li>​&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​&lt;/li>
+&lt;li>​&lt;code>Alt Gr&lt;/code>​+&lt;code>PrtSc&lt;/code>​&lt;/li>
+&lt;li>​&lt;code>Ctrl&lt;/code>​+&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​&lt;/li>
+&lt;/ul>
+&lt;p>注意，激活&lt;code>SysRq&lt;/code>​后，需要保持&lt;code>Alt&lt;/code>​按键按下，并松开&lt;code>SysRq&lt;/code>​或​&lt;code>PrtSc&lt;/code>​&lt;/p>
+&lt;p>&lt;strong>请阅读完后续内容再尝试，并在尝试之前保存所有工作内容！&lt;/strong>&lt;/p>
+&lt;h2 id="reisub">REISUB
+&lt;/h2>&lt;p>参考：&lt;a class="link" href="https://forum.manjaro.org/t/howto-reboot-turn-off-your-frozen-computer-reisub-reisuo/3855/104?page=2" target="_blank" rel="noopener"
+>[HowTo] reboot / turn off your frozen computer: REISUB/REISUO&lt;/a>&lt;/p>
+&lt;p>&lt;strong>REISUB&lt;/strong>是 &lt;strong>R&lt;/strong> eboot &lt;strong>E&lt;/strong> ven &lt;strong>I&lt;/strong> f &lt;strong>S&lt;/strong> ystem &lt;strong>U&lt;/strong> tterly &lt;strong>B&lt;/strong> roken 的SysRq命令的助记符。表示 &lt;strong>即使系统完全崩溃也能重启&lt;/strong>。&lt;/p>
+&lt;p>激活SysRq按键后，在键盘上按下如下按键，就可以优雅的重启系统：&lt;/p>
+&lt;ul>
+&lt;li>Switch the keyboard from &lt;strong>R&lt;/strong> aw mode, used by programs such as &lt;a class="link" href="https://en.wikipedia.org/wiki/X11" target="_blank" rel="noopener"
+>X11 &lt;/a>​&lt;a class="link" href="https://en.wikipedia.org/wiki/X11" target="_blank" rel="noopener"
+>&lt;strong>112&lt;/strong>&lt;/a> and &lt;a class="link" href="https://en.wikipedia.org/wiki/SVGALib" target="_blank" rel="noopener"
+>SVGALib &lt;/a>​&lt;a class="link" href="https://en.wikipedia.org/wiki/SVGALib" target="_blank" rel="noopener"
+>&lt;strong>25&lt;/strong>&lt;/a>, to XLATE (translate) mode&lt;/li>
+&lt;li>Send an &lt;strong>E&lt;/strong> nd signal (SIGTERM) to all processes, except the boot process, allowing all processes to end gracefully&lt;/li>
+&lt;li>Send an &lt;strong>I&lt;/strong> nstant kill (SIGKILL) to all processes, except the boot process, &lt;a class="link" href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg" target="_blank" rel="noopener"
+>&lt;em>forcing&lt;/em>&lt;/a>​&lt;a class="link" href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg" target="_blank" rel="noopener"
+> all processes to end &lt;/a>​&lt;a class="link" href="https://archived.forum.manjaro.org/uploads/short-url/cnLk0cUdRVTCXdbIvFEXpWqbpBb.jpeg" target="_blank" rel="noopener"
+>&lt;strong>43&lt;/strong>&lt;/a> .&lt;/li>
+&lt;li>&lt;strong>S&lt;/strong> ync all mounted filesystems, allowing them to write all data to disk.&lt;/li>
+&lt;li>&lt;strong>U&lt;/strong> nmount and remount all mounted filesystems in &lt;a class="link" href="https://en.wikipedia.org/wiki/File_system_permissions" target="_blank" rel="noopener"
+>read-only &lt;/a>​&lt;a class="link" href="https://en.wikipedia.org/wiki/File_system_permissions" target="_blank" rel="noopener"
+>&lt;strong>8&lt;/strong>&lt;/a> mode.&lt;/li>
+&lt;li>Re &lt;strong>B&lt;/strong> oot the system&lt;/li>
+&lt;/ul>
+&lt;p>下面是上述英文的中文解释&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">R - 把键盘设置为 ASCII 模式 &lt;span class="o">(&lt;/span>用于接收后面键盘输入&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Keyboard mode &lt;span class="nb">set&lt;/span> to XLATE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">E - 向除 init 以外所有进程发送 SIGTERM 信号 &lt;span class="o">(&lt;/span>让进程自己正常退出&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Terminate All Tasks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">I - 向除 init 以外所有进程发送 SIGKILL 信号 &lt;span class="o">(&lt;/span>强制结束进程&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Kill All Tasks
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">S - 磁盘缓冲区同步
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq : Emergency Sync
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">U - 重新挂载为只读模式
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq : Emergency Remount R/O
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">B - 立即重启系统
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SysRq: Resetting
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>由于系统环境与后台进程个数的不确定性，每一步按键操作执行完成所费时间无法确定。为保险起见，一般采用 &lt;strong>R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键&lt;/strong>。&lt;/p>
+&lt;h2 id="用法">用法
+&lt;/h2>&lt;p>如果按照上述方法，并没有左右，则可能是&lt;code>SysRq&lt;/code>​功能没有启用。&lt;/p>
+&lt;h3 id="启用-sysrq-功能">启用 SysRq 功能
+&lt;/h3>&lt;p>首先检查 &lt;code>SysRq&lt;/code>​ 是否开启&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat /proc/sys/kernel/sysrq
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>若输出为 0，则还未开启。&lt;/p>
+&lt;p>在manjaro中，通过向grub写入配置命令启用Linux的SysRq功能。&lt;/p>
+&lt;p>向文件&lt;code>/etc/default/grub&lt;/code>​中的&lt;code>GRUB_CMDLINE_LINUX_DEFAULT&lt;/code>​参数添加： &lt;code>sysrq_always_enabled=1&lt;/code>​&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo nano /etc/default/grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>更改完后记得&lt;code>ctrl&lt;/code>​+&lt;code>O&lt;/code>​保存文件。&lt;/p>
+&lt;p>​&lt;img src="https://codetang-2417.github.io/p/linux%E4%B8%AD%E7%9A%84sysrq%E9%AD%94%E6%9C%AF%E9%94%AE/assets/image-20231007105854-9gz3bv9.png"
+width="972"
+height="292"
+loading="lazy"
+alt="image"
+class="gallery-image"
+data-flex-grow="332"
+data-flex-basis="798px"
+>​&lt;/p>
+&lt;p>然后执行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo update-grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>更新grub。最后重启系统。&lt;/p>
+&lt;h3 id="实际使用过程">实际使用过程
+&lt;/h3>&lt;p>先激活&lt;code>SysRq&lt;/code>​按键，全键盘：&lt;code>Alt&lt;/code>​+&lt;code>SysRq&lt;/code>​，笔记本：&lt;code>Fn&lt;/code>​+&lt;code>Alt&lt;/code>​+&lt;code>PrtSc&lt;/code>​。激活后保持&lt;code>Alt&lt;/code>​按键按下，松开&lt;code>PrtSc&lt;/code>​或者&lt;code>SysRq&lt;/code>​。&lt;/p>
+&lt;p>根据电脑的性能不同，激活时间不一样。新硬件可能在1秒，旧的硬件可能在6秒。&lt;/p>
+&lt;p>激活后，在键盘上按照R E I S U B的顺序，就可以安全的重启系统，需要注意根据上述介绍，一般采用 &lt;strong>R – 1 秒 – E – 30 秒 – I – 10 秒 – S – 5 秒 – U – 5 秒 – B，而不是一气呵成地按下这六个键&lt;/strong>。&lt;/p>
+&lt;p>‍&lt;/p></description></item></channel></rss>
